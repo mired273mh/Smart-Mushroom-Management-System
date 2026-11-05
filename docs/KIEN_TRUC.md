@@ -20,19 +20,32 @@ Express tách config, DB/migration, auth, routes và dịch vụ nghiệp vụ. 
 erDiagram
   users ||--o{ sessions : authenticates
   users ||--o{ rentals : owns
+  users ||--o{ rentals : created_by
   rooms ||--o{ trays : contains
   rental_plans ||--o{ rentals : prices
   rentals ||--|{ rental_items : includes
   trays ||--o{ rental_items : histories
   rental_items ||--o{ growth_events : progresses
+  users ||--o{ growth_events : created_by
   rental_items ||--o{ harvests : yields
+  users ||--o{ harvests : created_by
   harvests ||--o| fulfillment_requests : delivery
+  users ||--o{ fulfillment_requests : customer_id_guarded
   rentals ||--o{ transactions : ledger
+  users |o--o{ transactions : confirmed_by_nullable
   rooms ||--o{ devices : monitors
   devices ||--o{ sensor_readings : measures
   devices ||--o{ device_commands : receives
+  users ||--o{ device_commands : created_by
   rooms ||--o| room_thresholds : configures
   users ||--o{ notifications : receives
+  rental_items |o--o{ notifications : rental_item_nullable
+  sensor_readings |o--o{ notifications : reading_nullable
+  schema_migrations {
+    text filename PK
+    text checksum
+    timestamptz applied_at
+  }
 ```
 
 UUID PK, FK RESTRICT mặc định, `timestamptz`, CHECK cho trạng thái/phạm vi, unique email chuẩn hóa lowercase và code khay. Index theo device/time, user/time, rental/owner và partial unique thuê đang hoạt động. Migration nằm trong `server/migrations/`; tài liệu không thay thế schema thực thi.

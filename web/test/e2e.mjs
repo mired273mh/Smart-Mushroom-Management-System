@@ -146,6 +146,9 @@ try {
   await page.getByLabel('Chọn phòng giám sát').selectOption(roomId);
   await page.getByRole('table',{ name:'Lịch sử cảm biến' }).getByRole('cell',{ name:'850',exact:true }).first().waitFor();
   await nav('Báo cáo');
+  const environmentReport=page.getByRole('table',{name:'Báo cáo môi trường 24 giờ'});
+  await environmentReport.getByRole('row').filter({hasText:roomName}).waitFor();
+  assert.deepEqual((await environmentReport.getByRole('row').filter({hasText:roomName}).getByRole('cell').allTextContents()).slice(-3),['2','1','1']);
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button',{ name:'Thu hoạch CSV ↓',exact:true }).click();
   const download = await downloadPromise;

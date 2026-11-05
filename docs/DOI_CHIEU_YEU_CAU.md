@@ -1,5 +1,7 @@
 # Truy vết yêu cầu — master checkpoint2026-11-05
 
+HQTCSDL: SQL objects/roles/9demo và Android/Docker runtime được cập nhật tại [kết quả test](KIEM_THU.md), [demo](demo-hqtcsdl/README.md), [phạm vi](PHAM_VI_HQTCSDL.md). Các khoảng trống cuối bảng là backlog; cycle không thuê OPTIONAL, retention RECOMMENDED, không tự coi bắt buộc. Yêu cầu phần mềm camera vẫn chưa có luồng thật nghiệm thu.
+
 Nguồn: DE_TAI_YEU_CAU, SRS, User Requirements; không coi JWT hay public admin registration là yêu cầu bắt buộc. Phiên opaque/RBAC và CLI bootstrap hiện có được giữ theo ADR003/004. Trạng thái **HOÀN THÀNH** bên dưới chỉ áp dụng phạm vi phần mềm đã có bằng chứng; hardware/production không suy ra từ API/simulator. Test log chi tiết ở KIEM_THU/TIEN_DO; bảng này không thay lịch sử FAIL.
 
 | ID | Chức năng | File triển khai chính | Trạng thái | Bằng chứng | Việc tiếp theo |

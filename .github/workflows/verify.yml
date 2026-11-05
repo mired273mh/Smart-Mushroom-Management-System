@@ -88,6 +88,8 @@ jobs:
       - run: docker compose up -d --wait --wait-timeout 120
       - run: docker compose exec -T -e ADMIN_EMAIL -e ADMIN_PASSWORD -e ADMIN_NAME api node server/src/cli.js admin
       - run: npm run test:deploy
+      - run: docker compose stop
+      - run: node scripts/test-deployment-runtime.mjs
       - if: failure()
         run: docker compose logs --no-color --tail 80
       - if: always()

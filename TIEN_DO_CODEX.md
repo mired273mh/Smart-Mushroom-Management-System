@@ -31,6 +31,20 @@
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
 
+### 2026-11-05 — HQ2 ĐÃ KIỂM THỬ:9demo PostgreSQL, runtime deployment và bảo vệ
+
+- HQ1 đã commit/push `8139aae29fe9cd35a5e2cdc350cf6d7b11735ea0` trên main, ls-remote trùng hash. Giữ package.json user. Không sửa tiếp migration004 đã lưu; các bổ sung sau là demo/tests/deployment/docs hoặc migration mới nếu cần.
+- Chuẩn bị docs/demo-hqtcsdl với SQL có thể chạy riêng, runner tạo DB sm_test_* mới và không drop/reset, kết quả thực EXPLAIN/COMMIT/ROLLBACK/concurrency/roles/backup/API/simulator. Không coi REST test là React/Android UI test. Thêm data dictionary/3NF/câu hỏi bảo vệ và hướng dẫn least-privilege Docker/demo upgrade có backup; kiểm tra CI commit HQ1.
+- NEXT_TASK: chạy9demo và sửa lỗi phát hiện; lưu bằng chứng/số liệu thật; sau đó runtime Docker profile và tích hợp Android khi môi trường hỗ trợ. Không thêm cycle không thuê/retention ngoài phạm vi đã phân loại.
+- HQ2 mid-checkpoint:9/9 demo **PASS** (`hq2-demo-run.log`, sau refactor/prepare/shared tools `hq2-demo-shared-tools.log`);50.000mẫu forcedSeq43.777ms/index0.031ms run đầu,108.019/0.058ms run sau, explain.json thật. Không dùng làm SLA. --prepare PASS nhưng không ghi PASS9demos; psql guard/vars/02SQL preparedlab exit0, NOTICE23514 expected.
+- Runtime Docker **PASS** project smhq1793891444822: real sm_runtime current_user, rolsuper=false/schemaCREATE=false/schema_migrationsSELECT=false, bootstrap/login/Nginx/assets/DB/logout PASS; stack riêng stop, giữ volume. Thêm CI deployment step chạy profile sau dừng smoke stack dev; chưa xác nhận CI batch mới.
+- Shared pg_dump/restore helper scripts/postgres-tools.mjs dùng trong verify-backup và demo upgrade. `demo.mjs upgrade` đã dump riêng→restore NEW sm_test_demo_upgrade→migrate rehearsal/counts→migrate demo3→4; giữ3users/0rentals và credentials/config. Lặp verify4 PASS. Native5432/DBdev/credentials/phần cứng không đổi. Start chặn schema cũ, tránh API healthy nhưng thiếu routine.
+- Docs mới THIET_KE_CSDL_HQTCSDL/9demo SQL/README/BAO_VE, cập nhật SRS/UR/DEMO_WINDOWS/database guide. CI HQ1 `8139aae`/run42049829318 confirmed3jobs success. Đang chạy Android UI regression trên AVD riêng5558, không đụng AVD user/thiết bị thật; tiếp theo Git checkpoint và CI mới.
+- Android diagnostic lần đầu **BLOCKED/timeout**35s boot: Windows còn503532KiB free, own qemu17172 gần5GiB dù guest2048MB/Swiftshader, chưa chạy test app. Đã kiểm tra launcher/parent/executable path trong SDK rồi chỉ dừng own AVD; retry hostGPU/1536MB, không wipe/sửa AVD/WSL/Docker hay tắt process user. Chưa ghi AndroidHQ2PASS.
+- Android retry **PASS**: hostGPU/1536MB boot_completed1, APK build/install +Customer UI→API→PostgreSQL1/1 test PASS, SQL completed rental/2items/linked/paid/delivered (`hq2-android-ui-retry.log`). Test AVD đã emu kill sau xác minh tênSmartMushroom_Test; giữ userdata, không đụng AVD user. Không phần cứng IoT thật.
+- Bổ sung React báo cáo nguồn mẫu: hiển thị simulated/hardware counts từ view và nhắc chưa nghiệm thu sensor; Chrome regression đọc2mẫu/1sim/1hardware fixture **PASS**, build+2tests/11groups PASS (`hq2-report-{build,e2e}.log`). ERD bổ sung các FK creator/optional notification và bảng schema_migrations, domain UML cardinality đã khớp từ trước, không render lại ảnh không đổi.
+- Native demo upgraded schema4 start→realChrome/3roles/RBAC/APIready/logout→stop/status **PASS** (`hq2-native-smoke.log`); giữ3users/0rentals, simulator thêm mẫu có nhãn. Toàn bộ wrapper/demo test chạy thật, không có hardware flash/relay/camera. Chuẩn bị staged scan/commit/push và theo dõi CI mới; NEXT_TASK danh sách catalog/trays pagination/search theo SUPPORTING, không làm optionalcycle/retention trước.
+
 ### 2026-11-05 — HQ1 ĐÃ KIỂM THỬ: toàn vẹn PostgreSQL và SQL nâng cao thực dụng
 
 - Bắt đầu HEAD37a9db6/main, fetch origin/main PASS ahead0/behind0; package.json user giữ nguyên. CI run42045054946/HEAD37a9db6 completed success đã truy vấn GitHub, không sửa lỗi CI lịch sử.

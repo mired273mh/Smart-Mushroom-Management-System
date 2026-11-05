@@ -2,6 +2,8 @@
 
 Nguồn bắt buộc: `DE_TAI_YEU_CAU.md`; các phương án triển khai nằm trong ADR. Không có mã nguồn/dữ liệu của dự án trước được nhập vào repository này.
 
+Bổ sung nghiệm thu HQTCSDL theo yêu cầu người dùng2026-11-05: [phân loại phạm vi](PHAM_VI_HQTCSDL.md), [3NF/data dictionary](THIET_KE_CSDL_HQTCSDL.md), [9demo SQL có bằng chứng](demo-hqtcsdl/README.md). SQL objects phải hỗ trợ nghiệp vụ thực, DB roles không thay RBAC API; không nhập OPTIONAL/RECOMMENDED thành yêu cầu nghiệp vụ gốc.
+
 ## Tác nhân và phạm vi
 
 - Administrator: tạo tài khoản nhân sự, quản trị người dùng, phòng, khay, gói giá, thiết bị, ngưỡng và báo cáo.

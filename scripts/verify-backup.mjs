@@ -1,25 +1,15 @@
-import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
-import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import assert from 'node:assert/strict';
 import { createPool } from '../server/src/db.js';
 import { setup } from '../server/test/helpers.js';
 import { restrictedRoles } from '../server/test/database-roles.js';
+import { runPg } from './postgres-tools.mjs';
 const ctx = await setup();
-const pgBin = process.env.PG_BIN ?? join(homedir(),'.sm-tools','pgsql','bin');
-const executable = name => join(pgBin,name+(process.platform === 'win32' ? '.exe' : ''));
 const url = new URL(ctx.pool.options.connectionString);
-const pgEnv = { ...process.env, PGHOST:url.hostname, PGPORT:url.port || '5432', PGUSER:decodeURIComponent(url.username), PGPASSWORD:decodeURIComponent(url.password), PGDATABASE:url.pathname.slice(1) };
-const run = async (name,args,env=pgEnv) => {
-  const child = spawn(executable(name),args,{env,windowsHide:true,stdio:['ignore','ignore','pipe']});
-  let errorOutput = '';
-  child.stderr.on('data',chunk => { errorOutput += chunk; });
-  const code = await new Promise((resolve,reject) => { child.once('error',reject); child.once('exit',resolve); });
-  if (code !== 0) throw new Error(`${name} failed: ${errorOutput}`);
-};
+const run=(name,args,options)=>runPg(url.href,name,args,options);
 let restored, restoredRoles;
 try {
   const user = await ctx.user('customer');
@@ -49,7 +39,7 @@ try {
   const management = new URL(url); management.pathname='/postgres';
   const pool = createPool(management.href);
   try { await pool.query(`CREATE DATABASE "${restoreName}"`); } finally { await pool.end(); }
-  await run('pg_restore',['--exit-on-error','--no-owner','--no-privileges','--dbname',restoreName,filename],{...pgEnv,PGDATABASE:restoreName});
+  await run('pg_restore',['--exit-on-error','--no-owner','--no-privileges','--dbname',restoreName,filename],{database:restoreName});
   const restoreUrl = new URL(url); restoreUrl.pathname='/'+restoreName;
   restored = createPool(restoreUrl.href);
   assert.equal((await restored.query('SELECT email FROM users WHERE id=$1',[user.id])).rows[0].email,user.email);

@@ -1,5 +1,9 @@
 # Owner, runtime và report PostgreSQL
 
+HQ2 đã chạy `node scripts/test-deployment-runtime.mjs` **PASS**: project/volume mới, provision roles/grants sau migrate, bootstrap, real sm_runtime (superuser/DDL/schema_migrations=false), Nginx/auth/query/logout. Chỉ stop stack thử nghiệm, giữ volume. Script cần cổng8080 trống, không tự dừng stack khác; private/log tại .local/hq-docker/smhq*/ không upload artifact đó lên GitHub.
+
+Demo Windows có `node scripts/demo.mjs upgrade`: dump→restore rehearsal→migrate/counts, giữ credentials. Cập nhật sau ghi chú HQ1 bên dưới: demo đã lên schema4 ở HQ2 sau kiểm chứng; DBdev/native5432/credentials không đổi.
+
 `grants.sql` áp dụng **sau migration004** trên database dành riêng cho Smart Mushroom, với2 role mới khác nhau do DBA tạo. Script chặn role superuser/CREATEDB/CREATEROLE/BYPASSRLS hoặc thành viên của database owner; không tạo/sửa password và không đổi pg_hba.conf. Không chạy vào database dùng chung hoặc role đang có quyền chưa được rà soát.
 
 Trong psql bằng owner/DBA, tạo role mới (đổi tên nếu đã tồn tại, không tự ghi đè):

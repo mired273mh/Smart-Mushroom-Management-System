@@ -5,6 +5,7 @@ import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'dotenv';
 import { createPool } from '../server/src/db.js';
+import { runPg } from './postgres-tools.mjs';
 import { migrate } from '../server/src/migrate.js';
 import { hashPassword, newToken, tokenHash } from '../server/src/security.js';
 import { createApp } from '../server/src/app.js';
@@ -49,6 +50,36 @@ async function initialize(){
     console.log('Created isolated '+name+' with 3 accounts, 6 trays and simulator. Passwords are stored only in .local/demo/private.json (ignored by Git).');
   } finally{await pool.end();}
 }
+const schemaReady=async pool=>(await pool.query("SELECT 1 FROM schema_migrations WHERE filename='004_database_integrity.sql'")).rowCount>0;
+const businessCounts=async pool=>{
+  const tables=(await pool.query("SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename<>'schema_migrations' ORDER BY tablename")).rows;
+  const result={};for(const {tablename} of tables){if(!/^[a-z_]+$/.test(tablename))throw Error('Unexpected table name');result[tablename]=(await pool.query(`SELECT count(*)::bigint AS n FROM "${tablename}"`)).rows[0].n;}return result;
+};
+async function upgrade(){
+  const config=validate(JSON.parse(await readFile(configFile,'utf8'))),pool=createPool(config.databaseUrl);
+  let restored;
+  try{
+    if(await schemaReady(pool)){console.log('Demo schema already current; migrations verified: '+await migrate(pool));return;}
+    // Refuse upgrade while a local API may still be writing. Do not stop it.
+    try{await fetch('http://127.0.0.1:3000/health',{signal:AbortSignal.timeout(1000)});throw Error('Stop the local API/demo before upgrade.');}
+    catch(error){if(error.cause?.code!=='ECONNREFUSED')throw error;}
+    const before=await businessCounts(pool),stamp=Date.now()+'_'+randomBytes(4).toString('hex');
+    const backups=new URL('../.local/backups/',import.meta.url);await mkdir(backups,{recursive:true});
+    const filename=fileURLToPath(new URL('demo-before-upgrade-'+stamp+'.dump',backups));
+    await runPg(config.databaseUrl,'pg_dump',['--format=custom','--file',filename]);
+    const restoreName='sm_test_demo_upgrade_'+stamp,management=new URL(config.databaseUrl);management.pathname='/postgres';
+    const manager=createPool(management.href);try{await manager.query(`CREATE DATABASE "${restoreName}"`);}finally{await manager.end();}
+    await runPg(config.databaseUrl,'pg_restore',['--exit-on-error','--no-owner','--no-privileges','--dbname',restoreName,filename],{database:restoreName});
+    const restoredUrl=new URL(config.databaseUrl);restoredUrl.pathname='/'+restoreName;restored=createPool(restoredUrl.href);
+    await migrate(restored);
+    if(JSON.stringify(await businessCounts(restored))!==JSON.stringify(before))throw Error('Restore/upgrade row counts mismatch; original DB not migrated.');
+    if(JSON.stringify(await businessCounts(pool))!==JSON.stringify(before))throw Error('Demo data changed during verification; original DB not migrated.');
+    await migrate(pool);
+    if(JSON.stringify(await businessCounts(pool))!==JSON.stringify(before))throw Error('Post-upgrade counts changed; inspect backup before any further action.');
+    console.log('Demo schema upgraded after dump/restore rehearsal; business row counts unchanged.');
+    console.log('Private backup: '+filename+'; restored test database retained. Accounts/config unchanged.');
+  }finally{await restored?.end();await pool.end();}
+}
 async function start(){
   const config=validate(JSON.parse(await readFile(configFile,'utf8')));
   const pool=createPool(config.databaseUrl);let api;const children=[];let closing=false;
@@ -60,7 +91,7 @@ async function start(){
     console.log('Demo processes stopped; DB/accounts and PostgreSQL retained.');
   };
   try{
-    await pool.query('SELECT 1');
+    if(!await schemaReady(pool))throw Error('Demo schema needs upgrade. Stop services, then run: node scripts/demo.mjs upgrade (backup +restore rehearsal first).');
     const app=createApp({pool,config:{WEB_ORIGIN:'http://localhost:5173'}});
     api=createServer((req,res)=>{
       if(req.method==='POST'&&req.url==='/__demo/stop'){
@@ -86,6 +117,7 @@ async function start(){
 }
 try{
   if(command==='init')await initialize();
+  else if(command==='upgrade')await upgrade();
   else if(command==='start')await start();
   else if(command==='stop'){
     const config=validate(JSON.parse(await readFile(configFile,'utf8')));
@@ -96,5 +128,5 @@ try{
   } else if(command==='status'){
     const config=validate(JSON.parse(await readFile(configFile,'utf8')));const pool=createPool(config.databaseUrl);
     try{const row=(await pool.query("SELECT current_database() AS database,(SELECT count(*)::int FROM users) AS users,(SELECT count(*)::int FROM rentals) AS rentals")).rows[0];console.log(JSON.stringify(row));}finally{await pool.end();}
-  }else throw new Error('Usage: node scripts/demo.mjs init|start|stop|status. See docs/DEMO_WINDOWS.md.');
+  }else throw new Error('Usage: node scripts/demo.mjs init|upgrade|start|stop|status. See docs/DEMO_WINDOWS.md.');
 }catch(error){console.error('Demo failed: '+(error.code||error.message));process.exitCode=1;}

@@ -2,6 +2,8 @@
 
 Ngày: 2026-11-05. Tài liệu hóa phạm vi `DE_TAI_YEU_CAU.md`, tiêu chí chi tiết tại SRS. Các lựa chọn ADR không thay đổi yêu cầu gốc.
 
+Nhu cầu bảo vệ HQTCSDL bổ sung2026-11-05: giải thích ERD/3NF/constraints/routines/locks/roles/EXPLAIN/backup bằng source và SQL đã test. Xem [9demo](demo-hqtcsdl/README.md) và [hỏi đáp](demo-hqtcsdl/BAO_VE.md); phạm vi OPTIONAL/RECOMMENDED giữ riêng tại PHAM_VI_HQTCSDL.
+
 | Nhóm nhu cầu | Vai trò | ID đề tài | Kết quả người dùng cần |
 |---|---|---|---|
 | Tài khoản và quyền | Admin/Operator/Customer | A01–03, O01, C01–03 | Truy cập đúng ứng dụng và dữ liệu, khóa tài khoản hoặc đặt lại mật khẩu an toàn |

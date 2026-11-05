@@ -17,6 +17,10 @@ Nếu chưa có dependency project, chạy `npm.cmd ci` tại root và `flutter 
 
 ## 2. Khởi tạo demo riêng — một lần
 
+Source HQTCSDL cần migration004. Nếu demo đã khởi tạo trước đó: dừng API/demo rồi chạy `node scripts/demo.mjs upgrade`. Lệnh giữ DB/account/config, dump riêng, restore DB mới để thử migration và so business row counts trước khi apply vào demo. Nếu preflight lỗi thì dừng, không tự sửa/xóa dữ liệu. Chạy lại khi current chỉ verify migrations; start từ chối schema cũ bằng hướng dẫn upgrade.
+
+[9demo SQL HQTCSDL](demo-hqtcsdl/README.md): `node scripts/test-hqtcsdl.mjs` tạo lab mới riêng, không dùng DB demo đang nhập liệu làm test fixture. Native demo loopback giữ credentials cũ; least-privilege Docker theo [database guide](../deploy/database/README.md).
+
 Tại root:
 
 ```powershell

@@ -2,6 +2,24 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## HQTCSDL HQ2 — 2026-11-05
+
+| Phạm vi | Kết quả thực tế | Bằng chứng / giới hạn |
+|---|---|---|
+|9demo PostgreSQL/SQL nâng cao/transaction/race/role/EXPLAIN/backup/API/IoT | PASS9/9 | node scripts/test-hqtcsdl.mjs; hq2-demo-shared-tools.log; results/schema/explain tại .local/hq-demo/run-1793891975435-d27734 |
+| --prepare và SQL thủ công | PASS | hq2-prepare.log/hq2-manual-sql.log; psql guard+vars+02 exit0; prepare không đánh dấu9demo PASS |
+| EXPLAIN đo thật50.000simulated rows | PASS2plans | forcedSeq vs normal device/time index; run đầu43.777/0.031ms, run sharedtools108.019/0.058ms, không phải SLA production |
+| Runtime Docker profile | PASS | hq2-docker-runtime.log; smhq1793891444822, actual sm_runtime/no superuser/DDL/migrations access; bootstrap/Nginx/API/auth/query/logout, stop chỉ stack own giữ volume |
+| Demo upgrade3→4 | PASS | hq2-demo-upgrade.log: dump→new restoreDB/rehearsal/counts→apply,3users/0rentals không đổi; repeat verifies4; credentials/config giữ nguyên |
+| Native demo sau upgrade | PASS | hq2-native-smoke.log: APIready/Chrome/admin login/3role RBAC/logout; stop giữDB3users/0rentals |
+| Android lần đầu | BLOCKED→retry | Boot timeout35s, thiếu RAM/Swiftshader; không test app lúc chưa boot, không sửa/wipe AVD user |
+| Android retry | PASS APK/install +UI1/1 +SQL | hq2-android-ui-retry.log; hostGPU/1536MB/own5558; customer register/rent2/link/SIMULATOR/harvest/delivery/profile/logout, SQLpaid/completed/delivered; AVD own đã stop |
+| React provenance report | Build +2tests/11groups PASS | hq2-report-build.log/hq2-report-e2e.log;2samples/1sim/1hardware HTTPfixture được hiển thị đúng; hardware chưa sensor thật |
+| CI HQ1 | PASS3jobs |8139aae/run42049829318, đã xác minh jobs qua GitHub; chưa suy sang CI HQ2 |
+| IoT/camera/production/phone thật | BLOCKED/NOT TESTED | Không có thiết bị/luồng thật hoặc cấu hình triển khai thực địa; compile/simulator/ACK không chứng minh relay vật lý |
+
+Shared CLI helper scripts/postgres-tools.mjs dùng ở backup và upgrade, tránh nhân đôi cách truyền PG credentials; không in secret. HQ2 chưa chạy native backup CLI trên Linux; cần PG_BIN đúng client tương thích server nếu không dùng portable Windows. CI deployment nay chạy runtime profile sau stop dev smoke; đang đợi kết quả commit HQ2. Không dọn/xóa DB/volume/log/bằng chứng sau test.
+
 ## HQTCSDL HQ1 — 2026-11-05
 
 | Kiểm tra | Kết quả thực tế | Bằng chứng / giới hạn |

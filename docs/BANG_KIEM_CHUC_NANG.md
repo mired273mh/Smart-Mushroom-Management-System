@@ -2,6 +2,8 @@
 
 Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có một phần hoặc chưa nghiệm thu môi trường đích. Một test API không tự chứng minh mọi nhánh giao diện/hardware. Chi tiết lệnh và lịch sử FAIL/PASS ở KIEM_THU.md.
 
+HQ2: [9demo HQTCSDL](demo-hqtcsdl/README.md) PASS, [3NF/data dictionary](THIET_KE_CSDL_HQTCSDL.md)/hỏi đáp đã có; real limited-role Docker, demo upgrade/rehearsal, Android emulator UI+SQL và React provenance report PASS. Phần chưa đủ ở lists/paging/search ngoài rentals và môi trường hardware/production vẫn giữ trạng thái, không gọi hoàn thành100%.
+
 HQTCSDL HQ1: [phân loại REQUIRED/SUPPORTING/RECOMMENDED/OPTIONAL](PHAM_VI_HQTCSDL.md), migration004 sở hữu lịch sử/fulfillment,2views/PLpgSQL function/payment procedure đang được API dùng,45tests PASS, actual limited login và backup/restore PASS. [Hướng dẫn database roles](../deploy/database/README.md); Docker least-privilege override chưa chạy tại HQ1. Không xem cycle không thuê/retention là bắt buộc khi chưa có đặc tả rõ.
 
 Cleanup2026-11-05: giữ toàn bộ source/migration/test/UML và dữ liệu; bỏ cache/local one-off/Cupertino unused. Backend38, React2+11 nhóm, Flutter analyze/12tests/APK, firmware3profiles và Compose config/images đều PASS sau dọn. Không thay trạng thái nghiệm thu hardware/camera/production hoặc đánh dấu xong backlog. [Phân loại, file và bằng chứng cleanup](DON_DEP_REPOSITORY.md).
