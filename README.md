@@ -93,6 +93,7 @@ IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng r
 - [Kiến trúc/ERD](docs/KIEN_TRUC.md), [ADR](docs/QUYET_DINH_KIEN_TRUC.md), [thiết kế chi tiết/UML](docs/THIET_KE_CHI_TIET.md), [API](docs/API.md).
 - [Cài đặt/triển khai/backup](docs/CAI_DAT_TRIEN_KHAI.md), [hướng dẫn sử dụng](docs/HUONG_DAN_SU_DUNG.md), [Test Plan](docs/TEST_PLAN.md), [kết quả test](docs/KIEM_THU.md).
 - [Kế hoạch](docs/KE_HOACH_THUC_HIEN.md), [bảng kiểm](docs/BANG_KIEM_CHUC_NANG.md), [tiến độ/checkpoint](TIEN_DO_CODEX.md).
+- [Kiểm kê máy Windows và các bước còn thiếu để demo](docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md): công cụ/PATH, DB profile, Android/JDK/WSL/Docker, ESP32/camera và kết quả kiểm tra thực tế.
 
 `server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI Linux và Docker smoke. `compose.yaml` đã chạy trong CI, cổng local8080; máy Windows hiện chưa có Docker Engine. Xem [báo cáo review cuối](docs/REVIEW_CUOI.md) để biết lỗi đã sửa, kết quả CI và giới hạn nghiệm thu.
 

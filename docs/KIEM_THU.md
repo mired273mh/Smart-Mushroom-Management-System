@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+Kiểm kê Windows2026-11-05 (không tạo DB/test fixtures): `node/npm.cmd/git --version`, `npm.cmd ls --all` PASS; pg_isready2 cổng accepting, SQL read-only55439/3 checksum migration PASS nhưng0 Admin/data; SQL5432 chưa auth. Node26 API smoke health/ready200/protected401; React build +Chrome login/Vite proxy401/no pageerror PASS; Flutter pub deps/analyze sạch, doctor xác nhận thiếu Android/PATH/JDK. CLI/core/library/board/compiler ESP32 chạy, chưa flash. `npm --version` FAIL do Restricted/npm.ps1, npm.cmd PASS; WSL CLI FAIL Class not registered/REGDB_E_CLASSNOTREG, không repair. GitHub connector xác nhận CI3f53424/run42005908332 success cả2 jobs từ lượt review trước. Chi tiết executable paths, lỗi và hướng dẫn ở KIEM_TRA_MOI_TRUONG_WINDOWS.md; không rerun bộ test nghiệp vụ/firmware hoặc gọi là sensor/camera/Android/Windows Docker PASS trong lượt này.
+
 **Kết quả review cuối 2026-11-05:** run42005126537/3c14bc8 **PASS cả2 jobs api-web/deployment**, gồm32 backend tests, React2+8 nhóm, benchmark đọc, Flutter analyze/12 tests/build/live API/4 nhóm UI, Docker build/up/smoke. R07 đã xử lý focus/editor, không skip assertions. Thử Chrome CPU6x bổ sung ban đầu FAIL Back tooltip/route; sửa locator/chờ heading/di chuyển pointer, rerun4 nhóm PASS. Không thay source app để né test. Bản chốt docs/harness cần được lưu/push và xem CI tương ứng; không tuyên bố Android/hardware/TLS đã đạt.
 
 CI42004176690/bcc138a: mọi bước trước Flutter UI và deployment PASS; Flutter UI staff login không gửi request, artifact Email rỗng. Sửa helper focus theo đúng label +đợi frame +assert sau blur; local4 nhóm PASS. Tiếp tục CI Linux, không sửa app/skip kiểm tra để che lỗi harness.

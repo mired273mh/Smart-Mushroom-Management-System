@@ -7,12 +7,13 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Mốc review cuối:** Đã review/sửa lỗi và kiểm thử lại phần mềm; **CI đầy đủ PASS** run42005126537/3c14bc8 (api-web +deployment). Chi tiết phát hiện, test và phần thiếu ở `docs/REVIEW_CUOI.md`; chưa nghiệm thu vật lý/production.
+- **Mốc review cuối:** Đã review/sửa lỗi và kiểm thử lại phần mềm; **CI đầy đủ PASS** run42005908332/3f53424 (api-web +deployment), đã xác nhận lại qua GitHub trong lượt kiểm kê. Chi tiết phát hiện, test và phần thiếu ở `docs/REVIEW_CUOI.md`; chưa nghiệm thu vật lý/production.
 - **Đã hoàn thành:** Thiết kế; Express/PostgreSQL32 tests; React2 client tests +8 nhóm E2E; Flutter12 unit/widget +live API1/1 +browser UI4 nhóm; sửa lỗi regression theo REVIEW_CUOI; pagination lịch sử thuê; firmware2 mode compile/17 URL assertions; backup/restore; benchmark đọc20 users;6 UML render; Docker build/up/smoke trên CI.
 - **Chưa hoàn thành:**TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê.
 - **Blocker môi trường:** Thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Blocker GitHub đã giải quyết: Git Credential Manager có tài khoản mired273mh và push main thành công.
 - **Công việc tiếp theo chính xác:**Android SDK/build/emulator và nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention, chu kỳ nuôi khay không thuê và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
+- **Kiểm kê Windows mới nhất:** xem `docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md`. Node26.13.0/npm11.20/Git2.56 chạy; PostgreSQL17.11 có2 cluster5432/55439; Flutter3.47.9/Dart3.13.7/Arduino CLI chạy bằng absolute path nhưng thiếu PATH. server/.env còn placeholder; DB portable đủ schema nhưng0 Admin/data. Thiếu Android SDK/JDK, Docker Desktop; WSL2.6.2 hiện lỗi Class not registered. Chưa cài/sửa cấu hình máy.
 
 ## 2. Trạng thái các giai đoạn
 
@@ -29,6 +30,22 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — ĐANG LÀM: kiểm kê môi trường Windows và điều kiện trình diễn end-to-end
+
+- Theo yêu cầu chỉ kiểm tra/báo cáo: không cài phần mềm hệ thống, không đổi PATH/registry/firewall, không migration/bootstrap hay ghi dữ liệu DB, không flash/điều khiển thiết bị. Kiểm tra bằng executable, kết nối và source thực tế; không suy ra hoạt động từ thư mục.
+- HEAD3f53424 trùng origin/main; GCM có tài khoản mired273mh. Có thay đổi `package.json` từ trước lượt này (format +allowScripts esbuild); giữ nguyên, không tự stage/commit thay đổi của người dùng.
+- Phạm vi: phiên bản/PATH/dependencies; PostgreSQL portable55439 và service5432; cấu hình Backend/React/Flutter/ESP32; Android/JDK/Docker/WSL/USB/camera; hướng dẫn bước thủ công +link chính thức. Tiêu chí: báo cáo bảng trạng thái có bằng chứng, phân biệt dữ liệu thật/simulator/chưa test; chỉ sửa tài liệu kiểm kê/tiến độ liên quan.
+
+### 2026-11-05 (ICT) — HOÀN THÀNH: kiểm kê và hướng dẫn phần còn thiếu (không phải hoàn thành triển khai)
+
+- Thêm `docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md`: bảng công cụ/version/PATH/bắt buộc/link chính thức/hướng dẫn; profile DB, trình tự chạy Backend/React/Flutter/ESP32/Docker, phần thủ công, lỗi và phân loại bằng chứng. Cập nhật TIEN_DO, BANG_KIEM_CHUC_NANG, KIEM_THU và link README. Không sửa chức năng ứng dụng hoặc thay đổi package.json của người dùng.
+- Thực chạy: Node26.13.0/npm.cmd11.20.0/Git2.56.0.windows.4; portable Node22.23.4; PostgreSQL binaries17.11, pg_isready5432 và55439 PASS. SQL xác thực read-only trên55439 PASS,3 checksum migration khớp, toàn bộ bảng nghiệp vụ kiểm tra trống/0 Admin/0 thiết bị/camera. SQL auth5432 CHƯA TEST vì không có credentials dùng được; không dùng credentials portable cho cluster khác.
+- `server/.env` có file nhưng DATABASE_URL/ADMIN_* còn placeholder; đã kiểm tra giá trị dạng boolean/redacted, không in password/token. API smoke với profile portable đúng:200 health/200 ready/401 protected. `npm.cmd ls --all` exit0, React build PASS, Vite+Chrome login/proxy401/no pageerror PASS trên Node26. Các tiến trình smoke tạm đã dừng, DB hiện có giữ nguyên.
+- Flutter3.47.9/Dart3.13.7 executable PASS, pub deps PASS, analyze sạch; doctor báo thiếu PATH/Android SDK và Visual Studio target desktop. Devices chỉ Windows/Chrome/Edge; chưa Android. JRE21.0.13 chạy java, không có javac/JDK dùng được. Arduino CLI1.5.1/core3.3.3/lib list/board details/compiler14.2 PASS; USB COM3/4 là Bluetooth, chưa nhận diện board ESP32; chưa config.local.h/camera/sensor thật.
+- Lỗi thực tế: `npm` bị Restricted chặn npm.ps1, `npm.cmd` hoạt động (không đổi policy). WSL Appx2.6.2 hiện diện nhưng CLI báo `Wsl/CallMsi/Install/REGDB_E_CLASSNOTREG`; lệnh list bị kẹt, đã chỉ dừng PID chẩn đoán do lượt này tạo. Docker executable/Desktop/Engine chưa thấy qua PATH/registry/service/pipe; Compose standalone5.7.0 không thay Engine. Chưa tự repair/cài đặt WSL/Docker/JDK/SDK.
+- Git: đầu lượt HEAD3f53424 trùng remote/main; GCM user mired273mh, không cần login lại hiện tại. GitHub connector xác nhận run42005908332 cả2 jobs success; không chạy lại32 tests/12 widget/ESP32 compile trong lượt chỉ kiểm kê này và không coi CI Linux là Windows Docker/Android/hardware PASS. package.json còn thay đổi local chưa commit từ trước, không tự stage. Commit/push riêng tài liệu kiểm kê sau staged scan; kết quả/hash báo cuối phiên để tránh vòng lặp commit ghi chính nó.
+- Bước tiếp theo thủ công: dùng DB55439 hiện có hoặc chủ động cấu hình DB5432, thay ADMIN_* mẫu/bootstrap/tạo dữ liệu demo; dùng npm.cmd. Thêm User PATH nếu muốn; cài SDK/JDK/phone hoặc emulator; sửa WSL/cài Docker chỉ nếu demo Compose. Cắm board/chốt BOM/cấu hình token/camera; driver GPIO/fail-safe vẫn cần phát triển và nghiệm thu an toàn. Không coi việc cài tool là hoàn thành đồ án vật lý.
 
 ### 2026-11-05 — P0a: HOÀN THÀNH phân tích thiết kế ban đầu
 
