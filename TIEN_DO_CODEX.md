@@ -32,6 +32,20 @@
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
 
+### 2026-11-05 — HOÀN THÀNH batch master1: Android/Docker thật và demo Windows cách ly
+
+- Môi trường mới thực chạy: WSL3.0.3/kernel6.18.54, Desktop4.98/Engine29.9.2/Compose5.6.1, NDK28.2 compiler, Studio JBR25. Flutter APK debug PASS; thêm SDK integration_test +customer_android_test.dart +scripts/test-mobile-android.mjs. Android emulator5558 riêng trong .local: UI register/rent2/link/telemetry SIMULATOR/delivery/profile/logout PASS; SQL xác nhận completed/2items/linked/paid/delivered. Không coi là hardware/phone thật.
+- Baseline FAIL môi trường/harness: PG chưa chạy; recovery95s vượt script timeout60s; tăng-t180 và chờ pg_isready, không reset dữ liệu. AVD user5554 offline, giữ nguyên; AVD test mới .local không ghi userdata user. Test lần đầu chọn TextFormField ở dialog TextField, sửa locator rồi PASS1/1. DEBUG environment làm Gradle echo args fixture, runner đã xóa DEBUG chỉ trong child để không log thông tin test; không đổi env hệ thống.
+- Docker project smverify20261105200125 volume riêng: build/up/migrate/bootstrap/health/Nginx/assets/CSP/auth/DB/logout PASS trên Windows, không dùng project/volume của user. Demo mới scripts/demo.mjs init/start/stop/status: DB sm_demo_* mới,3 roles/password random trong .local/demo/private.json,6trays/1plan/simulator. Init2 lần giữ dữ liệu; Chrome/admin/3role RBAC/API/sim/stop/persist status PASS. Credentials không log/commit. Không sửa server/.env placeholder; demo dùng profile riêng.
+- Bug thật mới: Admin logout bị ngoài viewport1280x720; thêm sidebar overflow-y:auto +Chrome regression. React build+2tests+9 nhóm PASS; backend32/32, Flutter analyze+12tests, backup/restore,20users200reads0errors/p95 32,42/45,14ms, firmware2mode compile PASS. Đã cập nhật AGENTS/PROMPT_BAT_DAU/PROMPT_TIEP_TUC để lệnh tiếp tục không dựng lại và thống nhất quyền push. Thêm CI Android build (chưa có kết quả remote tại checkpoint này).
+- Files: mobile pubspec/lock/integration_test; scripts/demo.mjs,test-mobile-android.mjs,local-postgres.ps1; web style/E2E; workflow; AGENTS/2prompts; README/mobile guide/DEMO_WINDOWS/DOI_CHIEU_YEU_CAU/BANG_KIEM/KIEM_THU/TIEN_DO. Không stage package.json user. Cần staged scan/commit/push batch, kiểm tra CI. Tiếp theo: hỗ trợ IoT hardware an toàn bằng source/đề xuất BOM chưa flash, xử lý phần mềm còn thiếu; user yêu cầu tự đề xuất phần cứng theo tài liệu, chưa xác nhận đã mua/đấu.
+
+### 2026-11-05 — ĐANG LÀM: master review và hoàn thiện demo Windows/Android
+
+- Bắt đầu HEADaf2a5db; giữ nguyên thay đổi package.json từ người dùng (format/allowScripts), không stage ngoài phạm vi. Đọc tài liệu/source hiện tại, không dựng lại ứng dụng đã PASS. Tiêu chí batch1: AGENTS/PROMPT_TIEP_TUC thống nhất lệnh tiếp tục và quyền Git, Android APK build thật, kế hoạch test emulator và demo cách ly dữ liệu.
+- Môi trường đã thay đổi: Docker Desktop4.98/Engine29.9.2/Compose5.6.1 và WSL3.0.3/kernel6.18.54 chạy được; NDK28.2.13676358 compiler chạy; emulator-5554 đang online. Flutter doctor Android PASS. Đã bắt đầu flutter build apk --debug --no-pub; chưa kết luận APK PASS trước khi có kết quả.
+- Chỉ dùng DB demo/test mới cho dữ liệu thử; giữ cluster/dữ liệu hiện có. Không cài phần mềm hệ thống, không bật tải vật lý, không reset/unregister hoặc xóa volume. Tiếp tục batch kế tiếp sau kiểm thử/checkpoint; cập nhật checklist truy vết file/test/việc thiếu và hướng dẫn demo thực tế.
+
 ### 2026-11-05 — HOÀN THÀNH: kiểm đủ công cụ sau khi người dùng cài Android Studio
 
 - Chỉ kiểm kê, không cài package hoặc đổi cấu hình persistent, không mở emulator/build APK vì có thể tự download SDK/NDK. Giữ package.json thay đổi từ trước. Cập nhật báo cáo Windows, TIEN_DO, BANG_KIEM và KIEM_THU.

@@ -7,7 +7,7 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | Mức | Dữ liệu/môi trường | Lệnh | Đã chạy |
 |---|---|---|---|
 | PostgreSQL + HTTP integration | DB `sm_test_*` mới, không mock DB | `npm test` / Windows `scripts/test.ps1` | PASS32/32 |
-| React browser E2E | Chrome headless, API+DB thật | `npm run test:web` | PASS2 client tests +8 nhóm E2E |
+| React browser E2E |Chrome headless, API+DB thật | `npm run test:web` |PASS2 client tests +9 nhóm, gồm Admin logout1280x720 |
 | React production build | Vite/React | `npm run build:web` | PASS |
 | Flutter unit/widget | MockClient, không sensor/API thật | `flutter test` trong mobile | PASS12/12 |
 | Flutter client integration | Dart/MushroomApi gọi API/DB thật | `npm run test:mobile:api` | PASS1/1 |
@@ -22,7 +22,9 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | CI đầy đủ | Ubuntu/PostgreSQL/Chrome/Flutter/Docker | `.github/workflows/verify.yml` | PASS2 jobs run42005126537/3c14bc8 |
 | Tải đọc local |20 sessions,400 rentals,1000 readings | `npm run test:load` | PASS200 request/0 lỗi; p95 33,42–42,07ms |
 | TLS production | Chưa domain/certificate môi trường đích | deployment acceptance | CHƯA CHẠY |
-| Android APK/emulator/điện thoại | Thiếu Android SDK | doctor/build/install | CHƯA CHẠY |
+| Android APK +emulator |SDK36/NDK28.2/Android17 API37 emulator5558, DB mới |flutter build apk; node scripts/test-mobile-android.mjs |PASS build +1 UI flow với SQL hậu kiểm; không phone thật |
+| Android phone/release |Chưa phone/signing/HTTPS public |device acceptance |NOT TESTED |
+| Docker Windows |Desktop4.98/WSL3.0.3/Engine29.9.2, project riêng |compose build/up +test:deploy |PASS master batch |
 | Sensor/relay/camera thực | Chưa có phần cứng được xác nhận | Theo IoT checklist | CHƯA CHẠY |
 
 ## Matrix các tình huống rủi ro chính

@@ -60,3 +60,9 @@ Tham chiếu kỹ thuật: [PostgreSQL constraints](https://www.postgresql.org/d
 - Cursor base64url chứa vị trí, phiên bản, viewer và bộ lọc; giới hạn độ dài, validate chặt. Cursor không phải secret hay chứng cứ cấp quyền: mỗi trang vẫn lọc customer_id từ user đăng nhập bằng SQL. Cursor đổi viewer/bộ lọc bị từ chối; client phải về trang đầu.
 - Giữ timestamp PostgreSQL đủ microsecond khi tạo cursor, vì JavaScript Date chỉ giữ millisecond. Migration003 thêm index hỗ trợ truy vấn; không đổi/xóa lịch sử.
 - React/Flutter dùng20 dòng/trang, nút trước/sau và bộ lọc trạng thái; staff thêm filter customer_id. Quay về dùng stack cursor, làm mới/bộ lọc thay đổi xóa stack. Các danh sách khác còn giới hạn bản đầu, cần từng batch riêng.
+
+### ADR-014 — Demo và Android E2E không tác động dữ liệu thật
+
+- Native demo scripts/demo.mjs tạo DB sm_demo_* mới trên local cluster riêng, account/password random lưu .local/demo/private.json (ignored), không seed vào DB dev hoặc lấy .env user làm đích. Init lặp giữ dữ liệu; start/stop điều khiển đúng process demo bằng control key riêng, giữ PostgreSQL/data.
+- Android integration_test chạy trên emulator được chỉ định, fixture/DB sm_test_* mới; 10.0.2.2 trỏ API host qua loopback. Ngưỡng/sensor là simulator có nhãn, không gọi hardware test. AVD test riêng trong .local tránh wipe/ghi đè AVD đang dùng của người dùng. App production không thêm backdoor/test route.
+- Không đổi auth opaque đang hoạt động sang JWT chỉ vì checklist master nhắc tên JWT: đề tài không bắt buộc định dạng token, ADR003 và tests vẫn là cơ sở.

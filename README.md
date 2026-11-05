@@ -6,7 +6,7 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 |---|---|---|
 | Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API;32 integration tests PASS |
 | Web nhân sự | React + Vite | Build,2 API client tests +8 nhóm Chrome E2E PASS |
-| App Customer | Flutter | Analyze,12 unit/widget tests, live API + Chrome UI E2E4 nhóm, Web build PASS; chưa Android SDK/APK |
+| App Customer | Flutter |Analyze/12 tests/Web build; APK debug +Android emulator UI/API/PostgreSQL flow PASS; chưa phone thật |
 | IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
 | Deployment | Docker Compose + Nginx | CI Linux toàn bộ +Docker build/up/smoke PASS run42005126537; chưa production TLS |
 
@@ -94,6 +94,7 @@ IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng r
 - [Cài đặt/triển khai/backup](docs/CAI_DAT_TRIEN_KHAI.md), [hướng dẫn sử dụng](docs/HUONG_DAN_SU_DUNG.md), [Test Plan](docs/TEST_PLAN.md), [kết quả test](docs/KIEM_THU.md).
 - [Kế hoạch](docs/KE_HOACH_THUC_HIEN.md), [bảng kiểm](docs/BANG_KIEM_CHUC_NANG.md), [tiến độ/checkpoint](TIEN_DO_CODEX.md).
 - [Kiểm kê máy Windows và các bước còn thiếu để demo](docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md): công cụ/PATH, DB profile, Android/JDK/WSL/Docker, ESP32/camera và kết quả kiểm tra thực tế.
+- [Chạy demo Windows/Android](docs/DEMO_WINDOWS.md), [truy vết32 yêu cầu theo source/test/việc thiếu](docs/DOI_CHIEU_YEU_CAU.md). Demo: local-postgres.ps1 → `node scripts/demo.mjs init` → `node scripts/demo.mjs start`; account riêng ở `.local/demo/private.json`; dừng bằng `node scripts/demo.mjs stop`.
 
 `server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI Linux và Docker smoke. `compose.yaml` đã chạy trong CI, cổng local8080; máy Windows hiện chưa có Docker Engine. Xem [báo cáo review cuối](docs/REVIEW_CUOI.md) để biết lỗi đã sửa, kết quả CI và giới hạn nghiệm thu.
 

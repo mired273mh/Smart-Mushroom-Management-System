@@ -2,6 +2,8 @@
 
 Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có một phần hoặc chưa nghiệm thu môi trường đích. Một test API không tự chứng minh mọi nhánh giao diện/hardware. Chi tiết lệnh và lịch sử FAIL/PASS ở KIEM_THU.md.
 
+**Master checkpoint:** bảng6 cột file/trạng thái/bằng chứng/việc tiếp theo cho32 ID tại [DOI_CHIEU_YEU_CAU.md](DOI_CHIEU_YEU_CAU.md). Android APK/emulator UI+SQL và Docker Windows runtime đã PASS; các ghi chú lịch sử chưa Android/Docker bên dưới được thay bởi checkpoint này. Phone/hardware/production còn chưa nghiệm thu.
+
 | ID | Chức năng | Mã thực tế | Bằng chứng / giới hạn |
 |---|---|---|---|
 | A01 | Tạo tài khoản quản trị an toàn | ☑ CLI + Admin Web tạo bổ sung | security.test: bootstrap thật một lần, không log secret; public register không nâng quyền |
@@ -40,8 +42,8 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | Sản phẩm | Trạng thái |
 |---|---|
 | REST API/PostgreSQL | 32/32 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
-| React Web | Build,2 API client tests +8 nhóm Chrome E2E PASS; clear mô tả/session race regression; responsive390px không tràn |
-| Flutter Customer | Analyze sạch,12 unit/widget+1 live API test PASS,Web build + Chrome UI E2E4 nhóm PASS; session/catalog regression; APK/emulator chưa chạy |
+| React Web |Build,2 API client tests +9 Chrome E2E PASS; session/paging/390px và Admin logout1280x720 |
+| Flutter Customer |Analyze sạch/12 tests; APK debug +Android emulator UI→API→PostgreSQL PASS; chưa phone thật |
 | ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
 | Tích hợp/triển khai |Local +CI toàn bộ PASS run42005126537/3c14bc8, gồm Docker build/up/smoke; TLS production/Android/hardware chưa nghiệm thu |

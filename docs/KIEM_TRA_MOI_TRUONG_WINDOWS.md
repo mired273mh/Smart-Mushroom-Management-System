@@ -1,5 +1,7 @@
 # Kiểm tra môi trường Windows — 2026-11-05
 
+**Cập nhật master mới nhất:** WSL3.0.3, Docker Desktop4.98/Engine29.9.2/Compose5.6.1 đã hoạt động; Docker Windows build/up/smoke PASS. NDK28.2.13676358 compiler PASS; APK debug và Android emulator UI→Express/PostgreSQL PASS. Không cần cài lại các tool này. Các kết luận thiếu SDK/NDK/Docker/WSL lỗi bên dưới là lịch sử trước khi người dùng cài thêm, được thay bởi checkpoint này. Xem [DEMO_WINDOWS.md](DEMO_WINDOWS.md) và TIEN_DO để chạy hiện tại; phone/cảm biến/relay/camera thật vẫn chưa test.
+
 Kiểm tra tại repository Smart Mushroom hiện tại, sau review commit `3f53424`. Chỉ kiểm kê, chạy kiểm tra đọc/build/analyze và cập nhật tài liệu. Không cài phần mềm hệ thống; không đổi PATH, policy, registry, firewall; không tạo/xóa/sửa dữ liệu DB; không flash hoặc điều khiển thiết bị. Các API/Vite/Chrome headless tạm dùng để smoke test đã dừng.
 
 **Kết luận mới nhất:** Android Studio/SDK đã cài thêm; `flutter doctor -v` đánh dấu **Flutter/Android toolchain PASS**, licenses accepted. SDK có API36/37, Build Tools36.0.0 và AVD Medium_Phone_API_37.0; chưa chạy emulator/phone hoặc build APK. **Còn thiếu NDK28.2.13676358** mà source dự án chỉ định. JDK17, JBR25 của Studio và Flutter/Dart đã chạy được; PATH Flutter đúng sau nhận environment mới. Docker chưa tìm thấy, WSL CLI vẫn timeout12s; Docker chỉ cần nếu chọn Compose. Không cài/chỉnh cấu hình máy trong lượt kiểm tra. Các kết quả SQL/React bên dưới thuộc lần kiểm kê đầu, chưa chạy lại.

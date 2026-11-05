@@ -1,4 +1,5 @@
-param([string]$ToolsRoot = "$env:USERPROFILE/.sm-tools", [int]$Port = 55439)
+param([string]$ToolsRoot = "$env:USERPROFILE/.sm-tools", [int]$Port = 55439,
+  [ValidateRange(10,600)][int]$StartupTimeoutSeconds = 180)
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path $PSScriptRoot -Parent
 $localRoot = Join-Path $repoRoot '.local'
@@ -29,9 +30,18 @@ $connectionUri = [Uri]$connectionString
 if ($connectionUri.Port -ne $Port) { throw 'Port khac credentials hien co.' }
 & (Join-Path $pgBin 'pg_ctl.exe') -D $pgData status *> $null
 if ($LASTEXITCODE -ne 0) {
-  & (Join-Path $pgBin 'pg_ctl.exe') -D $pgData -l (Join-Path $localRoot 'postgres.log') -o "-h 127.0.0.1 -p $Port" -w start
+  & (Join-Path $pgBin 'pg_ctl.exe') -D $pgData -l (Join-Path $localRoot 'postgres.log') -o "-h 127.0.0.1 -p $Port" -w -t $StartupTimeoutSeconds start
   if ($LASTEXITCODE -ne 0) { throw 'PostgreSQL start failed; xem .local/postgres.log' }
 }
+# A running postmaster may still be recovering after an interrupted Windows
+# shutdown. Status alone is not readiness; never reset WAL/data to skip recovery.
+$deadline = (Get-Date).AddSeconds($StartupTimeoutSeconds)
+do {
+  & (Join-Path $pgBin 'pg_isready.exe') -q -h 127.0.0.1 -p $Port
+  if ($LASTEXITCODE -eq 0) { break }
+  if ((Get-Date) -ge $deadline) { throw 'PostgreSQL chua ready; xem .local/postgres.log, khong xoa data/WAL.' }
+  Start-Sleep -Seconds 1
+} while ($true)
 $env:DATABASE_URL = $connectionString
 $env:PGPASSWORD = $connectionUri.UserInfo.Split(':')[1]
 $existing = & (Join-Path $pgBin 'psql.exe') -h 127.0.0.1 -p $Port -U sm_local -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='smart_mushroom_dev'"

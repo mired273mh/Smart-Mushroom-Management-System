@@ -191,6 +191,13 @@ try {
   console.log('PASS: Operator đúng menu quyền; không có JavaScript pageerror.');
   console.log('PASS: Response401 từ phiên cũ không đăng xuất người dùng mới; mô tả phòng có thể xóa trống.');
   console.log('PASS: Response logout cũ không xóa phiên mới khi request đồng thời báo hết phiên.');
+  await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
+  await login(admin);
+  await page.getByRole('heading',{name:'Tổng quan',exact:true}).waitFor();
+  await page.setViewportSize({width:1280,height:720});
+  await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
+  await page.getByRole('heading',{name:'Đăng nhập',exact:true}).waitFor();
+  console.log('PASS: Admin đầy đủ menu vẫn truy cập được Đăng xuất trên màn hình1280x720.');
 } catch (error) {
   if (page) {
     await mkdir(new URL('../../.local/',import.meta.url),{recursive:true});

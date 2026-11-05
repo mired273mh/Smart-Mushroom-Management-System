@@ -10,7 +10,7 @@
 
 ## 1. Quy trình bắt buộc mỗi lượt
 
-1. Đọc `AGENTS.md`, `docs/DE_TAI_YEU_CAU.md`, `docs/KE_HOACH_THUC_HIEN.md`, `docs/BANG_KIEM_CHUC_NANG.md`, `TIEN_DO_CODEX.md` và `docs/QUYET_DINH_KIEN_TRUC.md`.
+1. Đọc `TIEN_DO_CODEX.md` trước khi bắt đầu; sau đó đọc `AGENTS.md`, `PROMPT_TIEP_TUC.md`, `docs/DE_TAI_YEU_CAU.md`, `docs/KE_HOACH_THUC_HIEN.md`, `docs/BANG_KIEM_CHUC_NANG.md` và `docs/QUYET_DINH_KIEN_TRUC.md`. Đối chiếu source/build/test thực tế, không chỉ tin nhật ký.
 2. Quan sát **trạng thái thực tế** của repo: `git status`, thay đổi chưa commit, các file vừa sửa, cấu trúc project, cấu hình, test có sẵn. Không mặc định file tiến độ luôn chính xác.
 3. Xác định đúng **một nhóm việc kế tiếp có thể kiểm thử** (hoặc một lát cắt end-to-end), nêu ngắn gọn trước khi làm. Nếu mới bắt đầu, làm nhiệm vụ đầu tiên trong `PROMPT_BAT_DAU.md`.
 4. Thiết kế tối thiểu vừa đủ, viết code thực, thêm test/lệnh xác minh, tự chạy được thì chạy.
@@ -20,9 +20,10 @@
 
 ## 2. Câu lệnh rút gọn “Tiếp tục đồ án.”
 
-Khi người dùng chỉ gửi **`Tiếp tục đồ án.`**, phải hiểu là:
+Khi người dùng gửi **`Tiếp tục đồ án`** hoặc **`Tiếp tục đồ án.`**, phải hiểu là:
 
 - Đọc quy tắc, file tiến độ và các tài liệu phạm vi;
+- Đọc `PROMPT_TIEP_TUC.md`; ưu tiên phần đang dang dở và lỗi build/test cản trở demo Windows/Android, không khởi tạo lại dự án;
 - Kiểm tra code đang có và thay đổi Git chưa commit;
 - Xác minh những ghi chú chưa chắc chắn do lần trước bị hết token;
 - Hoàn thiện việc đang dở trước, sau đó chọn hạng mục tiếp theo theo kế hoạch;
@@ -47,6 +48,9 @@ Khi người dùng chỉ gửi **`Tiếp tục đồ án.`**, phải hiểu là:
 - Dữ liệu thật, code chạy được và bằng chứng test ưu tiên hơn giao diện giả. Mock/simulator có thể dùng để phát triển khi chưa có phần cứng, nhưng phải ghi rõ là mô phỏng, không gọi là kiểm thử ESP32 thật.
 - Với thiết bị vật lý, thử nghiệm dry-run trước. Không ra lệnh điều khiển quạt/sưởi/bơm trên thiết bị thật nếu chưa có xác nhận về phần cứng và giới hạn an toàn.
 - Không hardcode secrets; dùng `.env.example` với placeholder; validate input, phân quyền API, tránh lộ dữ liệu của khách thuê khác.
+- Demo/test dùng database mới có tên/prefix rõ ràng, không tự seed vào database người dùng. Không log credentials; file tài khoản demo riêng phải bị gitignore. Không dùng kết quả simulator/doctor/compile thay cho Android E2E, Docker runtime hoặc hardware test.
+- Không cài/repair phần mềm hệ thống cần quyền quản trị hoặc có nguy cơ ảnh hưởng máy khi chưa được người dùng cho phép. Dependency trong project và kiểm thử trên môi trường đã sẵn sàng thuộc phạm vi công việc bình thường.
+- Phần cứng chưa được đề tài chốt: nghiên cứu nguồn nhà sản xuất, ghi BOM/model/điện áp/sơ đồ/giới hạn an toàn để người dùng xác nhận trước lắp/flash/điều khiển thật. Có thể hoàn thiện source driver, backend/client và test mô phỏng có nhãn khi chưa có phần cứng; không dừng công việc phần mềm chỉ vì BOM chưa được xác nhận.
 
 ## 5. Ranh giới an toàn
 

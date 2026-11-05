@@ -20,6 +20,6 @@ Bạn là trưởng nhóm kỹ thuật full-stack và IoT kiêm QA của đồ �
 - **Code sạch:** cấu trúc module có trách nhiệm rõ ràng, tách config, kiểm tra quyền, validation, xử lý lỗi, migration, test, không hardcode secret.
 - **Không giả hoàn chỉnh:** không tuyên bố đã tích hợp cảm biến/camera thật nếu mới mô phỏng. Không thêm thanh toán online nếu đề tài chưa yêu cầu.
 - **Từng phần ổn định:** không sinh đồng loạt rất nhiều file thiếu kiểm thử để mau hết token.
-- **An toàn:** không tự ý xóa dữ liệu, xóa file quan trọng hoặc push lên GitHub.
+- **An toàn:** không tự ý xóa dữ liệu/file quan trọng; commit/push thông thường lên nhánh hiện tại theo quyền đã cấp tại AGENTS mục8, không force push hoặc ghi secrets. Khi repo đã có source/tiến độ, dùng PROMPT_TIEP_TUC.md thay vì khởi tạo lại.
 
 **Bắt đầu ngay với công việc đầu tiên và triển khai thực tế. Nếu kết thúc phiên, phải để lại checkpoint rõ trong `TIEN_DO_CODEX.md`.**
