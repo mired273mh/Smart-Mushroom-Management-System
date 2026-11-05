@@ -1,8 +1,8 @@
 # Review và kiểm thử cuối — 2026-11-05
 
-Trạng thái: **ĐANG LÀM**. Bản đầu vào: `861f597`. Các kết quả lịch sử không thay thế lần chạy kiểm tra này.
+Trạng thái: **ĐÃ REVIEW/SỬA LỖI VÀ KIỂM THỬ PHẦN MỀM; CHƯA NGHIỆM THU TOÀN ĐỀ TÀI VẬT LÝ/PRODUCTION**. Bản đầu vào: `861f597`. Các kết quả lịch sử không thay thế lần chạy kiểm tra này.
 
-Đã phát hiện và sửa các lỗi phân quyền theo thời gian, race reset/token, PATCH ghi đè trạng thái, vòng đời tài khoản đang thuê, session giữa2 client, catalog selection và dữ liệu đổi trang. Đã thêm regression thay vì chỉ dựa vào bộ test cũ. CI đang xác minh lại các lỗi chỉ xuất hiện trên Linux; chưa gọi toàn bộ workflow PASS.
+Đã phát hiện và sửa các lỗi phân quyền theo thời gian, race reset/token, PATCH ghi đè trạng thái, vòng đời tài khoản đang thuê, session giữa2 client, catalog selection và dữ liệu đổi trang. Đã thêm regression thay vì chỉ dựa vào bộ test cũ. **CI toàn bộ PASS** trên Linux tại [run42005126537](https://github.com/mired273mh/Smart-Mushroom-Management-System/actions/runs/42005126537), bản `3c14bc8`, gồm cả2 job api-web và deployment. Các lần FAIL phía dưới được giữ làm bằng chứng xử lý lỗi, không phải kết quả cuối.
 
 Phạm vi: PostgreSQL/migration/invariants, API/auth/RBAC/ownership/concurrency, React/Flutter UI và client, ESP32/simulator, dependency/security, cấu hình triển khai/CI và tính đúng của tài liệu.
 
@@ -18,7 +18,7 @@ Không chạy lệnh điều khiển thiết bị thật, không xóa DB/lịch 
 | R04 | Vừa | Form sửa tên khay đang thuê bị409 vì gửi room_id không đổi | Chỉ chặn khi room/status thực sự thay đổi |
 | R05 | Vừa | Xóa mềm Customer còn hợp đồng active khiến không thể đăng nhập hoàn tất yêu cầu nhận/giao | Từ chối xóa mềm khi còn thuê active; khóa tạm vẫn có thể bật lại |
 | R06 | Vừa | Ingest chờ room lock vẫn nhận token vừa bị rotate; regression201 thay vì401 | Revalidate token/active room/device trong transaction, khóa device |
-| R07 | Chưa kết luận | GitHub CI861f597 FAIL ở assertion Flutter Web staff-login denied; mọi bước trước đó PASS | Đang kiểm tra harness và chờ chạy lại CI sau sửa |
+| R07 | Harness, đã xử lý | GitHub CI861f597 FAIL ở assertion Flutter Web staff-login denied; các run sau xác định sai editor/focus | Focus đúng input/đợi frame/xác nhận payload; CI3c14bc8 toàn bộ PASS |
 
 Tái hiện tại `server/test/review-regression.test.js`. Lần test đầu có một fixture mã khay lowercase bị422; đã sửa fixture thành uppercase và chạy riêng tái hiện đúng bug maintenance→available. Không xem lỗi fixture là lỗi sản phẩm.
 
@@ -56,7 +56,7 @@ R01–R06 **ĐÃ SỬA**, full backend **32/32 PASS** sau sửa, gồm8 regressi
 | `flutter analyze`, `flutter test` |Sạch +12/12 PASS | Unit/widget dùng MockClient; không gọi là test thiết bị |
 | `flutter build web --no-wasm-dry-run` |PASS | Flutter Web production build |
 | `npm run test:mobile:api` |1/1 PASS | Dart client → Express → PostgreSQL thật |
-| `npm run test:mobile:web` |4 nhóm local PASS | UI Flutter Web, DB thật, mẫu IoT simulator; Linux harness đang xác minh |
+| `npm run test:mobile:web` |4 nhóm local +Linux CI PASS | UI Flutter Web, DB thật, mẫu IoT simulator; staff login/logout được xác nhận HTTP |
 | `npm run db:migrate` lặp2 lần |Verified3/3 cả2 lần | Không xóa DB, migration idempotent |
 | `npm run test:backup` |PASS | pg_dump custom → pg_restore DB mới, dữ liệu/migrations đúng |
 | `scripts/compile-iot.ps1` |2/2 PASS +17 URL assertions | Compile ESP32 sim/sensing; không flash/đọc sensor/relay |
@@ -65,6 +65,9 @@ R01–R06 **ĐÃ SỬA**, full backend **32/32 PASS** sau sửa, gồm8 regressi
 | `npm audit --json` |0 vulnerabilities được báo | Chỉ advisory dependencies npm tại thời điểm chạy; không phải pentest/OS image scan |
 | `scripts/render-uml.ps1`, Markdown links |6/6 render;22 docs/21 links không thiếu đích | Không thay đánh giá UML học thuật |
 | Scan tracked/staged + `git diff --check` |PASS ở các checkpoint | Không thấy secret thật/.env thật/dump/private key trong file commit; `.local` giữ riêng |
+| GitHub Actions đầy đủ |**PASS** run42005126537/3c14bc8 | Cả api-web và deployment success; không skip test để đạt CI |
+
+Thử bổ sung Chrome CPU throttle6x: lần đầu **FAIL** timeout15s tại Back thứ2; screenshot đã về đúng chi tiết hợp đồng, tooltip/focus làm accessible name thay đổi trong chuyển route. Harness chờ heading của route đích, dùng prefix Back và đưa pointer ra ngoài tooltip; chạy lại **4 nhóm PASS** dưới6x. Không thay đổi app, không coi đây là soak test hoặc benchmark mobile. Bản chốt docs/harness sẽ được push theo AGENTS; CI run nói trên gắn rõ commit đã xác minh, không gán nhầm sang commit chưa chạy.
 
 ## Những việc còn thiếu trước nghiệm thu toàn đề tài
 

@@ -8,7 +8,7 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 | Web nhân sự | React + Vite | Build,2 API client tests +8 nhóm Chrome E2E PASS |
 | App Customer | Flutter | Analyze,12 unit/widget tests, live API + Chrome UI E2E4 nhóm, Web build PASS; chưa Android SDK/APK |
 | IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
-| Deployment | Docker Compose + Nginx | Build/up/smoke Docker CI job PASS; trạng thái workflow tổng xem review; chưa production TLS |
+| Deployment | Docker Compose + Nginx | CI Linux toàn bộ +Docker build/up/smoke PASS run42005126537; chưa production TLS |
 
 Chưa nghiệm thu toàn bộ hệ thống vật lý/production. Các lệnh điều khiển hiện chỉ dry-run. Không có thanh toán online. Camera là contract URL, chưa có live feed đã xác minh. Bằng chứng và giới hạn chi tiết ở [nhật ký kiểm thử](docs/KIEM_THU.md).
 

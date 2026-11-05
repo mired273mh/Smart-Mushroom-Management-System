@@ -18,7 +18,8 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | Backup/restore | Fixtures test → DB mới | `npm run test:backup` | PASS |
 | Compose cấu hình | Standalone CLI5.7.0, không Engine | `docker-compose -f compose.yaml config --quiet` | PASS |
 | UML render | PlantUML1.2026.9/JRE21/Smetana | `scripts/render-uml.ps1` | PASS6/6 |
-| Docker runtime | Ubuntu CI, DB mới mỗi runner | Compose build/up + `npm run test:deploy` | PASS job deployment42003072419; workflow tổng xem REVIEW_CUOI |
+| Docker runtime | Ubuntu CI, DB mới mỗi runner | Compose build/up + `npm run test:deploy` | PASS job deployment42005126537 |
+| CI đầy đủ | Ubuntu/PostgreSQL/Chrome/Flutter/Docker | `.github/workflows/verify.yml` | PASS2 jobs run42005126537/3c14bc8 |
 | Tải đọc local |20 sessions,400 rentals,1000 readings | `npm run test:load` | PASS200 request/0 lỗi; p95 33,42–42,07ms |
 | TLS production | Chưa domain/certificate môi trường đích | deployment acceptance | CHƯA CHẠY |
 | Android APK/emulator/điện thoại | Thiếu Android SDK | doctor/build/install | CHƯA CHẠY |
@@ -59,7 +60,7 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 
 - Rà soát học thuật UML đã render với người hướng dẫn; browser test thêm mọi nhánh account/camera/config.
 - Android build/signing và kiểm thử trên điện thoại/emulator. Flutter UI browser E2E đã PASS luồng chính, vẫn chưa thay thế kiểm thử mobile đích.
-- Workflow Linux tổng phải PASS; Docker build/compose smoke đã PASS trên CI. Staging HTTPS và backup lịch vận hành chưa nghiệm thu.
+- Workflow Linux tổng và Docker build/compose smoke đã PASS run42005126537. Staging HTTPS và backup lịch vận hành chưa nghiệm thu.
 - Cảm biến hiệu chuẩn, soak test kết nối, fail-safe relay sau xác nhận phần cứng, live camera bảo vệ truy cập.
 - Benchmark đọc local20 người đã PASS với400 rentals/1000 samples; còn đo dữ liệu lớn, ghi đồng thời, WAN/TLS và soak test. Retention và pagination ngoài lịch sử thuê chưa hoàn thiện; không suy ra capacity production từ benchmark ngắn.
 

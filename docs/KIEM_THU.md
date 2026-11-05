@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+**Kết quả review cuối 2026-11-05:** run42005126537/3c14bc8 **PASS cả2 jobs api-web/deployment**, gồm32 backend tests, React2+8 nhóm, benchmark đọc, Flutter analyze/12 tests/build/live API/4 nhóm UI, Docker build/up/smoke. R07 đã xử lý focus/editor, không skip assertions. Thử Chrome CPU6x bổ sung ban đầu FAIL Back tooltip/route; sửa locator/chờ heading/di chuyển pointer, rerun4 nhóm PASS. Không thay source app để né test. Bản chốt docs/harness cần được lưu/push và xem CI tương ứng; không tuyên bố Android/hardware/TLS đã đạt.
+
 CI42004176690/bcc138a: mọi bước trước Flutter UI và deployment PASS; Flutter UI staff login không gửi request, artifact Email rỗng. Sửa helper focus theo đúng label +đợi frame +assert sau blur; local4 nhóm PASS. Tiếp tục CI Linux, không sửa app/skip kiểm tra để che lỗi harness.
 
 CI42003530326/a34bd38: deployment PASS; Web FAIL pagination assertion dòng140 (nhãn trang mới xuất hiện trước table data). Sửa useData scope theo dependencies ngay trong render; local React build/2 client tests/8 E2E PASS. Không skip assertion, bổ sung artifact Web layout nếu lỗi. CI tổng vẫn chưa PASS ở checkpoint này.

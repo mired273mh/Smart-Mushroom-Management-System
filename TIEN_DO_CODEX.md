@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Đang làm:** Review/kiểm thử toàn bộ theo yêu cầu mới: backend/DB/security, React/Flutter E2E, IoT compile, deployment/CI/tài liệu; sửa lỗi có bằng chứng và chạy regression.
+- **Mốc review cuối:** Đã review/sửa lỗi và kiểm thử lại phần mềm; **CI đầy đủ PASS** run42005126537/3c14bc8 (api-web +deployment). Chi tiết phát hiện, test và phần thiếu ở `docs/REVIEW_CUOI.md`; chưa nghiệm thu vật lý/production.
 - **Đã hoàn thành:** Thiết kế; Express/PostgreSQL32 tests; React2 client tests +8 nhóm E2E; Flutter12 unit/widget +live API1/1 +browser UI4 nhóm; sửa lỗi regression theo REVIEW_CUOI; pagination lịch sử thuê; firmware2 mode compile/17 URL assertions; backup/restore; benchmark đọc20 users;6 UML render; Docker build/up/smoke trên CI.
-- **Chưa hoàn thành:** Workflow CI tổng đang xác minh sau sửa lỗi UI; TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production.
+- **Chưa hoàn thành:**TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê.
 - **Blocker môi trường:** Thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Blocker GitHub đã giải quyết: Git Credential Manager có tài khoản mired273mh và push main thành công.
-- **Công việc tiếp theo chính xác:** Hoàn tất xác minh workflow Linux sau sửa Flutter harness/responsive pager, sau đó Android SDK/build/emulator và nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
+- **Công việc tiếp theo chính xác:**Android SDK/build/emulator và nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention, chu kỳ nuôi khay không thuê và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 
 ## 2. Trạng thái các giai đoạn
@@ -23,7 +23,7 @@
 | P2 | React Web: Administrator và Farm Operator | Đã kiểm thử bản đầu | Vite build PASS; Chrome E2E luồng chính PASS |
 | P3 | Flutter App: Customer | Đã kiểm thử (Web/VM), sửa session/catalog regression |Analyze sạch,12 tests +live API1/1 +Chrome UI4 nhóm PASS; Web build PASS; chưa Android SDK |
 | P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP test PASS; firmware 2 nhánh compile PASS; chưa upload/relay/live camera |
-| P5 | Tích hợp, bảo mật, kiểm thử, triển khai | Local và Docker CI đã kiểm thử; workflow tổng đang xác minh |32 backend tests, Web/Flutter E2E, backup/restore, benchmark đọc PASS; Docker smoke CI PASS; còn TLS/Android/hardware |
+| P5 | Tích hợp, bảo mật, kiểm thử, triển khai |Local +CI Linux đầy đủ/Docker smoke đã kiểm thử; chưa nghiệm thu production |32 backend tests, Web/Flutter E2E, backup/restore, benchmark đọc PASS; CI42005126537 PASS; còn TLS/Android/hardware |
 | P6 | UML 2.0, SRS, thiết kế, test plan, cài đặt, hướng dẫn | Hoàn thành tài liệu bản đầu | UR/SRS/ADR/ERD/detail/API/test/install/user guide; 6 PlantUML render PASS; cần review học thuật/nghiệm thu đích |
 
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
@@ -163,6 +163,8 @@
 - WIP740ea61 commit/push PASS. CI42003072419: Docker deployment job **PASS thực tế** (build/up/bootstrap/HTTP assets+auth+DB/CSP); API-Web FAIL responsive pager390px dòng147 trước Flutter. R13 đang sửa flex-wrap; lần này chưa kiểm chứng native editor trên Linux vì bước Flutter bị skip. Full tracked secret scan140 files PASS;22 Markdown/20 relative links không thiếu đích.
 - a34bd38 commit/push PASS; CI42003530326 deployment PASS, Web FAIL dòng140 do nhãn trang render trước table dữ liệu. Đã sửa scope state trong useData để query mới không dùng data cũ trước effect, local build/2 client tests/8 E2E PASS. Bổ sung artifact Web; đồng bộ README/TEST_PLAN/SRS/cài đặt/IoT guide với test counts, Docker thực tế và giới hạn benchmark. CI tổng vẫn đang xác minh; lỗi/font assumption giữ dấu vết trong REVIEW_CUOI.
 - bcc138a commit/push PASS; CI42004176690 backend/React/load/Flutter analyze+12 tests+build/live API/deployment PASS, Flutter UI cuối FAIL: Email rỗng nên không gửi staff login. Generic input:focus có thể vẫn là editor trước; helper đã dùng đúng input theo aria-label, đợi focus/frame và assert sau blur,4 nhóm local PASS lại. Cần run Linux kế tiếp; không đánh dấu toàn review hoàn thành.
+- **HOÀN THÀNH review phần mềm trong môi trường hiện có:**3c14bc8 commit/push PASS, CI run42005126537 **PASS2/2 jobs** api-web +deployment; đã xem trạng thái từng job, mọi bước test nghiệp vụ success, không skip để đạt CI. Full kết quả/14 mã review (R07 là harness), các lần FAIL và phần chưa nghiệm thu ở REVIEW_CUOI. Android APK/phone, sensor/relay/live camera, GPIO driver và production TLS vẫn chưa đạt; bounded lists/retention/chu kỳ khay không thuê còn thiếu.
+- Thử thêm CPU Chrome6x: lần đầu FAIL Back thứ2/tooltip trong chuyển route; chỉnh harness chờ heading/prefix Back/di chuyển pointer,4 nhóm PASS khi rerun6x. File chốt: scripts/test-mobile-web.mjs, README,TIEN_DO và docs REVIEW_CUOI/KIEM_THU/TEST_PLAN/BANG_KIEM. Cần commit/push bản chốt sau scan diff/secret; CI đầy đủ đã chứng minh ở3c14bc8, sẽ kiểm tra run của bản chốt riêng. Không xóa lịch sử lỗi hay dữ liệu test.
 
 ### 2026-11-05 — ĐANG LÀM: quy tắc lưu Git và baseline hiện tại
 
