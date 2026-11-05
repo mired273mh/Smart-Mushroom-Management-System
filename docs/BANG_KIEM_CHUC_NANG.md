@@ -52,3 +52,5 @@ Chưa nghiệm thu hoàn chỉnh đồ án vật lý/production. Cần Android S
 Kiểm kê Windows2026-11-05: xem [báo cáo môi trường](KIEM_TRA_MOI_TRUONG_WINDOWS.md). SQL read-only55439/schema3/3 và Node26 API/React smoke PASS; DB dev trống/chưa Admin, server/.env còn placeholder. Android SDK/JDK thiếu; WSL lỗi Class not registered, Docker Windows chưa dùng được. COM3/4 là Bluetooth; sensor/camera/relay chưa test thật. CI3f53424/run42005908332 đã xác nhận success2 jobs, không thay kiểm thử hardware. Không đổi trạng thái chức năng thành hoàn tất chỉ từ kiểm kê/cài tool.
 
 Kiểm lại sau cài thêm: **JDK17.0.21 java/javac PASS**, không còn thiếu JDK; process cần nhận lại Machine PATH. Android SDK vẫn chưa tìm thấy, WSL CLI timeout12s, Docker chưa tìm thấy. Flutter SDK có nhưng PATH2 vị trí mới sai; không đánh dấu Android/ESP32 thật hoàn thành từ kiểm tra executable.
+
+Kiểm PATH tiếp theo: Machine PATH Flutter **đã đúng** .sm-tools\flutter\bin; sau nạp environment chỉ trong process, where/flutter3.47.9/dart3.13.7 PASS. Phiên VS Code/terminal cũ cần mở lại; không cần cài lại Flutter. Không test lại Android/Docker/WSL trong lượt này.

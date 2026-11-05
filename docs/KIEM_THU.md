@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+Xác minh PATH Flutter2026-11-05: Machine PATH đúng .sm-tools\flutter\bin, process cũ vẫn giữ2 path sai. Nạp Machine+User PATH chỉ trong process chẩn đoán: where.exe/Get-Command đúngSDK, flutter3.47.9/dart3.13.7 **PASS/exit0**. Không ghi EnvironmentVariable hệ thống, không build/test lại ứng dụng. Cần khởi động lại ứng dụng terminal cũ.
+
 Kiểm lại phần mềm2026-11-05: java/javac Temurin17.0.21 absolute path **PASS mới**, Machine PATH đã có nhưng process chưa nhận. node/npm.cmd/git/psql/Arduino CLI versions và pg_isready2 cổng PASS; flutter doctor chạy được nhưng Android SDK chưa tìm thấy. Hai PATH Flutter C:\flutter/C:\src\flutter không có executable. wsl --version **TIMEOUT12s**, không suy ra runtime hoạt động; Docker/Android vẫn chưa phát hiện qua các nguồn kiểm kê. Không đổi source hoặc chạy lại build/test nghiệp vụ; không cài/repair cấu hình máy.
 
 Kiểm kê Windows2026-11-05 (không tạo DB/test fixtures): `node/npm.cmd/git --version`, `npm.cmd ls --all` PASS; pg_isready2 cổng accepting, SQL read-only55439/3 checksum migration PASS nhưng0 Admin/data; SQL5432 chưa auth. Node26 API smoke health/ready200/protected401; React build +Chrome login/Vite proxy401/no pageerror PASS; Flutter pub deps/analyze sạch, doctor xác nhận thiếu Android/PATH/JDK. CLI/core/library/board/compiler ESP32 chạy, chưa flash. `npm --version` FAIL do Restricted/npm.ps1, npm.cmd PASS; WSL CLI FAIL Class not registered/REGDB_E_CLASSNOTREG, không repair. GitHub connector xác nhận CI3f53424/run42005908332 success cả2 jobs từ lượt review trước. Chi tiết executable paths, lỗi và hướng dẫn ở KIEM_TRA_MOI_TRUONG_WINDOWS.md; không rerun bộ test nghiệp vụ/firmware hoặc gọi là sensor/camera/Android/Windows Docker PASS trong lượt này.

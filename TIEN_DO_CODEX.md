@@ -32,6 +32,12 @@
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
 
+### 2026-11-05 — HOÀN THÀNH: xác minh PATH Flutter sau khi người dùng sửa
+
+- Machine PATH đã đúng `C:\Users\mired\.sm-tools\flutter\bin`, có flutter.bat/dart.bat; process cũ vẫn giữ2 đường dẫn không tồn tại nên where ban đầu FAIL. Chỉ nạp PATH đã lưu Machine+User vào process chẩn đoán, không sửa cấu hình Windows.
+- Sau nạp: where.exe flutter/dart và Get-Command đều về SDK .sm-tools; `flutter --version`3.47.9, `dart --version`3.13.7 PASS/exit0. Cần thoát/mở lại VS Code/terminal để nhận environment mới, không cần cài lại hoặc thêm lại PATH.
+- Cập nhật báo cáo Windows/TIEN_DO/checklist/nhật ký kiểm thử; không đổi source, không rerun build/test nghiệp vụ, không kết luận Android/WSL/Docker đã đạt từ kiểm tra PATH. package.json local giữ nguyên; commit/push riêng tài liệu theo AGENTS.
+
 ### 2026-11-05 — HOÀN THÀNH: kiểm lại phần mềm sau khi người dùng cài thêm
 
 - Nhóm việc: chỉ xác minh executable/PATH/registry/doctor để phân biệt thiếu cài đặt với cấu hình phiên cũ; không cài phần mềm hoặc đổi cấu hình máy. Giữ thay đổi package.json có từ trước.
