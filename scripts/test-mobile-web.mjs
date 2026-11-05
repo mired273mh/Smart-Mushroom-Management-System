@@ -52,12 +52,13 @@ try {
   const input = async (label,value) => {
     const field = page.getByRole('textbox',{name:label,exact:true});
     await field.click();
-    // Flutter creates its native editor after Semantics focus. Fill that editor
-    // directly instead of racing synthetic keystrokes against Flutter frames.
-    const editor=page.locator('input:focus, textarea:focus');
-    await editor.waitFor(); await editor.fill(value);
-    assert.equal(await editor.inputValue(),value);
-    await page.keyboard.press('Tab');
+    // Focus can still belong to the previous Flutter Semantics editor on Linux.
+    // Target this labelled input and let Flutter commit editing/focus frames.
+    await page.waitForFunction(name=>document.activeElement?.getAttribute('aria-label')===name,label);
+    const frames = () => page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    await frames(); await field.fill(value); await frames();
+    await field.press('Tab'); await frames();
+    assert.equal((await field.inputValue())===value,true,`Field ${label} must retain its fixture value after blur (value withheld).`);
   };
   const email = `flutter-ui-${Date.now()}@test.invalid`, password='UIOnlyTestPassword_123!';
   await input('Họ tên','Khách UI Flutter');

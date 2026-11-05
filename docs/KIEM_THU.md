@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+CI42004176690/bcc138a: mọi bước trước Flutter UI và deployment PASS; Flutter UI staff login không gửi request, artifact Email rỗng. Sửa helper focus theo đúng label +đợi frame +assert sau blur; local4 nhóm PASS. Tiếp tục CI Linux, không sửa app/skip kiểm tra để che lỗi harness.
+
 CI42003530326/a34bd38: deployment PASS; Web FAIL pagination assertion dòng140 (nhãn trang mới xuất hiện trước table data). Sửa useData scope theo dependencies ngay trong render; local React build/2 client tests/8 E2E PASS. Không skip assertion, bổ sung artifact Web layout nếu lỗi. CI tổng vẫn chưa PASS ở checkpoint này.
 
 CI42003072419/740ea61: deployment Docker **PASS**, API-Web FAIL responsive pager390px; thêm flex-wrap, React build +2 client tests +8 E2E local PASS lại. Chưa gọi tổng workflow PASS, Flutter Linux native-editor fix chưa tới bước chạy.
