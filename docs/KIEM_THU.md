@@ -9,6 +9,7 @@
 - Native `demo.mjs start`→`test-demo-smoke.mjs`→stop/status **PASS** (`hq5-demo-smoke.log`): schema4/APIready/3role RBAC/Chrome login/logout/directory, fresh SIMULATOR; users3/rentals0 giữ nguyên, riêng session được tạo/thu hồi có chủ đích. PostgreSQL/DB/backup/AVD giữ, API/Web/simulator own đã stop. Test mới có redaction credentials, không upload private config hoặc thay nghiệp vụ để smoke.
 - HQ4 `338dda1`/run42071329560 **PASS3jobs** đã xác minh qua connector: api-web/deployment/android-build. HQ5 CI chỉ kết luận sau push/đúng HEAD. Không chạy lại firmware/hardware hoặc gọi mock là sensor PASS.
 - Báo cáo tổng NGHIEM_THU_HQTCSDL.md liên kết32ID/SQL/Windowsguide và các giới hạn; sửa tracing O07 để không biến cycle không thuê OPTIONAL thành thiếu bắt buộc. Không tuyên bố100%: BOM/flash/relay/camera/phone/TLS đích vẫn chưa được nghiệm thu.
+- Git44a90d9 push/remote hash **PASS**; CI run42072667937 còn in_progress lúc ghi checkpoint tài liệu tiếp theo, phải xem HEAD mới thực tế. Paths151/ignore14/userpackagehash/docs33links72 PASS. npm audit --omit=dev exit0,0reported vulnerabilities (hq5-audit.json), không phải chứng nhận an toàn mọi dependency/runtime.
 
 ## HQTCSDL HQ4 — staff directories, 2026-11-06
 
