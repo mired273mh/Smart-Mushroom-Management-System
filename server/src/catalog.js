@@ -5,9 +5,11 @@ import { transaction } from './db.js';
 import { fail, notFound } from './errors.js';
 import { idParam, limitParam, name, uuid } from './validation.js';
 
-const roomInput = z.object({ name, description: z.string().trim().max(2000).default(''), active: z.boolean().default(true) }).strict();
-const planInput = z.object({ name, duration_days: z.number().int().min(1).max(365), price_vnd: z.number().int().min(0).max(1_000_000_000), active: z.boolean().default(true) }).strict();
-const trayInput = z.object({ room_id: uuid, code: z.string().trim().regex(/^[A-Z0-9][A-Z0-9_-]{2,39}$/), label: name, status: z.enum(['available','maintenance','retired']).default('available') }).strict();
+// Defaults belong to creation only; applying Zod defaults inside partial PATCH
+// schemas would overwrite omitted fields (e.g. reactivate a disabled room).
+const roomInput = z.object({ name, description: z.string().trim().max(2000).optional(), active: z.boolean().optional() }).strict();
+const planInput = z.object({ name, duration_days: z.number().int().min(1).max(365), price_vnd: z.number().int().min(0).max(1_000_000_000), active: z.boolean().optional() }).strict();
+const trayInput = z.object({ room_id: uuid, code: z.string().trim().regex(/^[A-Z0-9][A-Z0-9_-]{2,39}$/), label: name, status: z.enum(['available','maintenance','retired']).optional() }).strict();
 const someFields = schema => schema.partial().refine(v => Object.keys(v).length > 0, 'Cần ít nhất một trường.');
 
 export function catalogRouter(pool) {
@@ -30,7 +32,7 @@ export function catalogRouter(pool) {
   });
   router.post('/rooms', staff, async (req, res) => {
     const input = roomInput.parse(req.body);
-    const result = await pool.query('INSERT INTO rooms(name,description,active) VALUES ($1,$2,$3) RETURNING id,name,description,active,created_at', [input.name,input.description,input.active]);
+    const result = await pool.query('INSERT INTO rooms(name,description,active) VALUES ($1,$2,$3) RETURNING id,name,description,active,created_at', [input.name,input.description ?? '',input.active ?? true]);
     res.status(201).json({ data: result.rows[0] });
   });
   router.patch('/rooms/:id', staff, async (req, res) => {
@@ -59,7 +61,7 @@ export function catalogRouter(pool) {
   });
   router.post('/plans', admin, async (req, res) => {
     const input = planInput.parse(req.body);
-    const result = await pool.query('INSERT INTO rental_plans(name,duration_days,price_vnd,active) VALUES ($1,$2,$3,$4) RETURNING *', [input.name,input.duration_days,input.price_vnd,input.active]);
+    const result = await pool.query('INSERT INTO rental_plans(name,duration_days,price_vnd,active) VALUES ($1,$2,$3,$4) RETURNING *', [input.name,input.duration_days,input.price_vnd,input.active ?? true]);
     res.status(201).json({ data: result.rows[0] });
   });
   router.patch('/plans/:id', admin, async (req, res) => {
@@ -86,7 +88,7 @@ export function catalogRouter(pool) {
   });
   router.post('/trays', staff, async (req, res) => {
     const input = trayInput.parse(req.body);
-    const result = await pool.query('INSERT INTO trays(room_id,code,label,status) VALUES ($1,$2,$3,$4) RETURNING *', [input.room_id,input.code,input.label,input.status]);
+    const result = await pool.query('INSERT INTO trays(room_id,code,label,status) VALUES ($1,$2,$3,$4) RETURNING *', [input.room_id,input.code,input.label,input.status ?? 'available']);
     res.status(201).json({ data: result.rows[0] });
   });
   router.patch('/trays/:id', staff, async (req, res) => {
@@ -97,7 +99,7 @@ export function catalogRouter(pool) {
       const current = (await db.query('SELECT * FROM trays WHERE id=$1 FOR UPDATE', [id])).rows[0];
       if (!current) return notFound();
       const busy = await db.query('SELECT 1 FROM rental_items WHERE tray_id=$1 AND ended_at IS NULL', [id]);
-      if (busy.rowCount && (input.room_id || (input.status && input.status !== current.status))) return fail(409, 'TRAY_IN_USE', 'Không chuyển phòng/trạng thái phục vụ khay đang thuê.');
+      if (busy.rowCount && ((input.room_id && input.room_id !== current.room_id) || (input.status && input.status !== current.status))) return fail(409, 'TRAY_IN_USE', 'Không chuyển phòng/trạng thái phục vụ khay đang thuê.');
       const merged = { ...current, ...input };
       return (await db.query('UPDATE trays SET room_id=$2,label=$3,status=$4 WHERE id=$1 RETURNING *', [id,merged.room_id,merged.label,merged.status])).rows[0];
     });

@@ -35,8 +35,9 @@ export function deviceRouter(pool) {
     const sample = z.object({ temperature: z.number().min(-40).max(85), humidity: z.number().min(0).max(100), co2: z.number().int().min(0).max(40000) }).strict().parse(req.body);
     const result = await transaction(pool, async db => {
       // Serialize per-room alert deduplication and automatic command generation.
-      await db.query('SELECT id FROM rooms WHERE id=$1 FOR UPDATE', [req.device.room_id]);
-      const currentDevice = (await db.query('SELECT * FROM devices WHERE id=$1 AND active', [req.device.id])).rows[0];
+      const room = await db.query('SELECT id FROM rooms WHERE id=$1 AND active FOR UPDATE', [req.device.room_id]);
+      if (!room.rowCount) return fail(401, 'INVALID_DEVICE_TOKEN', 'Phòng đã ngừng hoạt động.');
+      const currentDevice = (await db.query('SELECT * FROM devices WHERE id=$1 AND active AND token_hash=$2 FOR UPDATE', [req.device.id,req.device.token_hash])).rows[0];
       if (!currentDevice) return fail(401, 'INVALID_DEVICE_TOKEN', 'Thiết bị đã bị khóa.');
       const reading = (await db.query(`INSERT INTO sensor_readings(device_id,temperature,humidity,co2,simulated)
         VALUES ($1,$2,$3,$4,$5) RETURNING *`, [currentDevice.id,sample.temperature,sample.humidity,sample.co2,currentDevice.mode === 'simulator'])).rows[0];
@@ -129,10 +130,11 @@ export function monitoringRouter(pool) {
   router.get('/rooms/:id/environment', async (req, res) => {
     const id = idParam(req);
     const room = await roomAccess(pool, id, req.user);
-    const since = req.user.role === 'customer' ? (await pool.query(`SELECT min(n.starts_at) AS since FROM rentals n JOIN rental_items i ON i.rental_id=n.id
-      JOIN trays t ON t.id=i.tray_id WHERE t.room_id=$1 AND n.customer_id=$2 AND i.ended_at IS NULL`, [id,req.user.id])).rows[0].since : new Date(0);
     const result = await pool.query(`SELECT s.*,d.name AS device_name FROM sensor_readings s JOIN devices d ON d.id=s.device_id
-      WHERE d.room_id=$1 AND s.recorded_at>=$2 ORDER BY s.recorded_at DESC LIMIT $3`, [id,since,limitParam(req,1000)]);
+      WHERE d.room_id=$1 AND ($2<>'customer' OR s.recorded_at >= (
+        SELECT min(n.starts_at) FROM rentals n JOIN rental_items i ON i.rental_id=n.id JOIN trays t ON t.id=i.tray_id
+        WHERE t.room_id=$1 AND n.customer_id=$3 AND i.ended_at IS NULL))
+      ORDER BY s.recorded_at DESC,s.id DESC LIMIT $4`, [id,req.user.role,req.user.id,limitParam(req,1000)]);
     res.json({ data: { room, measurement_scope: 'room', readings: result.rows } });
   });
   router.get('/rooms/:id/thresholds', staff, async (req, res) => {

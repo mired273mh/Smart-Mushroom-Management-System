@@ -47,6 +47,11 @@
 | 2026-11-05 | Flutter browser harness ban đầu | `npm run test:mobile:web` | FAIL selector → ĐÃ SỬA | Flutter Semantics dùng tab/menuitem/merged accessible names khác DOM Text; sửa locator theo role/name, không bỏ assertion nghiệp vụ |
 | 2026-11-05 | Flutter UI E2E | `npm run test:mobile:web` | PASS4 nhóm | Chrome thật + build Flutter Web + API/PostgreSQL mới; register/rent2/env/link/delivery/cancel-resubmit/notification read/profile/logout/staff denied; không JS/Flutter exception; simulator không phải hardware |
 | 2026-11-05 | Đồng bộ GitHub sau đăng nhập | GCM list, `git fetch origin main`, `git diff --check`, `git push origin HEAD:refs/heads/main` | PASS | Push5756f5b..03cccf6, ahead4/behind0 trước push; source ứng dụng không đổi nên không chạy lại build/test; chưa xác nhận CI remote |
+| 2026-11-05 | Review cuối baseline | `scripts/test.ps1`, `npm audit --json` | PASS24/24; audit0 | Chạy lại baseline thực tế, trước thêm regression; không đủ để kết luận không có bug |
+| 2026-11-05 | Review regression trước sửa | `node --test server/test/review-regression.test.js` | FAIL → ĐANG SỬA | R01–R06 tái hiện. Một fixture lowercase sai validation đã sửa và chạy riêng chứng minh tray maintenance bị reset |
+| 2026-11-05 | CI remote baseline | API jobs/log của run41997537676 | FAIL xác nhận | Backend/React/build/Flutter analyze/unit/live API PASS trên Linux; Flutter UI staff-denied assertion cuối bị timeout |
+| 2026-11-05 | Review backend sau sửa | `scripts/test.ps1` | PASS32/32 | R01–R06 +8 regression cases đã PASS; original24 tests giữ PASS; không skip |
+| 2026-11-05 | Review firmware baseline | `scripts/compile-iot.ps1` | PASS compile2/2 | Mô phỏng77%flash/13%RAM, SCD4x79%flash/14%RAM; không upload/hardware |
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 

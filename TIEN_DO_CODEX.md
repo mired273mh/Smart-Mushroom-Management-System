@@ -7,7 +7,7 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Đang làm:** Đã đồng bộ source tới03cccf6 lên GitHub main; lưu nhật ký xác nhận push thành công. P5 chưa nghiệm thu container/Android/hardware.
+- **Đang làm:** Review/kiểm thử toàn bộ theo yêu cầu mới: backend/DB/security, React/Flutter E2E, IoT compile, deployment/CI/tài liệu; sửa lỗi có bằng chứng và chạy regression.
 - **Đã hoàn thành:** Thiết kế; Express/PostgreSQL24 tests; React Web6 nhóm E2E; Flutter Customer7 widget/client tests + live API + browser UI E2E4 nhóm; pagination lịch sử thuê; firmware2 mode compile; simulator; backup/restore; tài liệu và6 UML render.
 - **Chưa hoàn thành:** Docker runtime/CI remote/TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO điều khiển thật. Chưa phân trang đầy đủ/retention/benchmark tải.
 - **Blocker môi trường:** Thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Blocker GitHub đã giải quyết: Git Credential Manager có tài khoản mired273mh và push main thành công.
@@ -147,6 +147,15 @@
 - Checkpoint cuối: `git diff --check` PASS; `git check-ignore` xác nhận `.local/database.env`, tool binaries và Android local.properties bị ignore. Cảnh báo Git LF/CRLF ở Markdown không phải lỗi whitespace. Không có test đang chạy cần poll tiếp.
 
 ## 5. Tiêu chí để gọi một phần là hoàn thành
+
+### 2026-11-05 — ĐANG LÀM: review và kiểm thử cuối toàn đồ án
+
+- Bắt đầu từ HEAD `861f597`, working tree sạch; không làm lại source hoặc nhập dữ liệu dự án khác.
+- Phạm vi: đọc source và rà soát invariants DB/ownership/concurrency, auth/session, vòng đời thuê/thu hoạch/nhận-giao, UI states, firmware safety, Docker/CI và tài liệu; chạy toàn bộ bộ test/build có môi trường.
+- Tiêu chí: lỗi tái hiện được phải có test regression và sửa; ghi báo cáo kết quả thực tế, giới hạn Android/Docker/hardware, commit/push an toàn. Không suy ra mọi yêu cầu đã hoàn thành chỉ vì các test hiện có PASS.
+- Đã tái hiện lỗi backend R01–R06 (báo cáo `docs/REVIEW_CUOI.md`): password reset/login race, mất microsecond ở ranh giới tenant, PATCH default ghi đè, sửa label khay thuê bị chặn, xóa mềm Customer còn thuê, token device rotate/ingest race. Có8 regression cases, đã sửa source và đang xác minh full suite.
+- Baseline24/24 PASS và npm audit0 vulnerabilities. CI remote861f597 thực tế FAIL ở bước Flutter UI E2E cuối (staff denied assertion), đang điều tra; không giữ nhận định CI chưa chạy như trước.
+- Batch sửa backend R01–R06 **HOÀN THÀNH**, `scripts/test.ps1` **32/32 PASS**, không skip; không đổi migration đã apply. Cập nhật catalog/auth/users/iot và8 regression cases. Firmware baseline compile **2/2 PASS**. Review toàn đồ án vẫn ĐANG LÀM, tiếp theo UI/session state và CI.
 
 ### 2026-11-05 — ĐANG LÀM: quy tắc lưu Git và baseline hiện tại
 

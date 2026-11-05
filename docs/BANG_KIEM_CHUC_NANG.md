@@ -6,8 +6,8 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 |---|---|---|---|
 | A01 | Tạo tài khoản quản trị an toàn | ☑ CLI + Admin Web tạo bổ sung | security.test: bootstrap thật một lần, không log secret; public register không nâng quyền |
 | A02 | Đăng nhập | ☑ API + React | foundation + Chrome E2E, session/hash/revoke/expiry |
-| A03 | Tài khoản/vai trò/khóa/xóa/reset | ☑ API + React | security/rentals: create/role/soft-delete/reset/revoke/last admin; chưa browser test mọi nhánh |
-| A04 | CRUD phòng | ☑ API + React | Browser create; FK/khóa phòng đang thuê test; code edit/delete |
+| A03 | Tài khoản/vai trò/khóa/xóa/reset | ☑ API + React | security/rentals: create/role/soft-delete/reset/revoke/last admin; chặn xóa Customer còn thuê; reset/login race regression PASS |
+| A04 | CRUD phòng | ☑ API + React | Browser create; FK/khóa phòng đang thuê test; code edit/delete; PATCH không ghi đè trường bỏ qua PASS |
 | A05 | Quản lý/định danh/phân công khay | ☑ API + React | Unique code, ownership, room/status guard, browser phân công |
 | A06 | Gói thuê/chính sách giá | ☑ API + React | Tạo/sửa/giá snapshot; browser create |
 | A07 | Thiết bị/cảm biến/camera | ◐ API + React + firmware | Provision/rotate/disable/mode/provenance PASS; sensor/camera thật chưa test |
@@ -39,7 +39,7 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 
 | Sản phẩm | Trạng thái |
 |---|---|
-| REST API/PostgreSQL | 24/24 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
+| REST API/PostgreSQL | 32/32 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
 | React Web | Build và Chrome E2E6 nhóm PASS; ảnh local đã xem; responsive390px không tràn |
 | Flutter Customer | Analyze sạch,7 mock unit/widget+1 live API test PASS,Web build + Chrome UI E2E4 nhóm PASS; APK/emulator chưa chạy |
 | ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |

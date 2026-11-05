@@ -27,7 +27,7 @@ export function usersRouter(pool) {
         const admins = await db.query("SELECT 1 FROM users WHERE role='admin' AND active AND deleted_at IS NULL AND id<>$1", [id]);
         if (!admins.rowCount) return fail(409, 'LAST_ADMIN', 'Không được loại bỏ quản trị viên cuối cùng.');
       }
-      if (input.role && input.role !== current.role) {
+      if (deleting || (input.role && input.role !== current.role)) {
         const rented = await db.query("SELECT 1 FROM rentals WHERE customer_id=$1 AND status='active'", [id]);
         if (rented.rowCount) return fail(409, 'ACTIVE_RENTALS', 'Khách còn hợp đồng đang hoạt động.');
       }

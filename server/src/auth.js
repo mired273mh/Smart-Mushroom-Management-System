@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { email, name, password } from './validation.js';
 import { hashPassword, verifyPassword, newToken, tokenHash } from './security.js';
 import { fail } from './errors.js';
+import { transaction } from './db.js';
 
 export const publicUserColumns = 'id,email,name,role,active,created_at';
 export function authenticate(pool) {
@@ -38,14 +39,18 @@ export function authRouter(pool) {
   const dummyHash = hashPassword(newToken());
   router.post('/login', throttle, async (req, res) => {
     const input = z.object({ email, password: z.string().min(1).max(128) }).strict().parse(req.body);
-    const result = await pool.query('SELECT * FROM users WHERE email=$1', [input.email]);
-    const user = result.rows[0];
-    const valid = await verifyPassword(input.password, user?.password_hash ?? await dummyHash);
-    if (!valid || !user?.active || user.deleted_at) return fail(401, 'INVALID_CREDENTIALS', 'Email hoặc mật khẩu không đúng.');
-    const token = newToken();
-    await pool.query(`INSERT INTO sessions(token_hash,user_id,expires_at) VALUES ($1,$2,now()+interval '12 hours')`, [tokenHash(token), user.id]);
-    const { password_hash, deleted_at, ...publicUser } = user;
-    res.json({ data: { token, expires_in: 43200, user: publicUser } });
+    const data = await transaction(pool, async db => {
+      // Password checks and session issuance must serialize with resets/disable.
+      const result = await db.query('SELECT * FROM users WHERE email=$1 FOR UPDATE', [input.email]);
+      const user = result.rows[0];
+      const valid = await verifyPassword(input.password, user?.password_hash ?? await dummyHash);
+      if (!valid || !user?.active || user.deleted_at) return fail(401, 'INVALID_CREDENTIALS', 'Email hoặc mật khẩu không đúng.');
+      const token = newToken();
+      await db.query(`INSERT INTO sessions(token_hash,user_id,expires_at) VALUES ($1,$2,now()+interval '12 hours')`, [tokenHash(token),user.id]);
+      const { password_hash, deleted_at, ...publicUser } = user;
+      return { token, expires_in:43200, user:publicUser };
+    });
+    res.json({ data });
   });
   router.use(authenticate(pool));
   router.post('/logout', async (req, res) => {
