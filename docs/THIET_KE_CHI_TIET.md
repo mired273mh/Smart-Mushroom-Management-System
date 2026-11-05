@@ -32,7 +32,7 @@ API là modular monolith, chưa dùng microservices/broker. Domain model biểu 
 
 Session token 32 bytes ngẫu nhiên, SHA-256 trong DB, TTL12h; device token cùng độ dài nhưng lookup bảng riêng. Không dùng JWT/refresh token. Customer detail dùng SQL lọc customer_id, sai chủ trả 404. Environment/camera cần thuê active trong phòng; lịch sử environment chỉ từ thời điểm sớm nhất của thuê đang active tại phòng. Người thuê sau không đọc được growth/harvest của item cũ.
 
-Các route đọc lịch sử có giới hạn; phiên bản đầu chưa có pagination đầy đủ, không tuyên bố mở rộng vô hạn. Camera URL HTTPS không userinfo, API không fetch URL, nhưng gateway phải tự bảo vệ live stream; URL không phải hệ thống camera hoàn chỉnh.
+GET /rentals có keyset cursor/filter/ownership, timestamp microsecond và index theo ADR-013; React/Flutter dùng20 dòng/trang. Các route danh sách khác còn giới hạn, chưa có pagination đầy đủ. Camera URL HTTPS không userinfo, API không fetch URL, nhưng gateway phải tự bảo vệ live stream; URL không phải hệ thống camera hoàn chỉnh.
 
 ## UML 2.0 (source PlantUML)
 

@@ -39,6 +39,11 @@
 | 2026-11-05 | P6 UML | `scripts/render-uml.ps1` | PASS6/6 | PlantUML1.2026.9/JRE21.0.13/Smetana, PNG trong docs/uml/rendered; đã xem sequence |
 | 2026-11-05 | Checkpoint cuối | `git diff --check`, `git check-ignore` | PASS | Không lỗi whitespace; credentials/runtime/local DB/dump bị ignore; có cảnh báo chuyển LF/CRLF cho Markdown, không phải test failure |
 | 2026-11-05 | Baseline trước lưu Git theo quy tắc mới | `scripts/test.ps1`, `npm run build:web`, `npm run test:web`, Flutter analyze/test/build, `npm run test:mobile:api` | PASS | Backend21/21; Chrome5 nhóm; Flutter5/5 + live API1/1; không tuyên bố hardware/Android/container đã chạy |
+| 2026-11-05 | Pagination API + regression | `scripts/test.ps1` | PASS24/24 | 207 hợp đồng, timestamp ties/microsecond, không lặp/mất; lọc đúng chủ, cursor scope/input validation; migration003 |
+| 2026-11-05 | Pagination React | `npm run build:web`, `npm run test:web` | PASS6 nhóm | 122 hợp đồng, trang trước/sau, lọc reset cursor, hết trang; responsive390px và browser luồng cũ PASS |
+| 2026-11-05 | Pagination Flutter lần đầu | `flutter analyze`, `flutter test` | FAIL → ĐÃ SỬA | Lint null-aware; callback setState trả Future; HTTP lỗi nhanh trước UI subscribe. Sửa screen/load/helper và thêm paging/retry/pull-refresh regression |
+| 2026-11-05 | Pagination Flutter sau sửa | `flutter test`, `flutter analyze`, `flutter build web --no-wasm-dry-run` | PASS7/7 + analyze/build | Widget paging/previous/filter/retry và shared pull-refresh PASS; test không bỏ qua lỗi HTTP |
+| 2026-11-05 | Pagination Dart live + migration/backup | `npm run test:mobile:api`, `npm run db:migrate`, `npm run test:backup` | PASS1/1 + migration3/restore | Client Dart gọi API/DB thật với25 rentals fixtures; cursor/filter/ownership; restore DB mới xác minh3 migrations |
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 

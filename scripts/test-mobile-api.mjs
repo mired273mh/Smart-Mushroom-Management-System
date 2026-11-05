@@ -3,6 +3,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setup } from '../server/test/helpers.js';
+import { seedRentalHistory } from '../server/test/history-fixtures.js';
 const ctx = await setup();
 try {
   const [admin,customer] = await Promise.all(['admin','customer'].map(ctx.user));
@@ -15,6 +16,7 @@ try {
   const tray = await post('/trays',{room_id:room.id,code:'FLUTTER-LIVE-001',label:'Khay thử mới'});
   const plan = await post('/plans',{name:'Gói Flutter integration',duration_days:30,price_vnd:120000});
   const device = await post('/devices',{room_id:room.id,name:'Simulator Flutter',mode:'simulator'});
+  await seedRentalHistory(ctx.pool,{customerId:customer.id,actorId:admin.id,count:25,roomId:room.id,planId:plan.id});
   const flutterRoot = process.env.FLUTTER_ROOT ?? join(homedir(),'.sm-tools','flutter');
   const dart = join(flutterRoot,'bin','cache','dart-sdk','bin',process.platform === 'win32' ? 'dart.exe' : 'dart');
   const child = spawn(dart,[join(flutterRoot,'bin','cache','flutter_tools.snapshot'),'test','integration/api_live_test.dart','--reporter','expanded'],{

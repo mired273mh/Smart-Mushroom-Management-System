@@ -255,44 +255,183 @@ class _CustomerHomeState extends State<CustomerHome> {
   }
 }
 
-class RentalsScreen extends StatelessWidget {
+class RentalsScreen extends StatefulWidget {
   final MushroomApi api;
   const RentalsScreen({super.key, required this.api});
   @override
-  Widget build(BuildContext context) => AsyncContent<List<Json>>(
-    load: () async => rows(await api.request('/rentals')),
-    builder: (rentals) => ListView(
-      padding: const EdgeInsets.all(20),
-      physics: const AlwaysScrollableScrollPhysics(),
-      children: [
-        Text('Khay của tôi', style: Theme.of(context).textTheme.headlineSmall),
-        const Text('Hợp đồng hiện tại và lịch sử thuê của bạn.'),
-        const SizedBox(height: 20),
-        if (rentals.isEmpty)
-          const EmptyState('Bạn chưa có hợp đồng. Mở Thuê khay để bắt đầu.'),
-        ...rentals.map(
-          (r) => Card(
-            child: ListTile(
-              contentPadding: const EdgeInsets.all(18),
-              leading: const Icon(Icons.spa_outlined),
-              title: Text(
-                '${r['tray_count']} khay · ${r['duration_days']} ngày',
-              ),
-              subtitle: Text(
-                'Từ ${formattedDate(r['starts_at'])}\n${vnd(r['price_per_tray_vnd'])} / khay',
-              ),
-              trailing: StatusChip(r['status']),
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute<void>(
-                  builder: (_) => RentalScreen(api: api, id: r['id']),
-                ),
-              ),
-            ),
-          ),
+  State<RentalsScreen> createState() => _RentalsScreenState();
+}
+
+class _RentalsScreenState extends State<RentalsScreen> {
+  String? status;
+  List<String?> cursors = [null];
+  late Future<RentalsPage> future;
+  @override
+  void initState() {
+    super.initState();
+    future = widget.api.rentalsPage();
+    future.ignore();
+  }
+
+  void load() {
+    final next = widget.api.rentalsPage(status: status, cursor: cursors.last);
+    // Observe fast failures before FutureBuilder subscribes on the next frame.
+    // The original future still delivers its error to the builder for retry UI.
+    next.ignore();
+    setState(() {
+      future = next;
+    });
+  }
+
+  Future<void> refresh() async {
+    final next = widget.api.rentalsPage(status: status);
+    next.ignore();
+    setState(() {
+      cursors = [null];
+      future = next;
+    });
+    try {
+      await next;
+    } catch (_) {
+      /* The FutureBuilder displays the error. */
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Column(
+    children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+        child: DropdownButtonFormField<String>(
+          initialValue: status ?? 'all',
+          decoration: const InputDecoration(labelText: 'Trạng thái hợp đồng'),
+          items: const [
+            DropdownMenuItem(value: 'all', child: Text('Tất cả trạng thái')),
+            DropdownMenuItem(value: 'active', child: Text('Đang thuê')),
+            DropdownMenuItem(value: 'completed', child: Text('Hoàn tất')),
+          ],
+          onChanged: (value) {
+            status = value == 'all' ? null : value;
+            cursors = [null];
+            load();
+          },
         ),
-      ],
-    ),
+      ),
+      Expanded(
+        child: FutureBuilder<RentalsPage>(
+          future: future,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        snapshot.error.toString(),
+                        textAlign: TextAlign.center,
+                      ),
+                      FilledButton(
+                        onPressed: load,
+                        child: const Text('Thử lại'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            final page = snapshot.data!;
+            return Column(
+              children: [
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: refresh,
+                    child: ListView(
+                      padding: const EdgeInsets.all(20),
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: [
+                        Text(
+                          'Khay của tôi',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const Text(
+                          'Hợp đồng hiện tại và lịch sử thuê của bạn.',
+                        ),
+                        const SizedBox(height: 20),
+                        if (page.rentals.isEmpty)
+                          EmptyState(
+                            status == null
+                                ? 'Bạn chưa có hợp đồng. Mở Thuê khay để bắt đầu.'
+                                : 'Chưa có hợp đồng phù hợp bộ lọc.',
+                          ),
+                        ...page.rentals.map(
+                          (r) => Card(
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(18),
+                              leading: const Icon(Icons.spa_outlined),
+                              title: Text(
+                                '${r['tray_count']} khay · ${r['duration_days']} ngày',
+                              ),
+                              subtitle: Text(
+                                'Từ ${formattedDate(r['starts_at'])}\n${vnd(r['price_per_tray_vnd'])} / khay',
+                              ),
+                              trailing: StatusChip(r['status']),
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (_) => RentalScreen(
+                                    api: widget.api,
+                                    id: r['id'],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: cursors.length == 1
+                            ? null
+                            : () {
+                                cursors.removeLast();
+                                load();
+                              },
+                        child: const Text('Trang trước'),
+                      ),
+                      Text(
+                        'Trang ${cursors.length}',
+                        semanticsLabel: 'Trang ${cursors.length}',
+                      ),
+                      TextButton(
+                        onPressed: page.hasMore
+                            ? () {
+                                cursors.add(page.nextCursor);
+                                load();
+                              }
+                            : null,
+                        child: const Text('Trang sau'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    ],
   );
 }
 

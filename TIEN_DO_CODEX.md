@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Đang làm:** Áp dụng quy tắc commit/push mới; kiểm chứng và lưu baseline hiện tại, sau đó phân trang/filter lịch sử thuê xuyên API–React–Flutter. P5 chưa nghiệm thu container/Android/hardware.
+- **Đang làm:** Lưu batch phân trang/filter lịch sử thuê đã PASS; tiếp theo Flutter UI E2E qua browser trên API/DB thật. P5 chưa nghiệm thu container/Android/hardware.
 - **Đã hoàn thành:** Thiết kế; Express/PostgreSQL và API nghiệp vụ; React Web; Flutter Customer (Web/VM); firmware 2 mode compile; simulator; backup/restore test; tài liệu và 6 UML đã render.
 - **Chưa hoàn thành:** Docker runtime/CI remote/TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO điều khiển thật. Chưa phân trang đầy đủ/retention/benchmark tải.
 - **Blocker môi trường:** Thiếu Docker Engine và Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Chưa bật thiết bị thật. Người dùng đã cho phép commit/push thông thường lên nhánh hiện tại theo AGENTS mục 8.
-- **Công việc tiếp theo chính xác:** Phần mềm có thể tiếp tục: pagination/filter API+React+Flutter và test dữ liệu lớn; thêm Flutter UI E2E. Nghiệm thu đích: Docker build/up trên môi trường có Engine, Android debug build khi có SDK, phần cứng chỉ sau xác nhận an toàn. Không dựng lại phần đã PASS.
+- **Công việc tiếp theo chính xác:** Flutter UI E2E cho đăng ký/thuê/theo dõi/nhận-giao; các danh sách khác ngoài /rentals còn cần pagination riêng. Git push cần đăng nhập GitHub trên máy. Docker/Android/hardware vẫn giữ điều kiện nghiệm thu cũ, không dựng lại phần đã PASS.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 
 ## 2. Trạng thái các giai đoạn
@@ -157,6 +157,19 @@
 - Đã chạy lại baseline: backend21/21 PASS, React build + Chrome E2E5 nhóm PASS, Flutter analyze/5 tests/Web build PASS và Dart live API1/1 PASS. Chưa sửa các module nghiệp vụ trong batch này.
 - Preflight Git ban đầu báo `Author identity unknown`; người dùng cung cấp username `mired273mh`. Đã xác minh GitHub ID247734525, chọn địa chỉ noreply chuẩn GitHub cho tài khoản để cấu hình local (không suy đoán email cá nhân).
 - Fetch cho thấy `origin/main` có commit `5756f5b` chỉ sửa tiêu đề README. Giữ tiêu đề đó trong README hiện tại; sẽ tích hợp commit remote bằng merge thông thường, không force/rebase/reset hay xóa lịch sử.
+- **Commit baseline thành công:** `afc0a23` — source ứng dụng đã kiểm chứng và quy tắc Git mới; staged diff/whitespace/123 file đã kiểm tra. Scan đầu báo nhầm biến PowerShell `$pgPassword` là literal, đã rà soát đây là mật khẩu ngẫu nhiên runtime và điều chỉnh kiểm tra; không có secret thật được stage. `.env`, DB/dump/local tools giữ ngoài Git.
+- **Tích hợp remote:** merge thông thường `origin/main` thành công, giữ commit tiêu đề README của người dùng; không rewrite history.
+- **Push main THẤT BẠI:** `git push origin HEAD:refs/heads/main` báo `could not read Username for https://github.com: terminal prompts disabled` (chưa có credential GitHub cho Git). Không hỏi token trong chat, không force push; code đã nằm trong commit local. Đang kiểm tra credential helper có sẵn, phần pagination tiếp tục độc lập.
+
+### 2026-11-05 — HOÀN THÀNH: phân trang/filter lịch sử thuê xuyên suốt
+
+- Phạm vi nhỏ: GET /rentals có cursor ổn định theo starts_at/id, lọc trạng thái và customer_id cho staff; Customer vẫn chỉ thấy của mình. React/Flutter có điều hướng trang và lọc trạng thái; giữ shape `data` để không phá client cũ.
+- Tiêu chí: dữ liệu >100 hợp đồng, timestamp trùng/microsecond không mất/lặp bản ghi, kiểm tra ownership/filter/cursor sai; React browser paging, Flutter widget/live API và build PASS trước commit giai đoạn.
+- Đã có migration003/index, `server/src/rental-pagination.js`, route giữ ownership + metadata; fixtures lịch sử và test mới. Backend **24/24 PASS**, React build + Chrome E2E **6 nhóm PASS** (122 hợp đồng, pager390px).
+- Flutter test đầu phát hiện callback setState trả về Future trong load và helper refresh chung; đã đổi sang block đồng bộ, thêm regression pull-refresh. Analyze sạch trước lỗi widget; đang chạy lại Flutter test/build, chưa ghi giai đoạn hoàn thành.
+- Kết quả sau sửa: Flutter **7/7 PASS**, analyze sạch, Web build PASS. Test lỗi HTTP nhanh còn phát hiện Future chưa được UI subscribe; đã quan sát Future ngay, vẫn hiển thị lỗi/retry qua FutureBuilder và test đã PASS. Không bỏ qua lỗi.
+- `npm run test:mobile:api`: **1/1 PASS** sau thêm25 hợp đồng fixtures; client Dart kiểm tra cursor, lọc completed12 hợp đồng và không lộ chủ thuê khác. Migration dev3 verified và `npm run test:backup` PASS với3 migrations trên DB phục hồi mới.
+- File chính: rental-pagination.js, migration003, route/tests/fixtures backend; React api/App/components/style/E2E; Flutter api/screens/widgets + paging/pull-refresh tests; runner live API và docs. Cần commit/push theo mục8; không đánh dấu Docker/Android/hardware hoàn thành.
 
 - Có file source/di trú/cấu hình tương ứng và tài liệu chạy.
 - Đã chạy kiểm tra phù hợp hoặc nêu rõ giới hạn kiểm thử.

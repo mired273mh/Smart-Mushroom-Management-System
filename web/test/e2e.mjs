@@ -4,6 +4,7 @@ import { spawn } from 'node:child_process';
 import { mkdir, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { setup } from '../../server/test/helpers.js';
+import { seedRentalHistory } from '../../server/test/history-fixtures.js';
 
 const ctx = await setup();
 const [admin,operator,customer] = await Promise.all(['admin','operator','customer'].map(ctx.user));
@@ -118,6 +119,31 @@ try {
   await page.screenshot({ path:fileURLToPath(new URL('../../.local/web-mobile.png',import.meta.url)),fullPage:true });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),true);
   console.log('PASS: Telemetry mô phỏng, tải CSV, responsive 390px không tràn ngang.');
+  // Bulk fixtures are explicitly test data, beyond the old 100-row cap.
+  await seedRentalHistory(ctx.pool,{customerId:customer.id,actorId:admin.id,count:121});
+  await nav('Hợp đồng thuê');
+  const table = page.getByRole('table',{name:'Danh sách hợp đồng'});
+  await table.locator('tbody tr').first().waitFor();
+  assert.equal(await table.locator('tbody tr').count(),20);
+  const firstIds = await table.locator('tbody tr').evaluateAll(rows => rows.map(row => row.dataset.recordId));
+  await page.getByRole('button',{name:'Trang sau',exact:true}).click();
+  await page.getByText('Trang 2 · 20 hợp đồng',{exact:true}).waitFor();
+  const nextIds = await table.locator('tbody tr').evaluateAll(rows => rows.map(row => row.dataset.recordId));
+  assert.equal(nextIds.some(id => firstIds.includes(id)),false);
+  await page.getByRole('button',{name:'Trang trước',exact:true}).click();
+  await page.getByText('Trang 1 · 20 hợp đồng',{exact:true}).waitFor();
+  assert.deepEqual(await table.locator('tbody tr').evaluateAll(rows => rows.map(row => row.dataset.recordId)),firstIds);
+  await page.getByRole('button',{name:'Trang sau',exact:true}).click();
+  await page.getByText('Trang 2 · 20 hợp đồng',{exact:true}).waitFor();
+  await page.getByLabel('Trạng thái hợp đồng',{exact:true}).selectOption('completed');
+  await page.getByText('Trang 1 · 20 hợp đồng',{exact:true}).waitFor();
+  assert.equal(await table.getByText('Hoàn tất',{exact:true}).count(),20);
+  for (let n=0;n<2;n++) { await page.getByRole('button',{name:'Trang sau',exact:true}).click(); await page.getByText(`Trang ${n+2} · 20 hợp đồng`,{exact:true}).waitFor(); }
+  assert.equal(await page.getByRole('button',{name:'Trang sau',exact:true}).isDisabled(),true);
+  await page.getByLabel('Lọc khách thuê',{exact:true}).selectOption(customer.id);
+  await page.getByText('Trang 1 · 20 hợp đồng',{exact:true}).waitFor();
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),true);
+  console.log('PASS: 122 hợp đồng, next/previous không lặp, lọc status/customer reset trang và hết trang đúng; responsive pager390px.');
   await page.getByRole('button',{ name:'Đăng xuất',exact:true }).click();
   await login(operator);
   await page.getByRole('heading',{ name:'Tổng quan',exact:true }).waitFor();

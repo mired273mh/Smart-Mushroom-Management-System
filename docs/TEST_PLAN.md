@@ -6,10 +6,10 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 
 | Mức | Dữ liệu/môi trường | Lệnh | Đã chạy |
 |---|---|---|---|
-| PostgreSQL + HTTP integration | DB `sm_test_*` mới, không mock DB | `npm test` / Windows `scripts/test.ps1` | PASS21/21 |
-| React browser E2E | Chrome headless, API+DB thật | `npm run test:web` | PASS5 nhóm |
+| PostgreSQL + HTTP integration | DB `sm_test_*` mới, không mock DB | `npm test` / Windows `scripts/test.ps1` | PASS24/24 |
+| React browser E2E | Chrome headless, API+DB thật | `npm run test:web` | PASS6 nhóm |
 | React production build | Vite/React | `npm run build:web` | PASS |
-| Flutter unit/widget | MockClient, không sensor/API thật | `flutter test` trong mobile | PASS5/5 |
+| Flutter unit/widget | MockClient, không sensor/API thật | `flutter test` trong mobile | PASS7/7 |
 | Flutter client integration | Dart/MushroomApi gọi API/DB thật | `npm run test:mobile:api` | PASS1/1 |
 | Flutter static/build | SDK3.47.9, Dart3.13.7 | `flutter analyze`, `flutter build web --no-wasm-dry-run` | PASS |
 | Simulator executable | Node HTTP → PostgreSQL, dry-run ack | Nằm trong `npm test` | PASS |
@@ -44,6 +44,8 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | UI01 | Login→CRUD→gán→progress→harvest→giao | Lưu DB thật, không pageerror | web/test/e2e.mjs |
 | MOB01 | Staff vào Customer app, invalid input/network | Từ chối, thông báo đọc được | mobile tests |
 | REC01 | Phục hồi dump | DB mới có dữ liệu/migrations đúng | verify-backup |
+| PAGE01 | >100 hợp đồng, timestamp ties/microsecond | Duyệt207 bản ghi không mất/lặp, giữ ownership/filter | pagination.test.js |
+| PAGE02 | UI đổi trang/filter/HTTP lỗi | Reset cursor, prev/next chính xác, lỗi có retry | React E2E + Flutter widget + live API |
 
 ## Điều kiện nghiệm thu còn thiếu
 
@@ -51,6 +53,6 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 - Android build/signing và kiểm thử trên điện thoại/emulator, luồng UI Flutter đầy đủ.
 - Docker build/compose, GitHub Actions thực tế, staging HTTPS và backup lịch vận hành.
 - Cảm biến hiệu chuẩn, soak test kết nối, fail-safe relay sau xác nhận phần cứng, live camera bảo vệ truy cập.
-- Đo p95/tải20 người dùng, dung lượng retention, kiểm thử dữ liệu lớn và bổ sung pagination. Hiện chưa có benchmark; không suy ra mục tiêu1giây từ test chức năng.
+- Đo p95/tải20 người dùng, dung lượng retention, pagination các danh sách ngoài lịch sử thuê. Đã test207 rentals và UI122 rentals; chưa có benchmark, không suy ra mục tiêu1giây từ test chức năng.
 
 Chỉ nghiệm thu toàn bộ hệ thống sau khi các mục môi trường/thực địa được chạy và ghi bằng chứng. Bản hiện tại đủ kiểm chứng nhiều luồng phần mềm local, chưa phải nghiệm thu triển khai vật lý/production.

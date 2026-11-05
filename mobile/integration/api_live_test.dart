@@ -39,6 +39,29 @@ void main() {
           body: {'code': env['API_TEST_TRAY_CODE']},
         ) as Json;
         expect(linked['id'], itemId);
+        final firstPage = await api.rentalsPage(limit: 1);
+        expect(firstPage.rentals.single['id'], rental['id']);
+        expect(firstPage.hasMore, isTrue);
+        final nextPage = await api.rentalsPage(
+          limit: 5,
+          cursor: firstPage.nextCursor,
+        );
+        expect(
+          nextPage.rentals.every(
+            (entry) => entry['customer_id'] == api.user?['id'],
+          ),
+          isTrue,
+        );
+        expect(
+          nextPage.rentals.any((entry) => entry['id'] == rental['id']),
+          isFalse,
+        );
+        final completed = await api.rentalsPage(
+          status: 'completed',
+          limit: 200,
+        );
+        expect(completed.rentals.length, 12);
+        expect(completed.hasMore, isFalse);
         final reading = await http.post(
           Uri.parse('$base/api/iot/readings'),
           headers: {

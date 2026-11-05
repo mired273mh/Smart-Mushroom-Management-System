@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createApi } from './api.js';
 import { Badge, date, money, Form, LoadState, Modal, Table, useData, statusLabels } from './components.jsx';
 
@@ -64,8 +64,32 @@ function Plans({ api, revision, refresh, action, admin }) {
 
 function Rentals({ api, revision, refresh, action }) {
   const [creating,setCreating] = useState(false), [selected,setSelected] = useState(null);
-  const state = useData(async () => ({ rentals:await api('/rentals'), catalog:await api('/catalog'), customers:await api('/customers') }),[api,revision]);
-  return <><section className="card"><div className="section-head"><h2>Hợp đồng & phân công khay</h2><button onClick={() => setCreating(true)}>+ Gán khay cho khách</button></div><LoadState state={state}>{({ rentals,catalog,customers }) => <><Table rows={rentals} columns={[{ label:'Khách thuê',key:'customer_name' },{ label:'Số khay',key:'tray_count' },{ label:'Bắt đầu',render:r => date(r.starts_at) },{ label:'Kết thúc dự kiến',render:r => date(r.expected_end_at) },{ label:'Trạng thái',render:r => <Badge value={r.status}/> },{ label:'Thao tác',render:r => <button className="link" onClick={() => setSelected(r.id)}>Chi tiết</button> }]}/>{creating && <Modal title="Gán khay cho khách" close={() => setCreating(false)}><Form fields={[{ key:'customer_id',label:'Khách hàng',type:'select',choices:customers.map(c => ({ value:c.id,label:`${c.name} · ${c.email}` })) },{ key:'plan_id',label:'Gói thuê',type:'select',choices:catalog.plans.map(p => ({ value:p.id,label:`${p.name} · ${money(p.price_vnd)}` })) },{ key:'tray_ids',label:'Các khay trống',type:'multi',choices:catalog.trays.map(t => ({ value:t.id,label:`${t.code} · ${t.room_name}` })),hint:'Giữ Ctrl để chọn nhiều khay; tối đa 20 khay.' }]} submit={data => api('/rentals','POST',data)} onDone={r => { setCreating(false); setSelected(r.id); refresh(); }}/></Modal>}</>}</LoadState></section>{selected && <RentalDetail id={selected} api={api} revision={revision} refresh={refresh} action={action} close={() => setSelected(null)}/>}</>;
+  const [status,setStatus] = useState(''), [customer,setCustomer] = useState(''), [cursors,setCursors] = useState([null]);
+  const cursor = cursors.at(-1);
+  useEffect(() => { setCursors([null]); }, [revision]);
+  const query = new URLSearchParams({ limit:'20', ...(status ? { status } : {}), ...(customer ? { customer_id:customer } : {}), ...(cursor ? { cursor } : {}) });
+  const state = useData(() => api.page('/rentals?'+query),[api,revision,status,customer,cursor]);
+  const lookups = useData(async () => ({ catalog:await api('/catalog'), customers:await api('/customers') }),[api,revision]);
+  const changeFilter = setter => event => { setter(event.target.value); setCursors([null]); setSelected(null); };
+  return <>
+    <section className="card">
+      <div className="section-head"><h2>Hợp đồng & phân công khay</h2><button onClick={() => setCreating(true)}>+ Gán khay cho khách</button></div>
+      <div className="list-filters">
+        <label>Trạng thái hợp đồng<select aria-label="Trạng thái hợp đồng" value={status} onChange={changeFilter(setStatus)}><option value="">Tất cả trạng thái</option><option value="active">Đang thuê</option><option value="completed">Hoàn tất</option></select></label>
+        <label>Lọc khách thuê<select aria-label="Lọc khách thuê" value={customer} onChange={changeFilter(setCustomer)}><option value="">Tất cả khách thuê</option>{(lookups.data?.customers ?? []).map(c => <option key={c.id} value={c.id}>{c.name} · {c.email}</option>)}</select></label>
+      </div>
+      <LoadState state={state}>{page => <>
+        <Table label="Danh sách hợp đồng" rows={page.data} columns={[{ label:'Khách thuê',key:'customer_name' },{ label:'Số khay',key:'tray_count' },{ label:'Bắt đầu',render:r => date(r.starts_at) },{ label:'Kết thúc dự kiến',render:r => date(r.expected_end_at) },{ label:'Trạng thái',render:r => <Badge value={r.status}/> },{ label:'Thao tác',render:r => <button className="link" onClick={() => setSelected(r.id)}>Chi tiết</button> }]}/>
+        <nav className="pagination" aria-label="Phân trang hợp đồng">
+          <button className="secondary" disabled={cursors.length===1} onClick={() => setCursors(v => v.slice(0,-1))}>Trang trước</button>
+          <span role="status">Trang {cursors.length} · {page.data.length} hợp đồng</span>
+          <button className="secondary" disabled={!page.pagination.has_more} onClick={() => setCursors(v => [...v,page.pagination.next_cursor])}>Trang sau</button>
+        </nav>
+      </>}</LoadState>
+      {creating && <Modal title="Gán khay cho khách" close={() => setCreating(false)}><LoadState state={lookups}>{({ catalog,customers }) => <Form fields={[{ key:'customer_id',label:'Khách hàng',type:'select',choices:customers.map(c => ({ value:c.id,label:`${c.name} · ${c.email}` })) },{ key:'plan_id',label:'Gói thuê',type:'select',choices:catalog.plans.map(p => ({ value:p.id,label:`${p.name} · ${money(p.price_vnd)}` })) },{ key:'tray_ids',label:'Các khay trống',type:'multi',choices:catalog.trays.map(t => ({ value:t.id,label:`${t.code} · ${t.room_name}` })),hint:'Giữ Ctrl để chọn nhiều khay; tối đa 20 khay.' }]} submit={data => api('/rentals','POST',data)} onDone={r => { setCreating(false); setSelected(r.id); setCursors([null]); refresh(); }}/>}</LoadState></Modal>}
+    </section>
+    {selected && <RentalDetail id={selected} api={api} revision={revision} refresh={refresh} action={action} close={() => setSelected(null)}/>}
+  </>;
 }
 function RentalDetail({ id, api, revision, refresh, action, close }) {
   const [edit,setEdit] = useState(null), state = useData(() => api(`/rentals/${id}`),[api,id,revision]);

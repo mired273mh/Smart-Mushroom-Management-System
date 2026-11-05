@@ -1,4 +1,4 @@
-﻿# Bảng kiểm chức năng — checkpoint 2026-11-05
+# Bảng kiểm chức năng — checkpoint 2026-11-05
 
 Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có một phần hoặc chưa nghiệm thu môi trường đích. Một test API không tự chứng minh mọi nhánh giao diện/hardware. Chi tiết lệnh và lịch sử FAIL/PASS ở KIEM_THU.md.
 
@@ -34,14 +34,14 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | C08 | Điều kiện môi trường | ◐ API + Flutter | Room/time ownership và live Dart reading PASS; chưa sensor thật |
 | C09 | Camera trực tiếp | ◐ contract + mở URL | Chỉ chủ active; chưa live feed/camera thật, không đánh dấu hoàn tất |
 | C10 | Thông báo | ☑ in-app API + Flutter | Growth/harvest/environment scope tests; polling khi trang hoạt động, không OS push |
-| C11 | Lịch sử thuê/giao dịch | ☑ API + Flutter | Snapshot/ledger/tenant tests; danh sách bounded, chưa pagination đầy đủ |
+| C11 | Lịch sử thuê/giao dịch | ☑ API + Flutter | Snapshot/ledger/tenant tests; cursor/status pagination API+React+Flutter PASS; các danh sách khác còn bounded |
 | C12 | Yêu cầu nhận/giao nấm | ☑ API + Flutter | Ownership/address/status API PASS, Flutter dialog source; chưa phone E2E |
 
 | Sản phẩm | Trạng thái |
 |---|---|
-| REST API/PostgreSQL | 21/21 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
-| React Web | Build và Chrome E2E5 nhóm PASS; ảnh local đã xem; responsive390px không tràn |
-| Flutter Customer | Analyze sạch,5 mock unit/widget+1 live API test PASS,Web build PASS; APK/emulator chưa chạy |
+| REST API/PostgreSQL | 24/24 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
+| React Web | Build và Chrome E2E6 nhóm PASS; ảnh local đã xem; responsive390px không tràn |
+| Flutter Customer | Analyze sạch,7 mock unit/widget+1 live API test PASS,Web build PASS; APK/emulator chưa chạy |
 | ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
 | Tích hợp/triển khai | Local integration PASS; Compose config validation PASS; Docker runtime/CI remote/TLS chưa chạy |

@@ -38,6 +38,6 @@
 | Chưa có mẫu môi trường | Kiểm tra device, Wi-Fi/API và thời gian thuê; không dùng mẫu của khách trước thay thế |
 | Không có live camera | Chưa được cấu hình hoặc chưa có phần cứng; liên hệ Operator |
 | Không gửi được lệnh thật | Bản hiện tại chỉ dry-run, chờ nghiệm thu phần cứng/giới hạn an toàn |
-| Danh sách quá dài | Bản đầu có giới hạn trả về; chưa dùng cho dữ liệu vượt giới hạn mà không bổ sung phân trang |
+| Lịch sử hợp đồng dài | Dùng Trang trước/Trang sau và lọc trạng thái, Web có thêm lọc khách; đổi lọc/làm mới về trang đầu. Các danh sách khác vẫn có giới hạn bản đầu |
 
 Thao tác xóa trên Web yêu cầu người dùng xác nhận và bị FK chặn nếu có lịch sử; không cần xóa database để sửa lỗi nghiệp vụ.

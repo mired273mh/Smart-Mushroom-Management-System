@@ -25,7 +25,7 @@ export function LoadState({ state, children }) {
 }
 export function Table({ columns, rows, label = 'Dữ liệu' }) {
   if (!rows.length) return <p className="empty">Chưa có dữ liệu.</p>;
-  return <div className="table-wrap"><table aria-label={label}><thead><tr>{columns.map(c => <th key={c.label}>{c.label}</th>)}</tr></thead><tbody>{rows.map((row, i) => <tr key={row.id ?? i}>{columns.map(c => <td key={c.label}>{c.render ? c.render(row) : row[c.key] ?? '—'}</td>)}</tr>)}</tbody></table></div>;
+  return <div className="table-wrap"><table aria-label={label}><thead><tr>{columns.map(c => <th key={c.label}>{c.label}</th>)}</tr></thead><tbody>{rows.map((row, i) => <tr key={row.id ?? i} data-record-id={row.id}>{columns.map(c => <td key={c.label}>{c.render ? c.render(row) : row[c.key] ?? '—'}</td>)}</tr>)}</tbody></table></div>;
 }
 export function Modal({ title, close, children }) {
   useEffect(() => {

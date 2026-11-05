@@ -64,6 +64,7 @@ class _AsyncContentState<T> extends State<AsyncContent<T>>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     future = widget.load();
+    future.ignore();
     if (widget.poll != null) {
       timer = Timer.periodic(widget.poll!, (_) {
         if (mounted && foreground) refresh().catchError((_) {});
@@ -78,7 +79,10 @@ class _AsyncContentState<T> extends State<AsyncContent<T>>
 
   Future<void> refresh() async {
     final next = widget.load();
-    setState(() => future = next);
+    next.ignore();
+    setState(() {
+      future = next;
+    });
     await next;
   }
 

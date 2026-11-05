@@ -49,7 +49,13 @@ void main() {
           );
         }
         if (req.url.path.endsWith('/logout')) return http.Response('', 204);
-        return http.Response(jsonEncode({'data': []}), 200);
+        return http.Response(
+          jsonEncode({
+            'data': [],
+            'pagination': {'has_more': false, 'next_cursor': null},
+          }),
+          200,
+        );
       }),
     );
     await tester.pumpWidget(MushroomApp(api: api));

@@ -1,5 +1,5 @@
 export function createApi(token, onExpired) {
-  return async (path, method = 'GET', body) => {
+  const request = async (path, method = 'GET', body, envelope = false) => {
     const response = await fetch('/api' + path, {
       method, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}) },
       body: body === undefined ? undefined : JSON.stringify(body),
@@ -11,6 +11,8 @@ export function createApi(token, onExpired) {
       if (response.status === 401 && token) onExpired();
       throw new Error([result.error?.message ?? `Lỗi HTTP ${response.status}`, ...(result.error?.fields ?? []).map(f => `${f.path}: ${f.message}`)].join(' '));
     }
-    return result.data;
+    return envelope ? result : result.data;
   };
+  request.page = path => request(path, 'GET', undefined, true);
+  return request;
 }

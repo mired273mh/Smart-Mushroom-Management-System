@@ -53,3 +53,10 @@ Tham chiếu kỹ thuật: [PostgreSQL constraints](https://www.postgresql.org/d
 - Firmware kiểm tra `/iot/me` để mode biên dịch khớp mode server; simulator không được dùng token hardware. HTTPS xác minh root CA, đồng bộ NTP, không setInsecure/redirect token; HTTP chỉ mở riêng cho LAN khi dev chủ động cấu hình.
 - Relay chưa có sơ đồ/giới hạn an toàn được xác nhận nên firmware không chứa GPIO điều khiển tải; lệnh thật bị server chặn. Compile không phải kiểm thử cảm biến thật. Chưa upload lên ESP32.
 - Thư viện chuẩn nhà sản xuất: [Sensirion Arduino SCD4x](https://github.com/Sensirion/arduino-i2c-scd4x), [Espressif TLS example](https://github.com/espressif/arduino-esp32/tree/master/libraries/NetworkClientSecure/examples).
+
+### ADR-013 — Phân trang lịch sử thuê (2026-11-05)
+
+- Chọn keyset `(starts_at DESC, id DESC)` cho GET /rentals thay vì OFFSET, tránh dịch vị trí bản ghi khi có hợp đồng mới. Trả thêm `pagination` bên cạnh mảng `data` để client cũ không bị đổi cấu trúc dữ liệu.
+- Cursor base64url chứa vị trí, phiên bản, viewer và bộ lọc; giới hạn độ dài, validate chặt. Cursor không phải secret hay chứng cứ cấp quyền: mỗi trang vẫn lọc customer_id từ user đăng nhập bằng SQL. Cursor đổi viewer/bộ lọc bị từ chối; client phải về trang đầu.
+- Giữ timestamp PostgreSQL đủ microsecond khi tạo cursor, vì JavaScript Date chỉ giữ millisecond. Migration003 thêm index hỗ trợ truy vấn; không đổi/xóa lịch sử.
+- React/Flutter dùng20 dòng/trang, nút trước/sau và bộ lọc trạng thái; staff thêm filter customer_id. Quay về dùng stack cursor, làm mới/bộ lọc thay đổi xóa stack. Các danh sách khác còn giới hạn bản đầu, cần từng batch riêng.

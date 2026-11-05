@@ -16,6 +16,29 @@ class ApiException implements Exception {
   String toString() => message;
 }
 
+class RentalsPage {
+  final List<Json> rentals;
+  final bool hasMore;
+  final String? nextCursor;
+  RentalsPage({required this.rentals, required this.hasMore, this.nextCursor});
+  factory RentalsPage.fromJson(Json value) {
+    final meta = value['pagination'];
+    if (value['data'] is! List ||
+        meta is! Map ||
+        meta['has_more'] is! bool ||
+        (meta['has_more'] == true &&
+            (meta['next_cursor'] is! String ||
+                (meta['next_cursor'] as String).isEmpty))) {
+      throw ApiException('Phản hồi phân trang không hợp lệ. Vui lòng thử lại.');
+    }
+    return RentalsPage(
+      rentals: rows(value['data']),
+      hasMore: meta['has_more'],
+      nextCursor: meta['next_cursor'] as String?,
+    );
+  }
+}
+
 class MushroomApi extends ChangeNotifier {
   final String baseUrl;
   final http.Client client;
@@ -31,6 +54,7 @@ class MushroomApi extends ChangeNotifier {
     String path, {
     String method = 'GET',
     Json? body,
+    bool envelope = false,
   }) async {
     try {
       final request = http.Request(method, Uri.parse('$origin/api$path'));
@@ -55,7 +79,7 @@ class MushroomApi extends ChangeNotifier {
           response.statusCode,
         );
       }
-      return decoded['data'];
+      return envelope ? decoded : decoded['data'];
     } on ApiException {
       rethrow;
     } on TimeoutException {
@@ -65,6 +89,23 @@ class MushroomApi extends ChangeNotifier {
         'Không kết nối được máy chủ hoặc phản hồi không hợp lệ.',
       );
     }
+  }
+
+  Future<RentalsPage> rentalsPage({
+    String? status,
+    String? cursor,
+    int limit = 20,
+  }) async {
+    final filters = {'limit': '$limit'};
+    if (status != null) {
+      filters['status'] = status;
+    }
+    if (cursor != null) {
+      filters['cursor'] = cursor;
+    }
+    final query = Uri(queryParameters: filters).query;
+    final response = await request('/rentals?$query', envelope: true) as Json;
+    return RentalsPage.fromJson(response);
   }
 
   Future<void> login(String email, String password) async {

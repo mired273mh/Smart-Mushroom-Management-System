@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { staff, roles } from './auth.js';
 import { transaction } from './db.js';
-import { idParam, limitParam, uuid } from './validation.js';
+import { idParam, uuid } from './validation.js';
+import { rentalPageInput, rentalPageResponse } from './rental-pagination.js';
 import { fail, notFound } from './errors.js';
 
 export async function accessibleRental(db, id, user) {
@@ -26,10 +27,16 @@ export async function accessibleItem(db, id, user, { active = false, lock = fals
 export function rentalsRouter(pool) {
   const router = Router();
   router.get('/rentals', async (req, res) => {
-    const result = await pool.query(`SELECT n.*,u.name AS customer_name,(SELECT count(*)::int FROM rental_items i WHERE i.rental_id=n.id) AS tray_count
-      FROM rentals n JOIN users u ON u.id=n.customer_id WHERE ($1 <> 'customer' OR n.customer_id=$2)
-      ORDER BY n.starts_at DESC LIMIT $3`, [req.user.role,req.user.id,limitParam(req)]);
-    res.json({ data: result.rows });
+    const page = rentalPageInput(req);
+    const result = await pool.query(`SELECT n.*,u.name AS customer_name,(SELECT count(*)::int FROM rental_items i WHERE i.rental_id=n.id) AS tray_count,
+      to_char(n.starts_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS cursor_started_at
+      FROM rentals n JOIN users u ON u.id=n.customer_id
+      WHERE ($1 <> 'customer' OR n.customer_id=$2)
+        AND ($3::text IS NULL OR n.status=$3)
+        AND ($4::uuid IS NULL OR n.customer_id=$4)
+        AND ($5::timestamptz IS NULL OR (n.starts_at,n.id)<($5::timestamptz,$6::uuid))
+      ORDER BY n.starts_at DESC,n.id DESC LIMIT $7`, [req.user.role,req.user.id,page.status,page.customerId,page.cursor?.starts_at ?? null,page.cursor?.id ?? null,page.limit+1]);
+    res.json(rentalPageResponse(result.rows, page, req.user));
   });
   router.post('/rentals', async (req, res) => {
     const input = z.object({ plan_id: uuid, tray_ids: z.array(uuid).min(1).max(20).refine(ids => new Set(ids).size === ids.length), customer_id: uuid.optional() }).strict().parse(req.body);

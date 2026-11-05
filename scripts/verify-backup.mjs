@@ -34,6 +34,6 @@ try {
   const restoreUrl = new URL(url); restoreUrl.pathname='/'+restoreName;
   restored = createPool(restoreUrl.href);
   assert.equal((await restored.query('SELECT email FROM users WHERE id=$1',[user.id])).rows[0].email,user.email);
-  assert.equal((await restored.query('SELECT count(*)::int AS n FROM schema_migrations')).rows[0].n,2);
+  assert.equal((await restored.query('SELECT count(*)::int AS n FROM schema_migrations')).rows[0].n,3);
   console.log('PASS: pg_dump custom → pg_restore into a NEW sm_test_restore_* database; data and migrations verified. Source/test databases retained.');
 } finally { await restored?.end(); await ctx.close(); }

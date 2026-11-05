@@ -4,9 +4,9 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 
 | Thành phần | Công nghệ | Mức đã kiểm chứng |
 |---|---|---|
-| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API; 21 integration tests PASS |
+| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API; 24 integration tests PASS |
 | Web nhân sự | React + Vite | Build và Chrome E2E các luồng chính PASS |
-| App Customer | Flutter | Analyze, 5 unit/widget tests, 1 live API test, Web build PASS; chưa Android SDK/APK |
+| App Customer | Flutter | Analyze, 7 unit/widget tests, 1 live API test, Web build PASS; chưa Android SDK/APK |
 | IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
 | Deployment | Docker Compose + Nginx | Compose config validation PASS; chưa chạy container/CI remote/production TLS |
 
@@ -33,6 +33,8 @@ npm run dev:web
 ```
 
 API ở localhost3000; `/health` kiểm tra tiến trình, `/ready` kiểm tra DB. Vite proxy `/api` đến 127.0.0.1:3000; có thể đặt API_TARGET khi cần. Đăng ký công khai chỉ Customer; Operator/Admin bổ sung được Admin cấp qua Web. Không có tài khoản/mật khẩu mặc định.
+
+Lịch sử hợp đồng trên React/Flutter có20 bản ghi/trang, nút trước/sau và lọc trạng thái; Web nhân sự có thêm lọc khách thuê. API `/rentals` dùng cursor, giữ ownership ở từng trang; các danh sách khác vẫn theo giới hạn tại API.md.
 
 Nếu công cụ portable có sẵn tại `C:/Users/mired/.sm-tools` trên máy Windows hiện tại:
 

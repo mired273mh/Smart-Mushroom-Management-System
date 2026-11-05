@@ -2,7 +2,9 @@
 
 Base `/api`; JSON `{data: ...}`, lỗi `{error:{code,message,fields?}}`. `Authorization: Bearer <token>` cho user, token thiết bị riêng cho `/iot/*`. Không gửi token trong query string. Các input nhạy cảm từ chối trường thừa. Chi tiết validation tại `server/src/`.
 
-Danh sách mặc định 100, `?limit=1..200`; environment tối đa 1000. Phiên bản đầu chưa có cursor/offset, vì vậy danh sách chưa phù hợp dữ liệu lớn hơn giới hạn. CSV tối đa 10.000 dòng; chưa có export bất đồng bộ.
+Danh sách mặc định100, `?limit=1..200`; environment tối đa1000. **GET /rentals đã có cursor pagination**; các danh sách khác vẫn giới hạn số bản ghi, chưa có pagination đầy đủ. CSV tối đa10.000 dòng; chưa có export bất đồng bộ.
+
+GET /rentals nhận `limit`, `cursor`, `status=active|completed` và `customer_id` (chỉ staff). Trả `{data:[...], pagination:{limit,has_more,next_cursor}}`. Gọi trang đầu không có cursor; trang sau gửi next_cursor với cùng bộ lọc và user. Cursor sai/đổi scope trả422; Customer gửi customer_id bị403. Mảng `data` giữ tương thích client cũ. Cursor không thay thế ownership và không cần lưu bí mật. Không có total/page count; UI lưu stack cursor để quay lại, refresh về đầu. Thứ tự `starts_at DESC,id DESC` giữ chính xác microsecond.
 
 | Method/path | Quyền | Body/ý nghĩa |
 |---|---|---|
