@@ -1,6 +1,6 @@
 # Chạy demo Smart Mushroom trên Windows
 
-Ngày xác minh:2026-11-05. Dùng source hiện tại, database demo mới và tài khoản ngẫu nhiên; không dùng dữ liệu dự án khác. API/React/Flutter Android đã chạy với PostgreSQL thật; nhiệt/ẩm/CO₂ trong demo là **SIMULATOR**, lệnh **DRY-RUN**, không có live camera/relay thật.
+Ngày xác minh:2026-11-06. Dùng source hiện tại, database demo riêng và tài khoản ngẫu nhiên; không dùng dữ liệu dự án khác. API/React/Flutter Android đã chạy với PostgreSQL thật; nhiệt/ẩm/CO₂ trong demo là **SIMULATOR**, lệnh **DRY-RUN**, không có live camera/relay thật. [Báo cáo nghiệm thu HQTCSDL](NGHIEM_THU_HQTCSDL.md) ghi phạm vi và bằng chứng mới nhất.
 
 ## 1. Chuẩn bị và kiểm tra
 
@@ -48,6 +48,8 @@ node scripts/demo.mjs start
 - Simulator ghi mẫu mỗi2 giây, tối đa1000 mẫu mỗi lần chạy (~33 phút), kiểm tra mode và chỉ ack dry-run. Có thể dừng/chạy lại sau khi hết lượt; không tạo thêm thiết bị/account.
 - Script chỉ bind loopback. Nếu cổng3000/5173 bận, dừng đúng ứng dụng đang dùng cổng hoặc chọn kế hoạch cổng riêng; script không kill tiến trình lạ để lấy cổng.
 
+Terminal khác: `node scripts/test-demo-smoke.mjs` kiểm tra readiness/schema4,3role API/RBAC và đăng nhập/đăng xuất React qua Chrome, directory metadata và mẫu SIMULATOR mới≤30s. Cần Chrome/Playwright dependency; script dùng profile riêng, không in account/password, không gán thuê/xóa dữ liệu/schema hoặc điều khiển thiết bị. Kiểm users/rentals counts không đổi; tạo/thu hồi session là thay đổi có chủ đích. Không thay thế Android UI/full business E2E hoặc hardware test. Script không tự khởi động/dừng demo.
+
 ## 4. Flutter trên Android Emulator
 
 Android Studio→Device Manager→Start AVD. Emulator user đã từng offline trong kiểm thử; nếu adb không nhận online, khởi động lại AVD có chủ đích. Không wipe data. Có thể dùng điện thoại nhưng chưa được kiểm thử trong bằng chứng này.
@@ -62,7 +64,7 @@ flutter run -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:3000
 
 Thay emulator-5554 bằng ID **online** trên máy. `10.0.2.2` là host Windows nhìn từ emulator; không dùng localhost của Android để gọi Windows. Đăng nhập Customer trong private.json; Admin/Operator bị ứng dụng Customer từ chối theo thiết kế. App giữ session trong RAM, mở lại cần đăng nhập.
 
-APK debug có thể build bằng `flutter build apk --debug --no-pub`, file `mobile/build/app/outputs/flutter-apk/app-debug.apk`. Sau khi chạy integration_test, build lại target main.dart trước khi cài APK demo vì APK test không phải bản trình diễn. Bản release/signing/HTTPS public chưa nghiệm thu; không phát hành APK test hoặc debug key làm production.
+APK debug có thể build bằng `flutter build apk --debug --no-pub -t lib/main.dart`, file `mobile/build/app/outputs/flutter-apk/app-debug.apk`. Sau khi chạy integration_test, build lại target main.dart trước khi cài APK demo vì APK test không phải bản trình diễn. HQ5 đã build lại target main.dart thành công; không suy APK production/signing hoặc lần cài/run riêng của APK cuối từ kết quả build. Bản release/signing/HTTPS public chưa nghiệm thu; không phát hành APK test hoặc debug key làm production.
 
 ## 5. Kịch bản bảo vệ
 
@@ -72,7 +74,7 @@ APK debug có thể build bằng `flutter build apk --debug --no-pub`, file `mob
 4. Operator Web cập nhật fruiting→ready, lịch thu hoạch dự kiến, rồi ghi cân nặng thu hoạch. Customer mở Thông báo và Nhận nấm.
 5. Customer chọn nhận tại trại/giao hàng (giao cần địa chỉ); Operator xử lý tiếp nhận→bàn giao. Nhân viên chỉ xác nhận đã thu tiền khi thực sự trình diễn thu thủ công, không có online payment.
 6. Hoàn tất hợp đồng sau khi đã thu/bàn giao; Customer xem lịch sử. Admin xem dashboard/báo cáo và tải CSV. Kiểm tra cả logout và đăng nhập sai vai trò.
-7. Có thể trình diễn ngưỡng/cảnh báo và lệnh dry-run; chưa có driver GPIO/camera thật. Giải thích giới hạn này rõ với hội đồng.
+7. Có thể trình diễn ngưỡng/cảnh báo và lệnh dry-run. Có driver GPIO nhưng compile gate/allowlist mặc định khóa, chưa flash/đo tải; camera chưa có luồng thật. Giải thích giới hạn này rõ với hội đồng.
 
 ## 6. Dừng và chạy lại
 
@@ -89,11 +91,11 @@ Lần sau chạy PostgreSQL script rồi `node scripts/demo.mjs start`; không c
 
 ## 7. Tự kiểm thử và phạm vi bằng chứng
 
-- `scripts/test.ps1`: DB sm_test_* mới,32 integration cases; giữ DB, không xóa.
-- `npm.cmd run build:web`, `npm.cmd run test:web`:2 client tests +9 nhóm Chrome E2E, gồm1280x720/390px và session race.
-- Trong mobile: `flutter analyze`, `flutter test`:12 tests dùng MockClient/widget.
+- `scripts/test.ps1`: DB sm_test_* mới,50 integration cases; giữ DB, không xóa.
+- `npm.cmd run build:web`, `npm.cmd run test:web`:4 client tests +13 nhóm Chrome E2E, gồm1280x720/390px, session race, directory search/paging và gán thuê ngoài200.
+- Trong mobile: `flutter analyze`, `flutter test`:15 tests dùng MockClient/widget.
 - `node scripts/test-mobile-android.mjs`: đặt TEST_DATABASE_URL tên sm_test_* và ANDROID_TEST_DEVICE trỏ emulator online. Runner tạo DB riêng, dùng fixture test/10.0.2.2; Android UI thật và SQL hậu kiểm, **không sensor/relay/camera thật**. Có thể nạp TEST_DATABASE_URL từ .local/database.env vào biến chỉ trong terminal rồi đổi pathname thành sm_test_android; không in credential.
 - `npm.cmd run test:mobile:api`, `test:mobile:web` là VM/browser, tách khỏi Android.
-- `npm.cmd run test:backup` phục hồi DB mới; `test:load` chỉ benchmark đọc local; firmware compile2 mode không flash.
+- `npm.cmd run test:backup` phục hồi DB mới; `test:load` chỉ benchmark đọc local; firmware compile3profiles không flash.
 
 Docker Windows cũng đã build/up/smoke thành công trong project xác minh riêng; đó không phải DB/accounts của native demo. Nếu dùng Compose, xem CAI_DAT_TRIEN_KHAI và tạo root.env riêng, bootstrap admin trong container. Bằng chứng Windows Docker/Android không chứng minh production TLS hoặc phần cứng vật lý.

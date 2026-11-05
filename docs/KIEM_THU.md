@@ -2,6 +2,14 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## HQTCSDL HQ5 — nghiệm thu tổng, 2026-11-06
+
+- `node scripts/test-hqtcsdl.mjs` **PASS9/9** sau HQ4 API, không chỉ đọc SQL. Log hq5-sql-demos.log/results.json ở run-1793898420962-df4eb8;17tables/81constraints/35indexes,50.000simulated samples EXPLAIN49.727ms forcedSeq/0.044ms indexed (1run local, không SLA),2session COMMIT/23505/ROLLBACK,2real restricted logins, backup17table counts+graph/routines/ACL,3role HTTP và SIMULATOR/dry-run.
+- `flutter build apk --debug --no-pub -t lib/main.dart` **PASS native exit0**, hq5-demo-apk.log. APK debug179222269B, SHA256557e918496c39ab202cc9df66c38db88263c7d640a25e0a58d833cf269df378f, giữ local/ignored. Main target tránh dùng nhầm APK integration_test; chưa cài/run riêng APK cuối sau build. Android UI source đã PASS HQ3. JBR native-access warnings giữ log, không thay JDK hệ thống để né warning.
+- Native `demo.mjs start`→`test-demo-smoke.mjs`→stop/status **PASS** (`hq5-demo-smoke.log`): schema4/APIready/3role RBAC/Chrome login/logout/directory, fresh SIMULATOR; users3/rentals0 giữ nguyên, riêng session được tạo/thu hồi có chủ đích. PostgreSQL/DB/backup/AVD giữ, API/Web/simulator own đã stop. Test mới có redaction credentials, không upload private config hoặc thay nghiệp vụ để smoke.
+- HQ4 `338dda1`/run42071329560 **PASS3jobs** đã xác minh qua connector: api-web/deployment/android-build. HQ5 CI chỉ kết luận sau push/đúng HEAD. Không chạy lại firmware/hardware hoặc gọi mock là sensor PASS.
+- Báo cáo tổng NGHIEM_THU_HQTCSDL.md liên kết32ID/SQL/Windowsguide và các giới hạn; sửa tracing O07 để không biến cycle không thuê OPTIONAL thành thiếu bắt buộc. Không tuyên bố100%: BOM/flash/relay/camera/phone/TLS đích vẫn chưa được nghiệm thu.
+
 ## HQTCSDL HQ4 — staff directories, 2026-11-06
 
 | Phạm vi | Kết quả thật | Bằng chứng / giới hạn |

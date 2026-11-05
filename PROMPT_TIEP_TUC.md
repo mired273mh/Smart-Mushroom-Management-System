@@ -20,4 +20,6 @@ Dấu chấm cuối câu cũng được chấp nhận. Không dựng lại sourc
 
 Định hướng mới nhất: đồ án môn **HQTCSDL**. Đọc NEXT_TASK ở tiến độ, ưu tiên PostgreSQL/constraint/transaction/concurrency/least privilege/SQL nâng cao có lợi ích thật, rồi nghiệp vụ bắt buộc và tích hợp. Đối chiếu phân loại REQUIRED/SUPPORTING/RECOMMENDED/OPTIONAL trước thêm tính năng; cycle không thuê/retention không tự trở thành bắt buộc. Bộ demo trong docs/demo-hqtcsdl phải có lệnh, dữ liệu riêng/rollback, bằng chứng và giải thích đúng implementation. Không cần lặp cleanup/full build khi Git/source không đổi hoặc test liên quan đã đủ.
 
+HQ1–HQ5 có báo cáo tại docs/NGHIEM_THU_HQTCSDL.md:9SQLdemo, role/backup, catalog/directory paging, native smoke và Android source đã kiểm chứng theo log; vẫn phải đối chiếu HEAD/CI thực tế. Không xem ghi chú cũ “thiếu SDK/Docker” hay “cycle không thuê thiếu bắt buộc” là trạng thái hiện tại. Sau Android integration_test cần build target lib/main.dart trước dùng APK demo. Không tự tạo thêm giai đoạn ngoài phạm vi để bỏ qua blocker thiết bị/production; khi có cấu hình mới thì chọn một batch có căn cứ và kiểm thử được.
+
 Lưu ý: Yêu cầu này **không tự kích hoạt lúc token reset**. Người dùng phải mở repo và gửi lệnh, hoặc dùng một hệ thống tự động bên ngoài được cấu hình riêng.

@@ -2,6 +2,8 @@
 
 Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có một phần hoặc chưa nghiệm thu môi trường đích. Một test API không tự chứng minh mọi nhánh giao diện/hardware. Chi tiết lệnh và lịch sử FAIL/PASS ở KIEM_THU.md.
 
+HQ5: [nghiệm thu tổng HQTCSDL](NGHIEM_THU_HQTCSDL.md),9SQLdemo PASS sau HQ4 API, native Windows demo smoke3roles PASS, main.dart APK build PASS. HQ4 `338dda1` CI run42071329560 PASS3jobs đã xác minh; HQ5 chờ CI đúng commit. Source firmware không đổi, không flash/actuation. Các cap/production/hardware giới hạn ghi rõ trong báo cáo.
+
 HQ4: rooms/trays/plans/customers/users/devices đã keyset/search; Web5table20/trang và lookup gán thuê/chọn phòng ngoài200 đã Chrome+SQL PASS. Backend50/50, React4tests/13nhóm, Flutter live Dart1/1 PASS. Không thay giới hạn của history/readings/notifications/harvests/fulfillment/reports/CSV hoặc nghiệm thu vật lý. CI HQ3 be4a174/run42069882343 PASS3jobs.
 
 HQ2: [9demo HQTCSDL](demo-hqtcsdl/README.md) PASS, [3NF/data dictionary](THIET_KE_CSDL_HQTCSDL.md)/hỏi đáp đã có; real limited-role Docker, demo upgrade/rehearsal, Android emulator UI+SQL và React provenance report PASS. Phần chưa đủ ở lists/paging/search ngoài rentals và môi trường hardware/production vẫn giữ trạng thái, không gọi hoàn thành100%.
@@ -56,7 +58,7 @@ Master2/master3: GPIO source có khóa hai lớp và pulse/interlock/TTL đã co
 | Flutter Customer |Analyze sạch/15tests; realChrome5groups inclpaging/search/cross-page booking; APK/AndroidUI→API→SQL PASS; chưa phone thật |
 | ESP32 | Compile3 profile +pulse/URL assertions PASS; GPIO gate mặc định0, chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
-| Tích hợp/triển khai |Local +CI toàn bộ PASS run42005126537/3c14bc8, gồm Docker build/up/smoke; TLS production/Android/hardware chưa nghiệm thu |
+| Tích hợp/triển khai |Local +CI3jobs PASS run42071329560/338dda1 gồm Docker dev/runtime limited role và Android APK build; native smoke/Android emulator UI PASS riêng; TLS production/phone/hardware chưa nghiệm thu |
 | Tài liệu | UR/SRS/ADR/ERD/API/detail/test/deploy/user guide và 6 UML source/PNG render PASS |
 
 Chưa nghiệm thu hoàn chỉnh đồ án vật lý/production. Android SDK/Docker Engine đã chạy; còn xác nhận phần cứng/giới hạn an toàn. Các bản kiểm kê tiếp theo là lịch sử trước khi cài thêm. Những phần mềm có thể phát triển tiếp: phân trang/filter, retention, thêm browser coverage và đo tải; không gọi các mục này là đã hoàn thành.

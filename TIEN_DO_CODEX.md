@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Mốc hiện tại HQTCSDL:** HQ1/HQ2/HQ3 đã commit/push, CI tương ứng đều PASS3jobs; HQ4 staff directories/lookup đã kiểm thử, đang lưu checkpoint. CI mới chỉ được xác nhận theo đúng commit, không suy ra từ CI cũ.
+- **Mốc hiện tại HQTCSDL:** HQ1–HQ4 đã commit/push, CI tương ứng đều PASS3jobs; HQ5 SQL/demo/APK/tài liệu nghiệm thu đã kiểm thử, đang lưu checkpoint. CI mới chỉ được xác nhận theo đúng commit, không suy ra từ CI cũ.
 - **Đã kiểm chứng:** Express/PostgreSQL50tests, React build/4tests/13Chrome groups; Flutter analyze sạch/15tests/live Dart API1/1/Chrome5groups và APK+Android UI→API→SQL PASS. Firmware3profiles compile ở checkpoint trước, firmware không đổi. Backup/restore17table counts/graph/routines/roles,9demo SQL HQTCSDL, least-privilege Docker runtime, nâng cấp demo3→4 với backup/rehearsal đều PASS. SQL/API có views/function/procedure/5triggers; tài liệu3NF/data dictionary/EXPLAIN/câu hỏi bảo vệ đã bổ sung.
 - **Chưa nghiệm thu:** History/readings/notifications/harvests/fulfillment/reports còn cap riêng, dropdown giữ mọi lựa chọn trong RAM; TLS production/phone/signing/sensor/relay/camera thật. Retention/soak là RECOMMENDED, module cycle không thuê OPTIONAL theo PHAM_VI_HQTCSDL, không tự xem là blocker bắt buộc. Không tuyên bố hoàn thành100%.
 - **Blocker hiện tại:** Chưa xác nhận BOM/đấu dây/giới hạn/camera và chưa có thiết bị kiểm thử. Android SDK/NDK28.2, Docker Engine, WSL đã chạy, không cần cài lại. GitHub main push được. AVD người dùng5554 có lúc offline; E2E dùng AVD riêng5558 trong .local, không wipe AVD người dùng.
-- **NEXT_TASK:** Chốt commit/push HQ4 và kiểm tra CI đúng HEAD; đối chiếu nghiệm thu Master HQTCSDL, chạy lại9demo khi tích hợp API mới và cập nhật báo cáo tổng/đường chạy Windows. Không làm lại HQ1/HQ2/cleanup. BOM/flash/cấp tải vẫn cần xác nhận; không chặn phần mềm/SQL.
+- **NEXT_TASK:** Chốt commit/push HQ5 và xác minh CI HEAD; phần local/HQTCSDL đã có bằng chứng ở NGHIEM_THU_HQTCSDL.md. Bước nghiệm thu đích cần người dùng xác nhận BOM/thiết bị/camera/giới hạn tải và cấu hình phone/TLS/signing; không flash/cấp tải khi chưa xác nhận. Nếu có lỗi phần mềm mới, sửa batch có căn cứ rồi regression; không dựng lại hoặc lặp cleanup/optionalcycle/retention để thay nghiệm thu thiết bị. History có cap theo API doc, xem xét paging/remote selectors khi có yêu cầu dataset thực.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 - **Kiểm kê Windows mới nhất:** Node26.13/npm.cmd11.20/Git2.56/PostgreSQL17.11/Flutter3.47.9/Dart3.13.7/JDK17/Studio JBR25/Android SDK+NDK28.2/Docker Desktop4.98/Engine29.9.2/Compose5.6.1/WSL3.0.3/Arduino CLI1.5.1 đã chạy. CLI cần nhận PATH Machine+User mới; `npm.cmd` tránh npm.ps1 bị Restricted. Không cài/chỉnh phần mềm hệ thống trong master review. Native5432 chưa xác thực SQL; dùng portable55439 và DB demo/test mới. Các bản kiểm kê cũ bên dưới được giữ làm lịch sử.
 
@@ -24,12 +24,21 @@
 | P2 | React Web: Administrator và Farm Operator | Đã kiểm thử bản đầu | Vite build PASS; Chrome E2E luồng chính PASS |
 | P3 | Flutter App: Customer | Đã kiểm thử Web/VM/Android emulator |Analyze sạch,15 tests +live API/Chrome5groups; APK debug/Android UI+SQL PASS; phone/signing chưa test |
 | P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP PASS; firmware3 profile/pulse assertions PASS; GPIO source gated, chưa upload/relay/live camera |
-| P5 | Tích hợp, bảo mật, kiểm thử, triển khai |Local +CI Linux đầy đủ/Docker smoke đã kiểm thử; chưa nghiệm thu production |32 backend tests, Web/Flutter E2E, backup/restore, benchmark đọc PASS; CI42005126537 PASS; còn TLS/Android/hardware |
-| P6 | UML 2.0, SRS, thiết kế, test plan, cài đặt, hướng dẫn | Hoàn thành tài liệu bản đầu | UR/SRS/ADR/ERD/detail/API/test/install/user guide; 6 PlantUML render PASS; cần review học thuật/nghiệm thu đích |
+| P5 | Tích hợp, bảo mật, kiểm thử, triển khai |Local +CI Linux/Docker runtime đã kiểm thử; chưa nghiệm thu production |50backend, Web/Flutter/Android E2E,9SQLdemo/backup/roles/native smoke PASS; CI338dda1/42071329560 PASS3jobs; còn TLS/phone/hardware |
+| P6 | UML 2.0, SRS, thiết kế, test plan, cài đặt, hướng dẫn | Tài liệu local/HQTCSDL đã cập nhật | UR/SRS/ADR/ERD/3NF/data dictionary/API/test/9demo/defense/install/user guide;6PlantUML render PASS trước đó, không đổi source UML; cần giảng viên/nghiệm thu đích |
 
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-06 — HQ5 ĐÃ KIỂM THỬ: nghiệm thu tổng và bản demo
+
+- HQ4 commit/push `338dda1cd24355f705fd327485b3ad77bf8148a8` main PASS, ls-remote trùng hash. Source API/Web đã test50/4+13; package.json user giữ nguyên. HQ3 CI đã3jobs success, cần CI HQ4 HEAD.
+- Tiêu chí: chạy9demo HQTCSDL với API mới, xác minh native demo và build lại APK target lib/main.dart (Android integration_test trước đó có thể để APK target test). Đối chiếu32ID và báo cáo nghiệm thu theo đúng bằng chứng, cập nhật Windows guide lỗi thời/giới hạn/thao tác thủ công; lưu checkpoint/CI. Không cài phần mềm hệ thống, flash/GPIO, wipe/drop hoặc thêm optionalmodule.
+- 9/9SQLdemo **PASS** (`hq5-sql-demos.log`, run-1793898420962-df4eb8),17tables/81constraints/35indexes,2session race/rollback/realDBroles, backup17counts+graph/routines/ACL. EXPLAIN50.000simulated rows forcedSeq49.727ms/index0.044ms actual1run, không SLA.
+- Main.dart APK debug **PASS** native exit0 (`hq5-demo-apk.log`),179222269B/SHA256557e918496c39ab202cc9df66c38db88263c7d640a25e0a58d833cf269df378f; giữignored artifact, chưa cài/run riêng bản APK cuối sau build. UI source đã chạy AndroidHQ3. JBR native-accesswarnings không làm build fail, không đổi cấu hình máy.
+- New scripts/test-demo-smoke.mjs **PASS** với native demo actual: APIready/schema4/3roleRBAC/ReactChrome login/logout/directory/freshSIMULATOR, users3/rentals0 giữ nguyên. Chỉ session được tạo/thu hồi; script khôngstart/stop hoặc sửa business/schema. Wrapper start→smoke→stop/status PASS (`hq5-demo-smoke.log`), servicesown đãstop/PG+DB+logs giữ. Testscript redact known private credentials, không lưu screenshot mật khẩu.
+- CI HQ4 `338dda1`/run42071329560 **PASS3jobs** đã xem từngjob connector. Tài liệu NGHIEM_THU_HQTCSDL mới, README/DEMO_WINDOWS/REVIEW_CUOI/testlog/checklist/tracing/PROMPT_TIEP_TUC cập nhật; O07 cycle không thuê OPTIONAL, không còn ghi thiếu bắt buộc. Không làm lại AGENTS đã đủquy tắc hoặc cleanup đãPASS. Chuẩn bị scan/commit/push HQ5, xem CI đúngHEAD, cập nhật kết quảGit mộtcheckpoint; không lặpcommit vôhạn chỉđểghihash.
 
 ### 2026-11-05→06 — HQ4 ĐÃ KIỂM THỬ: danh sách quản trị và lựa chọn ngoài cap100
 

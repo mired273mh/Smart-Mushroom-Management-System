@@ -1,5 +1,7 @@
 # Review và kiểm thử cuối — 2026-11-05
 
+**Checkpoint HQTCSDL2026-11-06:** xem [báo cáo nghiệm thu mới nhất](NGHIEM_THU_HQTCSDL.md). Backend50/50, React4tests/13Chrome groups, Flutter15tests/Dart/browser/Android,9SQLdemo và native smoke đã kiểm chứng theo từng phạm vi. Lịch sử dưới đây giữ nguyên; không dùng số test/CI cũ thay trạng thái HEAD hoặc suy hardware/production PASS.
+
 Trạng thái: **ĐÃ REVIEW/SỬA LỖI VÀ KIỂM THỬ PHẦN MỀM; CHƯA NGHIỆM THU TOÀN ĐỀ TÀI VẬT LÝ/PRODUCTION**. Bản đầu vào: `861f597`. Các kết quả lịch sử không thay thế lần chạy kiểm tra này.
 
 Đã phát hiện và sửa các lỗi phân quyền theo thời gian, race reset/token, PATCH ghi đè trạng thái, vòng đời tài khoản đang thuê, session giữa2 client, catalog selection và dữ liệu đổi trang. Đã thêm regression thay vì chỉ dựa vào bộ test cũ. **CI toàn bộ PASS** trên Linux tại [run42005126537](https://github.com/mired273mh/Smart-Mushroom-Management-System/actions/runs/42005126537), bản `3c14bc8`, gồm cả2 job api-web và deployment. Các lần FAIL phía dưới được giữ làm bằng chứng xử lý lỗi, không phải kết quả cuối.

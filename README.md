@@ -89,6 +89,8 @@ IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng r
 
 ## Tài liệu và cấu trúc
 
+- [Nghiệm thu HQTCSDL mới nhất: bằng chứng, giới hạn, việc cần người dùng](docs/NGHIEM_THU_HQTCSDL.md).
+
 - [Yêu cầu gốc](docs/DE_TAI_YEU_CAU.md), [User Requirements](docs/USER_REQUIREMENTS.md), [SRS](docs/SRS.md).
 - [Kiến trúc/ERD](docs/KIEN_TRUC.md), [ADR](docs/QUYET_DINH_KIEN_TRUC.md), [thiết kế chi tiết/UML](docs/THIET_KE_CHI_TIET.md), [API](docs/API.md).
 - [Cài đặt/triển khai/backup](docs/CAI_DAT_TRIEN_KHAI.md), [hướng dẫn sử dụng](docs/HUONG_DAN_SU_DUNG.md), [Test Plan](docs/TEST_PLAN.md), [kết quả test](docs/KIEM_THU.md).
