@@ -54,7 +54,7 @@ docker compose exec -e ADMIN_EMAIL -e ADMIN_PASSWORD -e ADMIN_NAME api node serv
 
 Không ghi password trực tiếp vào lịch sử lệnh. Mở `http://localhost:8080` để kiểm tra local. Triển khai Internet cần domain/certificate/reverse proxy HTTPS ở phía trước, sửa WEB_ORIGIN, và kiểm tra cấu hình trusted proxy. TRUST_PROXY_HOPS=1 chỉ đúng khi API nhận request qua một proxy tin cậy và không expose trực tiếp; không bật trust proxy tùy ý.
 
-`docker compose stop` dừng mà giữ volume. Không dùng `down -v`, `dropdb`, `--clean` hay xóa `.local/postgres` trong quy trình thông thường. Chưa có kết quả chạy Compose/CI remote; cần thực hiện các lệnh trên trên máy có Docker trước nghiệm thu.
+`docker compose stop` dừng mà giữ volume. Không dùng `down -v`, `dropdb`, `--clean` hay xóa `.local/postgres` trong quy trình thông thường. Compose build/up/smoke đã PASS trên Ubuntu CI (job deployment run42003072419); máy Windows hiện chưa có Engine. CI dùng credentials/volume test mới và smoke auth/DB/assets/CSP, không thay nghiệm thu TLS và vận hành trên máy đích.
 
 ## 5. Sao lưu và phục hồi
 

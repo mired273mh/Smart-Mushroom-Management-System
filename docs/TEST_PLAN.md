@@ -6,10 +6,10 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 
 | Mức | Dữ liệu/môi trường | Lệnh | Đã chạy |
 |---|---|---|---|
-| PostgreSQL + HTTP integration | DB `sm_test_*` mới, không mock DB | `npm test` / Windows `scripts/test.ps1` | PASS24/24 |
-| React browser E2E | Chrome headless, API+DB thật | `npm run test:web` | PASS6 nhóm |
+| PostgreSQL + HTTP integration | DB `sm_test_*` mới, không mock DB | `npm test` / Windows `scripts/test.ps1` | PASS32/32 |
+| React browser E2E | Chrome headless, API+DB thật | `npm run test:web` | PASS2 client tests +8 nhóm E2E |
 | React production build | Vite/React | `npm run build:web` | PASS |
-| Flutter unit/widget | MockClient, không sensor/API thật | `flutter test` trong mobile | PASS7/7 |
+| Flutter unit/widget | MockClient, không sensor/API thật | `flutter test` trong mobile | PASS12/12 |
 | Flutter client integration | Dart/MushroomApi gọi API/DB thật | `npm run test:mobile:api` | PASS1/1 |
 | Flutter browser UI E2E | Flutter Web build, Chrome, API/DB thật | `npm run test:mobile:web` | PASS4 nhóm; không phải Android |
 | Flutter static/build | SDK3.47.9, Dart3.13.7 | `flutter analyze`, `flutter build web --no-wasm-dry-run` | PASS |
@@ -18,7 +18,9 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | Backup/restore | Fixtures test → DB mới | `npm run test:backup` | PASS |
 | Compose cấu hình | Standalone CLI5.7.0, không Engine | `docker-compose -f compose.yaml config --quiet` | PASS |
 | UML render | PlantUML1.2026.9/JRE21/Smetana | `scripts/render-uml.ps1` | PASS6/6 |
-| Docker/CI remote/TLS production | Chưa có môi trường/chưa push | compose/Actions/deployment | CHƯA CHẠY |
+| Docker runtime | Ubuntu CI, DB mới mỗi runner | Compose build/up + `npm run test:deploy` | PASS job deployment42003072419; workflow tổng xem REVIEW_CUOI |
+| Tải đọc local |20 sessions,400 rentals,1000 readings | `npm run test:load` | PASS200 request/0 lỗi; p95 33,42–42,07ms |
+| TLS production | Chưa domain/certificate môi trường đích | deployment acceptance | CHƯA CHẠY |
 | Android APK/emulator/điện thoại | Thiếu Android SDK | doctor/build/install | CHƯA CHẠY |
 | Sensor/relay/camera thực | Chưa có phần cứng được xác nhận | Theo IoT checklist | CHƯA CHẠY |
 
@@ -48,13 +50,17 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | PAGE01 | >100 hợp đồng, timestamp ties/microsecond | Duyệt207 bản ghi không mất/lặp, giữ ownership/filter | pagination.test.js |
 | PAGE02 | UI đổi trang/filter/HTTP lỗi | Reset cursor, prev/next chính xác, lỗi có retry | React E2E + Flutter widget + live API |
 | MOB02 | UI Flutter register→rent2→item/env→link→delivery→notifications/profile/logout | DB thật, đúng chủ, validate địa chỉ, hủy/gửi lại, staff denied | scripts/test-mobile-web.mjs |
+| REV01 | Reset/login race, rotate/ingest race, timestamp microsecond boundary |401 sau reset/rotate; không lộ mẫu trước lúc thuê | review-regression.test.js |
+| REV02 | PATCH room/plan/tray, sửa label khay thuê, xóa Customer còn thuê | Giữ trường bỏ qua; sửa label được; không xóa Customer active rental | review-regression.test.js |
+| REV03 |401/logout/profile cũ sau đăng nhập mới; catalog bị thay đổi | Không mất/đổi user mới; selection hết hạn bị loại | review_session_catalog_test.dart + React E2E |
+| REV04 | HTTP dev URL giả dạng private IP | Từ chối hostname/userinfo/invalid octets/port | ESP32 url_policy.h static assertions |
 
 ## Điều kiện nghiệm thu còn thiếu
 
 - Rà soát học thuật UML đã render với người hướng dẫn; browser test thêm mọi nhánh account/camera/config.
 - Android build/signing và kiểm thử trên điện thoại/emulator. Flutter UI browser E2E đã PASS luồng chính, vẫn chưa thay thế kiểm thử mobile đích.
-- Docker build/compose, GitHub Actions thực tế, staging HTTPS và backup lịch vận hành.
+- Workflow Linux tổng phải PASS; Docker build/compose smoke đã PASS trên CI. Staging HTTPS và backup lịch vận hành chưa nghiệm thu.
 - Cảm biến hiệu chuẩn, soak test kết nối, fail-safe relay sau xác nhận phần cứng, live camera bảo vệ truy cập.
-- Đo p95/tải20 người dùng, dung lượng retention, pagination các danh sách ngoài lịch sử thuê. Đã test207 rentals và UI122 rentals; chưa có benchmark, không suy ra mục tiêu1giây từ test chức năng.
+- Benchmark đọc local20 người đã PASS với400 rentals/1000 samples; còn đo dữ liệu lớn, ghi đồng thời, WAN/TLS và soak test. Retention và pagination ngoài lịch sử thuê chưa hoàn thiện; không suy ra capacity production từ benchmark ngắn.
 
 Chỉ nghiệm thu toàn bộ hệ thống sau khi các mục môi trường/thực địa được chạy và ghi bằng chứng. Bản hiện tại đủ kiểm chứng nhiều luồng phần mềm local, chưa phải nghiệm thu triển khai vật lý/production.

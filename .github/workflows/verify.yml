@@ -45,10 +45,12 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: flutter-browser-failure
+          name: browser-failure
           path: |
             .local/flutter-failure.png
             .local/flutter-semantics.json
+            .local/web-failure.png
+            .local/web-layout-failure.json
           if-no-files-found: ignore
   deployment:
     runs-on: ubuntu-latest

@@ -37,4 +37,4 @@ Nguồn bắt buộc: `DE_TAI_YEU_CAU.md`; các phương án triển khai nằm 
 
 ## Phi chức năng định lượng đề xuất
 
-API giới hạn body 64 KB, danh sách có giới hạn tối đa 200 mục; lịch sử cảm biến tối đa 1.000 mẫu/lần. Phiên người dùng hết hạn sau 12 giờ; token chỉ lưu hash trong DB. Truyền HTTPS khi triển khai. Mục tiêu phản hồi p95 dưới 1 giây với 20 người dùng đồng thời là mục tiêu nghiệm thu đề xuất, CHƯA đo. Múi giờ lưu UTC, hiển thị Asia/Ho_Chi_Minh. Sao lưu PostgreSQL hàng ngày là đề xuất vận hành, chưa có job production.
+API giới hạn body64KB; lịch sử thuê có cursor/limit, các danh sách khác còn giới hạn100–200 mục; lịch sử cảm biến tối đa1000 mẫu/lần. Phiên người dùng hết hạn sau12 giờ; token chỉ lưu hash trong DB. Truyền HTTPS khi triển khai. Mục tiêu p95 dưới1 giây với20 người đồng thời là tiêu chí đề xuất: benchmark local2 endpoint đọc đã đạt (xem REVIEW_CUOI), chưa nghiệm thu workload/WAN/TLS production. Múi giờ lưu UTC, hiển thị giờ địa phương của thiết bị (môi trường dự kiến Asia/Ho_Chi_Minh). Sao lưu PostgreSQL hàng ngày là đề xuất vận hành, chưa có job production.

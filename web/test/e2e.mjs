@@ -1,7 +1,7 @@
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdir, access } from 'node:fs/promises';
+import { mkdir, access, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { setup } from '../../server/test/helpers.js';
 import { seedRentalHistory } from '../../server/test/history-fixtures.js';
@@ -14,7 +14,7 @@ const vite = spawn(process.execPath, [fileURLToPath(new URL('../../node_modules/
 let viteOutput = '';
 vite.stderr.on('data',chunk => { viteOutput += chunk; });
 const base = 'http://127.0.0.1:5177';
-let browser;
+let browser, page;
 try {
   let ready = false;
   for (let i = 0; i < 50; i++) {
@@ -25,7 +25,7 @@ try {
   const installedChrome = process.env.CHROME_PATH ?? (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : undefined);
   if (installedChrome) await access(installedChrome);
   browser = await chromium.launch({ headless:true, ...(installedChrome ? { executablePath:installedChrome } : {}) });
-  const page = await browser.newPage({ viewport:{ width:1440,height:1000 } });
+  page = await browser.newPage({ viewport:{ width:1440,height:1000 } });
   const errors = [];
   page.on('pageerror',error => errors.push(error.message));
   page.on('dialog',dialog => dialog.accept());
@@ -191,6 +191,14 @@ try {
   console.log('PASS: Operator đúng menu quyền; không có JavaScript pageerror.');
   console.log('PASS: Response401 từ phiên cũ không đăng xuất người dùng mới; mô tả phòng có thể xóa trống.');
   console.log('PASS: Response logout cũ không xóa phiên mới khi request đồng thời báo hết phiên.');
+} catch (error) {
+  if (page) {
+    await mkdir(new URL('../../.local/',import.meta.url),{recursive:true});
+    await page.screenshot({path:fileURLToPath(new URL('../../.local/web-failure.png',import.meta.url)),fullPage:true}).catch(()=>{});
+    const layout=await page.evaluate(()=>({viewport:innerWidth,width:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].map(e=>({tag:e.tagName,classes:e.className,right:e.getBoundingClientRect().right})).filter(e=>e.right>innerWidth)})).catch(()=>({}));
+    await writeFile(new URL('../../.local/web-layout-failure.json',import.meta.url),JSON.stringify(layout,null,2));
+  }
+  throw error;
 } finally {
   await browser?.close();
   vite.kill();

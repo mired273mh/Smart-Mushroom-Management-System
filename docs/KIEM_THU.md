@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+CI42003530326/a34bd38: deployment PASS; Web FAIL pagination assertion dòng140 (nhãn trang mới xuất hiện trước table data). Sửa useData scope theo dependencies ngay trong render; local React build/2 client tests/8 E2E PASS. Không skip assertion, bổ sung artifact Web layout nếu lỗi. CI tổng vẫn chưa PASS ở checkpoint này.
+
 CI42003072419/740ea61: deployment Docker **PASS**, API-Web FAIL responsive pager390px; thêm flex-wrap, React build +2 client tests +8 E2E local PASS lại. Chưa gọi tổng workflow PASS, Flutter Linux native-editor fix chưa tới bước chạy.
 
 Review batch cuối 2026-11-05: firmware sửa allowlist HTTP dev,2 mode compile PASS với17 static assertions; Compose config PASS; UML render6/6 PASS. `test:load`200 request/20 users/0 lỗi, p95 rentals33,42ms/environment42,07ms trên loopback. CI85fb2b2 **FAIL** ở staff login Flutter UI; diagnostics xác nhận401, helper đã đổi nhập native editor, local4 nhóm PASS lại; đang chờ CI. CI Compose smoke mới **CHƯA CHẠY**. Chi tiết/giới hạn tại REVIEW_CUOI.

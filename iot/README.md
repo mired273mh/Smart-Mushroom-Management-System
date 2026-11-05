@@ -47,3 +47,5 @@ Driver dùng I²C 0x62, start periodic, kiểm tra ready rồi đọc CO₂/nhi�
 - Camera cần IP camera/gateway HTTPS có kiểm soát truy cập riêng; URL contract không tự cung cấp video và không bảo vệ camera công khai.
 
 Không có lệnh upload trong quy trình đã chạy. Không coi compile PASS là ESP32/cảm biến/relay PASS.
+
+HTTP dev chỉ nhận URL dạng `http://<IPv4 RFC1918>[:port]` không kèm đường dẫn; parser từ chối hostname, userinfo, octet/port sai và octet leading-zero. `url_policy.h` có17 static assertions được compiler xác minh ở cả2 mode. Mặc định vẫn yêu cầu HTTPS; compile không xác minh kết nối LAN/TLS trên board thật.

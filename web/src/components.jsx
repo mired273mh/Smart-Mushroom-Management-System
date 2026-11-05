@@ -1,23 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 export const date = value => value ? new Date(value).toLocaleString('vi-VN') : '—';
 export const money = value => Number(value ?? 0).toLocaleString('vi-VN') + ' ₫';
 export const statusLabels = { active: 'Đang thuê', completed: 'Hoàn tất', available: 'Sẵn sàng', maintenance: 'Bảo trì', retired: 'Ngừng dùng', incubation: 'Ủ phôi', fruiting: 'Ra quả thể', ready: 'Sẵn sàng thu hoạch', harvested: 'Đã thu hoạch', pending: 'Chờ xác nhận', paid: 'Đã thu', requested: 'Mới yêu cầu', processing: 'Đang xử lý', cancelled: 'Đã hủy', admin: 'Quản trị viên', operator: 'Vận hành', customer: 'Khách hàng', simulator: 'Mô phỏng', hardware: 'Phần cứng', pickup: 'Nhận tại trại', delivery: 'Giao hàng' };
 export const Badge = ({ value }) => <span className={`badge ${value}`}>{statusLabels[value] ?? value}</span>;
 
 export function useData(load, dependencies, interval = 0) {
+  const scope = useMemo(() => ({}), dependencies);
   const [state, setState] = useState({ data: null, error: '', loading: true });
   useEffect(() => {
     let alive = true;
     const run = async () => {
-      try { const data = await load(); if (alive) setState({ data, error: '', loading: false }); }
+      try { const data = await load(); if (alive) setState({ scope, data, error: '', loading: false }); }
       catch (error) { if (alive) setState(s => ({ ...s, error: error.message, loading: false })); }
     };
-    setState({ data: null, error: '', loading: true });
+    setState({ scope, data: null, error: '', loading: true });
     run();
     const timer = interval ? setInterval(() => { if (!document.hidden) run(); }, interval) : null;
     return () => { alive = false; if (timer) clearInterval(timer); };
-  }, dependencies);
-  return state;
+  }, [scope]);
+  // Hide data from the previous query during render, before effects execute.
+  return state.scope === scope ? state : { data:null, error:'', loading:true };
 }
 export function LoadState({ state, children }) {
   if (state.loading) return <p className="empty" role="status">Đang tải dữ liệu…</p>;

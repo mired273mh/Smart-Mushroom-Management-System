@@ -4,11 +4,11 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 
 | Thành phần | Công nghệ | Mức đã kiểm chứng |
 |---|---|---|
-| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API; 24 integration tests PASS |
-| Web nhân sự | React + Vite | Build và Chrome E2E các luồng chính PASS |
-| App Customer | Flutter | Analyze, 7 unit/widget tests, live API + Chrome UI E2E4 nhóm, Web build PASS; chưa Android SDK/APK |
+| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API;32 integration tests PASS |
+| Web nhân sự | React + Vite | Build,2 API client tests +8 nhóm Chrome E2E PASS |
+| App Customer | Flutter | Analyze,12 unit/widget tests, live API + Chrome UI E2E4 nhóm, Web build PASS; chưa Android SDK/APK |
 | IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
-| Deployment | Docker Compose + Nginx | Compose config validation PASS; chưa chạy container/CI remote/production TLS |
+| Deployment | Docker Compose + Nginx | Build/up/smoke Docker CI job PASS; trạng thái workflow tổng xem review; chưa production TLS |
 
 Chưa nghiệm thu toàn bộ hệ thống vật lý/production. Các lệnh điều khiển hiện chỉ dry-run. Không có thanh toán online. Camera là contract URL, chưa có live feed đã xác minh. Bằng chứng và giới hạn chi tiết ở [nhật ký kiểm thử](docs/KIEM_THU.md).
 
@@ -61,11 +61,14 @@ npm run test:web
 npm run test:mobile:api
 npm run test:mobile:web
 npm run test:backup
+npm run test:load
 ```
 
 TEST_DATABASE_URL cần quyền tạo database test. Mỗi module tạo DB riêng, giữ lại để kiểm tra; không tự dọn/xóa DB. Các lệnh browser/live Dart/backup cần TEST_DATABASE_URL được đặt trong chính terminal đó. `scripts/test.ps1` tạo biến trong tiến trình riêng, không xuất ngược sang terminal cha.
 
 Chrome E2E Windows dùng đường dẫn Chrome chuẩn; có thể đặt CHROME_PATH. Linux cài `npx playwright install --with-deps chromium`. Flutter runner dùng FLUTTER_ROOT hoặc `.sm-tools/flutter`. Backup test dùng PG_BIN hoặc `.sm-tools/pgsql/bin`; phục hồi chỉ vào database test mới.
+
+`test:load` tạo dữ liệu test mới, đo2 endpoint đọc với20 tài khoản đồng thời và lưu số đo tại `.local/review-load.json`. Đây là benchmark ngắn qua loopback, không thay nghiệm thu tải production. `test:deploy` dùng CI Compose riêng đã bootstrap admin qua ADMIN_EMAIL/ADMIN_PASSWORD; không chạy bootstrap lên DB thật để thử lại.
 
 `test:mobile:web` cần bản build mới tại `mobile/build/web`; chạy `flutter build web --no-wasm-dry-run` trong mobile trước. Test tương tác chính UI Flutter qua Chrome và DB thật; không thay thế kiểm thử Android.
 
@@ -91,6 +94,6 @@ IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng r
 - [Cài đặt/triển khai/backup](docs/CAI_DAT_TRIEN_KHAI.md), [hướng dẫn sử dụng](docs/HUONG_DAN_SU_DUNG.md), [Test Plan](docs/TEST_PLAN.md), [kết quả test](docs/KIEM_THU.md).
 - [Kế hoạch](docs/KE_HOACH_THUC_HIEN.md), [bảng kiểm](docs/BANG_KIEM_CHUC_NANG.md), [tiến độ/checkpoint](TIEN_DO_CODEX.md).
 
-`server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI chưa chạy remote. `compose.yaml` triển khai mục tiêu local8080, chưa nghiệm thu trên Docker.
+`server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI Linux và Docker smoke. `compose.yaml` đã chạy trong CI, cổng local8080; máy Windows hiện chưa có Docker Engine. Xem [báo cáo review cuối](docs/REVIEW_CUOI.md) để biết lỗi đã sửa, kết quả CI và giới hạn nghiệm thu.
 
 Khi tiếp tục, gửi **Tiếp tục đồ án.** trong cùng repo. AGENTS.md yêu cầu đối chiếu code/Git với checkpoint trước làm tiếp. Sau giai đoạn đã kiểm chứng, tự commit và push thông thường lên nhánh hiện tại theo mục 8 của AGENTS.md; không force push, không commit secret hoặc xóa lịch sử/dữ liệu/tài liệu yêu cầu. Nếu Git thất bại phải ghi lỗi vào tiến độ. Không có cơ chế tự chạy lại lúc reset token.
