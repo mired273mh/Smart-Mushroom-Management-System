@@ -20,7 +20,7 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | O02 | Quản lý phòng/khay | ☑ API + React | CRUD thật, validation/FK; không xóa lịch sử |
 | O03 | Gán thuê | ☑ API + React | Nhiều khay atomically, race201/409, browser gán |
 | O04 | Giám sát nhiệt/ẩm/CO₂ | ◐ API + React | Room readings từ simulator, browser hiển thị; chưa cảm biến thật |
-| O05 | Điều khiển môi trường | ◐ manual/automatic dry-run | Mist/fan/light/heater contract, TTL/ack/replay; relay/GPIO thật CHƯA TRIỂN KHAI |
+| O05 | Điều khiển môi trường | ◐ source hardware có khóa, chưa nghiệm thu | Allowlist +pulse10s/TTL/freshness/interlock; backend38 tests, compile3 profile; chưa flash/đo relay |
 | O06 | Camera/luồng giám sát | ◐ cấu hình/mở URL | HTTPS/ownership PASS; live feed/gateway chưa nghiệm thu |
 | O07 | Tiến trình/trạng thái | ☑ API + React | Stage tuần tự, events, browser update; hiện gắn rental item |
 | O08 | Lịch/bản ghi thu hoạch | ☑ API + React | Expected date, ready→harvested/weight; browser ghi thu hoạch |
@@ -41,15 +41,15 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 
 | Sản phẩm | Trạng thái |
 |---|---|
-| REST API/PostgreSQL | 32/32 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
-| React Web |Build,2 API client tests +9 Chrome E2E PASS; session/paging/390px và Admin logout1280x720 |
+| REST API/PostgreSQL | 38/38 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
+| React Web |Build,2 API client tests +10 Chrome E2E PASS; session/paging/390px và Admin logout1280x720 |
 | Flutter Customer |Analyze sạch/12 tests; APK debug +Android emulator UI→API→PostgreSQL PASS; chưa phone thật |
-| ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |
+| ESP32 | Compile3 profile +pulse/URL assertions PASS; GPIO gate mặc định0, chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
 | Tích hợp/triển khai |Local +CI toàn bộ PASS run42005126537/3c14bc8, gồm Docker build/up/smoke; TLS production/Android/hardware chưa nghiệm thu |
 | Tài liệu | UR/SRS/ADR/ERD/API/detail/test/deploy/user guide và 6 UML source/PNG render PASS |
 
-Chưa nghiệm thu hoàn chỉnh đồ án vật lý/production. Cần Android SDK, Docker Engine và phần cứng/giới hạn an toàn được xác nhận. Những phần mềm có thể phát triển tiếp: phân trang/filter, retention, thêm browser coverage và đo tải; không gọi các mục này là đã hoàn thành.
+Chưa nghiệm thu hoàn chỉnh đồ án vật lý/production. Android SDK/Docker Engine đã chạy; còn xác nhận phần cứng/giới hạn an toàn. Các bản kiểm kê tiếp theo là lịch sử trước khi cài thêm. Những phần mềm có thể phát triển tiếp: phân trang/filter, retention, thêm browser coverage và đo tải; không gọi các mục này là đã hoàn thành.
 
 Kiểm kê Windows2026-11-05: xem [báo cáo môi trường](KIEM_TRA_MOI_TRUONG_WINDOWS.md). SQL read-only55439/schema3/3 và Node26 API/React smoke PASS; DB dev trống/chưa Admin, server/.env còn placeholder. Android SDK/JDK thiếu; WSL lỗi Class not registered, Docker Windows chưa dùng được. COM3/4 là Bluetooth; sensor/camera/relay chưa test thật. CI3f53424/run42005908332 đã xác nhận success2 jobs, không thay kiểm thử hardware. Không đổi trạng thái chức năng thành hoàn tất chỉ từ kiểm kê/cài tool.
 

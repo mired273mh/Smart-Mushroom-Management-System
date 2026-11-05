@@ -5,6 +5,7 @@ import { transaction } from './db.js';
 import { idParam, limitParam, name, uuid } from './validation.js';
 import { fail, notFound } from './errors.js';
 import { newToken, tokenHash } from './security.js';
+import { hardwareAllowed, HARDWARE_MAX_SECONDS, enqueueHardware } from './hardware-policy.js';
 
 const thresholdInput = z.object({
   temperature_min: z.number().min(-40).max(85), temperature_max: z.number().min(-40).max(85),
@@ -12,6 +13,13 @@ const thresholdInput = z.object({
   co2_max: z.number().int().min(0).max(40000), notifications_enabled: z.boolean(),
 }).strict().refine(v => v.temperature_min < v.temperature_max && v.humidity_min < v.humidity_max);
 const defaultThreshold = { temperature_min: 15, temperature_max: 30, humidity_min: 70, humidity_max: 95, co2_max: 1500, notifications_enabled: true };
+
+async function lockedDevice(db, snapshot) {
+  const room=await db.query('SELECT id FROM rooms WHERE id=$1 AND active FOR SHARE',[snapshot.room_id]);
+  const current=(await db.query('SELECT * FROM devices WHERE id=$1 AND active AND token_hash=$2 FOR UPDATE',[snapshot.id,snapshot.token_hash])).rows[0];
+  if(!room.rowCount||!current)return fail(401,'INVALID_DEVICE_TOKEN','Thiết bị/phòng/token không còn hiệu lực.');
+  return current;
+}
 
 async function roomAccess(db, id, user) {
   const room = (await db.query(`SELECT r.id,r.name FROM rooms r WHERE r.id=$1 AND ($2 <> 'customer' OR EXISTS (
@@ -21,7 +29,7 @@ async function roomAccess(db, id, user) {
   return room;
 }
 
-export function deviceRouter(pool) {
+export function deviceRouter(pool, config = {}) {
   const router = Router();
   router.use(async (req, res, next) => {
     const match = /^Bearer ([a-f0-9]{64})$/.exec(req.headers.authorization ?? '');
@@ -54,14 +62,21 @@ export function deviceRouter(pool) {
         [`Phòng có môi trường vượt ngưỡng: ${sample.temperature} °C, ${sample.humidity} %RH, ${sample.co2} ppm${reading.simulated ? ' (mô phỏng)' : ''}.`,reading.id,currentDevice.room_id]);
       }
       if (currentDevice.automation_enabled) {
+        const ventilate = sample.co2 > threshold.co2_max || sample.temperature > threshold.temperature_max;
         const actuators = [
           ['mist', sample.humidity < threshold.humidity_min],
-          ['fan', sample.co2 > threshold.co2_max || sample.temperature > threshold.temperature_max],
-          ['heater', sample.temperature < threshold.temperature_min],
+          ['fan', ventilate],
+          ['heater', sample.temperature < threshold.temperature_min && !ventilate],
         ];
         for (const [actuator, enabled] of actuators) {
-          const previous = (await db.query('SELECT enabled FROM device_commands WHERE device_id=$1 AND actuator=$2 AND source=\'automatic\' ORDER BY created_at DESC LIMIT 1', [currentDevice.id,actuator])).rows[0];
-          if (previous && previous.enabled === enabled) continue;
+          const previous = (await db.query("SELECT enabled,(created_at>now()-interval '30 seconds') AS recent FROM device_commands WHERE device_id=$1 AND actuator=$2 AND source='automatic' ORDER BY created_at DESC LIMIT 1", [currentDevice.id,actuator])).rows[0];
+          const armed = hardwareAllowed(config,currentDevice);
+          if (previous && previous.enabled === enabled && (!armed || !enabled || previous.recent)) continue;
+          if (armed) {
+            const actor = (await db.query("SELECT id FROM users WHERE role='admin' AND active AND deleted_at IS NULL ORDER BY created_at LIMIT 1")).rows[0];
+            if (actor) await enqueueHardware(db,currentDevice,{actuator,enabled,duration_seconds:HARDWARE_MAX_SECONDS},actor.id,'automatic');
+            continue;
+          }
           // Automation is observable dry-run only until hardware acceptance.
           await db.query(`INSERT INTO device_commands(device_id,actuator,enabled,duration_seconds,dry_run,status,source,created_by)
             SELECT $1,$2,$3,10,true,'dry_run','automatic',id FROM users WHERE role='admin' AND active AND deleted_at IS NULL ORDER BY created_at LIMIT 1`, [currentDevice.id,actuator,enabled]);
@@ -71,30 +86,38 @@ export function deviceRouter(pool) {
     });
     res.status(201).json({ data: result });
   });
-  router.get('/me', (req, res) => res.json({ data: { id:req.device.id, room_id:req.device.room_id, name:req.device.name, mode:req.device.mode } }));
+  router.get('/me', (req, res) => res.json({ data: { id:req.device.id, room_id:req.device.room_id, name:req.device.name, mode:req.device.mode, hardware_control_available:hardwareAllowed(config,req.device) } }));
   router.get('/commands', async (req, res) => {
-    await pool.query("UPDATE device_commands SET status='expired' WHERE device_id=$1 AND status IN ('pending','dry_run') AND expires_at<=now()", [req.device.id]);
-    await pool.query('UPDATE devices SET last_seen_at=now() WHERE id=$1', [req.device.id]);
-    const result = await pool.query(`SELECT id,actuator,enabled,duration_seconds,dry_run,expires_at,source FROM device_commands
-      WHERE device_id=$1 AND expires_at>now() AND status='dry_run' AND $2='simulator' ORDER BY created_at LIMIT 20`, [req.device.id,req.device.mode]);
-    res.json({ data: result.rows });
+    const payload=await transaction(pool,async db=>{
+      const current=await lockedDevice(db,req.device);
+      await db.query("UPDATE device_commands SET status='expired' WHERE device_id=$1 AND status IN ('pending','dry_run') AND expires_at<=clock_timestamp()", [current.id]);
+      await db.query('UPDATE devices SET last_seen_at=now() WHERE id=$1', [current.id]);
+      const armed=hardwareAllowed(config,current);
+      const result = await db.query(`SELECT id,actuator,enabled,duration_seconds,dry_run,expires_at,source,floor(extract(epoch FROM expires_at))::bigint AS expires_epoch FROM device_commands
+        WHERE device_id=$1 AND expires_at>clock_timestamp() AND ((status='dry_run' AND dry_run AND $2='simulator') OR (status='pending' AND NOT dry_run AND $3)) ORDER BY created_at LIMIT 20`, [current.id,current.mode,armed]);
+      return {data:result.rows,meta:{hardware_control_available:armed,max_duration_seconds:HARDWARE_MAX_SECONDS}};
+    });
+    res.json(payload);
   });
   router.post('/commands/:id/ack', async (req, res) => {
     const input = z.object({ success: z.boolean(), result: z.string().trim().max(500) }).strict().parse(req.body);
-    const result = await pool.query(`UPDATE device_commands SET status=$3,result=$4 WHERE id=$1 AND device_id=$2
-      AND status='dry_run' AND dry_run AND expires_at>now() AND $5='simulator' RETURNING id,status,dry_run`, [idParam(req),req.device.id,input.success ? 'acknowledged' : 'failed',input.result,req.device.mode]);
+    const result = await transaction(pool,async db=>{
+      const current=await lockedDevice(db,req.device);
+      return db.query(`UPDATE device_commands SET status=$3,result=$4 WHERE id=$1 AND device_id=$2
+        AND expires_at>clock_timestamp() AND ((status='dry_run' AND dry_run AND $5='simulator') OR (status='pending' AND NOT dry_run AND $6)) RETURNING id,status,dry_run`, [idParam(req),current.id,input.success ? 'acknowledged' : 'failed',input.result,current.mode,hardwareAllowed(config,current)]);
+    });
     if (!result.rowCount) return notFound();
     res.json({ data: result.rows[0] });
   });
   return router;
 }
 
-export function monitoringRouter(pool) {
+export function monitoringRouter(pool, config = {}) {
   const router = Router();
   const deviceColumns = 'id,room_id,name,mode,active,last_seen_at,created_at,automation_enabled';
   router.get('/devices', staff, async (req, res) => {
     const result = await pool.query(`SELECT ${deviceColumns},(last_seen_at>now()-interval '2 minutes') AS online FROM devices ORDER BY created_at DESC LIMIT $1`, [limitParam(req)]);
-    res.json({ data: result.rows });
+    res.json({ data: result.rows.map(device=>({...device,hardware_control_available:hardwareAllowed(config,device)})) });
   });
   router.post('/devices', admin, async (req, res) => {
     const input = z.object({ room_id: uuid, name, mode: z.enum(['simulator','hardware']).default('simulator') }).strict().parse(req.body);
@@ -120,9 +143,20 @@ export function monitoringRouter(pool) {
   });
   router.post('/devices/:id/commands', staff, async (req, res) => {
     const input = z.object({ actuator: z.enum(['mist','fan','light','heater']), enabled: z.boolean(), duration_seconds: z.number().int().min(1).max(60).default(10), dry_run: z.boolean().default(true) }).strict().parse(req.body);
-    if (!input.dry_run) return fail(409, 'HARDWARE_NOT_CONFIRMED', 'Chưa nghiệm thu phần cứng và giới hạn an toàn; chỉ cho phép dry-run.');
-    const device = (await pool.query('SELECT id FROM devices WHERE id=$1 AND active', [idParam(req)])).rows[0];
+    const device = (await pool.query('SELECT * FROM devices WHERE id=$1 AND active', [idParam(req)])).rows[0];
     if (!device) return notFound();
+    if (!input.dry_run) {
+      if (!hardwareAllowed(config,device)) return fail(409, 'HARDWARE_NOT_CONFIRMED', 'Chưa xác nhận BOM/giới hạn hoặc thiết bị chưa được allowlist; chỉ dry-run.');
+      if (input.duration_seconds>HARDWARE_MAX_SECONDS) return fail(422,'HARDWARE_DURATION_LIMIT','Xung hardware tối đa10 giây.');
+      const command=await transaction(pool,async db=>{
+        const room=await db.query('SELECT id FROM rooms WHERE id=$1 AND active FOR UPDATE',[device.room_id]);
+        const current=(await db.query('SELECT * FROM devices WHERE id=$1 AND active FOR UPDATE',[device.id])).rows[0];
+        if(!room.rowCount||!current)return notFound();
+        if(input.enabled && !(await db.query("SELECT 1 FROM sensor_readings WHERE device_id=$1 AND NOT simulated AND recorded_at>clock_timestamp()-interval '30 seconds' LIMIT 1",[device.id])).rowCount) return fail(409,'SENSOR_STALE','Cần mẫu hardware mới trong30 giây trước khi bật tải.');
+        return enqueueHardware(db,current,input,req.user.id);
+      });
+      return res.status(201).json({data:command});
+    }
     const result = await pool.query(`INSERT INTO device_commands(device_id,actuator,enabled,duration_seconds,dry_run,status,created_by)
       VALUES ($1,$2,$3,$4,true,'dry_run',$5) RETURNING *`, [device.id,input.actuator,input.enabled,input.duration_seconds,req.user.id]);
     res.status(201).json({ data: result.rows[0] });

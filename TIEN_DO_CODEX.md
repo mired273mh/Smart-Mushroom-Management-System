@@ -7,30 +7,38 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Mốc review cuối:** Đã review/sửa lỗi và kiểm thử lại phần mềm; **CI đầy đủ PASS** run42005908332/3f53424 (api-web +deployment), đã xác nhận lại qua GitHub trong lượt kiểm kê. Chi tiết phát hiện, test và phần thiếu ở `docs/REVIEW_CUOI.md`; chưa nghiệm thu vật lý/production.
-- **Đã hoàn thành:** Thiết kế; Express/PostgreSQL32 tests; React2 client tests +8 nhóm E2E; Flutter12 unit/widget +live API1/1 +browser UI4 nhóm; sửa lỗi regression theo REVIEW_CUOI; pagination lịch sử thuê; firmware2 mode compile/17 URL assertions; backup/restore; benchmark đọc20 users;6 UML render; Docker build/up/smoke trên CI.
-- **Chưa hoàn thành:**TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê.
-- **Blocker môi trường mới nhất:** Android Studio/SDK và licenses đã đạt doctor; còn thiếu NDK28.2.13676358 theo cấu hình dự án, chưa boot AVD/build APK. Docker Engine chưa có/WSL CLI timeout nếu chọn Compose; chưa xác nhận BOM/relay/giới hạn an toàn/camera. GitHub đã đăng nhập và push main thành công.
-- **Công việc tiếp theo chính xác:**Bổ sung NDK28.2.13676358, mở AVD hoặc kết nối phone và build/test APK khi được cho phép; nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention, chu kỳ nuôi khay không thuê và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
+- **Mốc review cuối:** CI `be531fa`/run42035426091 **PASS cả3 jobs** (api-web, deployment, android-build), đã kiểm tra GitHub. Batch hardware tiếp theo có source/test riêng bên dưới; chưa nghiệm thu vật lý/production.
+- **Đã kiểm chứng:** Express/PostgreSQL38 tests; React2 client tests +10 nhóm Chrome E2E; Flutter analyze/12 tests +live API/browser, APK debug và Android emulator UI→API→PostgreSQL; backup/restore, benchmark đọc20 users,6 UML; Docker Windows build/up/smoke. Source GPIO có khóa hai lớp, pulse/interlock/TTL/freshness; compile đang ghi bằng chứng theo checkpoint.
+- **Chưa hoàn thành:** TLS production, signing/phone thật, sensor/relay/camera thật và hiệu chuẩn. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê. Không tuyên bố hoàn thành100%.
+- **Blocker hiện tại:** Chưa xác nhận BOM/đấu dây/giới hạn/camera và chưa có thiết bị kiểm thử. Android SDK/NDK28.2, Docker Engine, WSL đã chạy, không cần cài lại. GitHub main push được. AVD người dùng5554 có lúc offline; E2E dùng AVD riêng5558 trong .local, không wipe AVD người dùng.
+- **Công việc tiếp theo chính xác:** Hoàn tất checkpoint source hardware/compile và Git; tiếp tục pagination/search bounded lists, cycle không thuê và kiểm thử workload. Phương án `docs/PHUONG_AN_PHAN_CUNG_IOT.md` phải được xác nhận trước flash/cấp tải, nhưng không chặn công việc phần mềm. Demo Windows dùng scripts/demo.mjs và DB mới riêng.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
-- **Kiểm kê Windows mới nhất:** xem `docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md`. Node26.13.0/npm11.20/Git2.56 chạy; PostgreSQL17.11 có2 cluster5432/55439; Flutter3.47.9/Dart3.13.7/Arduino CLI chạy bằng absolute path nhưng thiếu PATH. server/.env còn placeholder; DB portable đủ schema nhưng0 Admin/data. Thiếu Android SDK/JDK, Docker Desktop; WSL2.6.2 hiện lỗi Class not registered. Chưa cài/sửa cấu hình máy.
-- **Kiểm lại sau người dùng cài thêm:** JDK17.0.21 đã cài, java/javac absolute path PASS; Machine PATH đã có JDK nhưng process VS Code/Codex chưa nhận. Android SDK/Docker vẫn chưa tìm thấy; WSL --version timeout12s, chưa xác minh đã sửa. PATH Flutter C:\flutter\bin và C:\src\flutter\bin không có executable, SDK thực tế vẫn ở C:\Users\mired\.sm-tools\flutter. Không cần cài lại JDK/Flutter.
+- **Kiểm kê Windows mới nhất:** Node26.13/npm.cmd11.20/Git2.56/PostgreSQL17.11/Flutter3.47.9/Dart3.13.7/JDK17/Studio JBR25/Android SDK+NDK28.2/Docker Desktop4.98/Engine29.9.2/Compose5.6.1/WSL3.0.3/Arduino CLI1.5.1 đã chạy. CLI cần nhận PATH Machine+User mới; `npm.cmd` tránh npm.ps1 bị Restricted. Không cài/chỉnh phần mềm hệ thống trong master review. Native5432 chưa xác thực SQL; dùng portable55439 và DB demo/test mới. Các bản kiểm kê cũ bên dưới được giữ làm lịch sử.
 
 ## 2. Trạng thái các giai đoạn
 
 | Mốc | Nội dung | Tình trạng | Bằng chứng |
 |---|---|---|---|
 | P0 | Kiến trúc, repo, skeleton, .env.example, tài liệu chạy | Đã kiểm thử | SRS/ADR/ERD + health/readiness PASS |
-| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử và review regression |32/32 integration tests PASS, cursor/filter lịch sử thuê; các list khác chưa phân trang |
+| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử và review regression |38/38 integration tests PASS, hardware policy/cursor/filter; các list khác chưa phân trang |
 | P2 | React Web: Administrator và Farm Operator | Đã kiểm thử bản đầu | Vite build PASS; Chrome E2E luồng chính PASS |
-| P3 | Flutter App: Customer | Đã kiểm thử (Web/VM), sửa session/catalog regression |Analyze sạch,12 tests +live API1/1 +Chrome UI4 nhóm PASS; Web build PASS; chưa Android SDK |
-| P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP test PASS; firmware 2 nhánh compile PASS; chưa upload/relay/live camera |
+| P3 | Flutter App: Customer | Đã kiểm thử Web/VM/Android emulator |Analyze sạch,12 tests +live API/browser; APK debug/Android UI+SQL PASS; phone/signing chưa test |
+| P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP PASS; firmware3 profile/pulse assertions PASS; GPIO source gated, chưa upload/relay/live camera |
 | P5 | Tích hợp, bảo mật, kiểm thử, triển khai |Local +CI Linux đầy đủ/Docker smoke đã kiểm thử; chưa nghiệm thu production |32 backend tests, Web/Flutter E2E, backup/restore, benchmark đọc PASS; CI42005126537 PASS; còn TLS/Android/hardware |
 | P6 | UML 2.0, SRS, thiết kế, test plan, cài đặt, hướng dẫn | Hoàn thành tài liệu bản đầu | UR/SRS/ADR/ERD/detail/API/test/install/user guide; 6 PlantUML render PASS; cần review học thuật/nghiệm thu đích |
 
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — HOÀN THÀNH batch software master2; hardware chưa nghiệm thu
+
+- Master1 commit/push `be531fa` PASS, remote trùng hash; tiếp tục không dừng ở báo cáo. Người dùng yêu cầu tự nghiên cứu/chọn BOM nhưng phải trình cấu hình/điện áp/sơ đồ/giới hạn để xác nhận trước lắp/flash/bật tải; chưa có xác nhận phần cứng.
+- Đề xuất ESP32-DevKitC V4 +SCD41 (true CO₂/temp/RH) +4 relay Adafruit STEMMA4409 (3.3V HIGH), chỉ tải DC12V nhỏ cho prototype. Đang đối chiếu datasheet/manufacturer; không mặc định người dùng đã mua. Tiêu chí software: backend allowlist trống mặc định, firmware GPIO compile gate OFF mặc định, xung giới hạn/TTL/fresh sensor/network/watchdog/interlock/replay; test source/API/compile, không gọi hardware PASS. Chưa thay env thật hoặc phát lệnh tới thiết bị.
+- Source đã có: server/src/hardware-policy.js +iot/config/app, hardware.test.js +helper config; firmware pulse_policy.h/task GPIO/timer/interlock/cache; React capability +dry-run mặc định; Compose/env example rỗng; scripts/compile-iot.ps1 compile3 profile. Phương án BOM/sơ đồ/nguồn/chân/giới hạn và quy trình xác nhận đã viết trong docs/PHUONG_AN_PHAN_CUNG_IOT.md, nguồn nhà sản xuất.
+- Backend37/37 PASS (`scripts/test.ps1`, `.local/master-hardware-tests2.log`), React build PASS +2 client tests/10 nhóm Chrome E2E PASS (`.local/master-hardware-web3.log`). Hai lần E2E harness FAIL: chưa chọn actuator bắt buộc, rồi locator850 không duy nhất khi thêm fixture hardware; sửa fixture/locator, không bỏ qua assertion. Fixture HTTP mode hardware chỉ là test software, không phải sensor thật.
+- CI be531fa/run42035426091 success3jobs đã xác nhận; không suy ra CI mới từ kết quả commit cũ. Compile cuối3/3 PASS sau assertions freshness/I²C pin conflict: sim1014319B, sensing1039867B, outputs1040747B flash, RAM45476/46876/46924B. Dart live API1/1 PASS. Docker rebuild/up/migrate/Nginx/auth/DB/logout PASS trên Windows với project riêng, không xóa volume. Logs .local/master-hardware-{compile-final,dart,docker}.log. Chưa flash/allowlist env thật/cấp điện. Bước kế: rà secret/diff, commit/push; hardware BLOCKED chờ xác nhận/thiết bị.
+- Rà soát cuối tái hiện TTL race mới: poll chờ room lock nhận lệnh đã hết hạn vì now() cố định ở đầu transaction (`master-hardware-ttl-before.log`, FAIL1). Đổi poll/ack/freshness sang clock_timestamp(), thêm regression thật với PostgreSQL lock. Full38/38 PASS (`master-hardware-ttl-after.log`), không skip. Bản cuối cần Git/check CI; không suy ra hardware PASS từ test này.
 
 ### 2026-11-05 — HOÀN THÀNH batch master1: Android/Docker thật và demo Windows cách ly
 

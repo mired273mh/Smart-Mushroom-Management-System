@@ -83,9 +83,9 @@ flutter run -d chrome --web-port=5174 --dart-define=API_BASE_URL=http://localhos
 flutter build web --no-wasm-dry-run
 ```
 
-Đặt WEB_ORIGIN=http://localhost:5174 ở backend cho Flutter Web dev. Android debug mặc định dùng 10.0.2.2:3000; Android SDK và release signing chưa được cấu hình. Chi tiết tại [hướng dẫn Flutter](mobile/HUONG_DAN.md).
+Đặt WEB_ORIGIN=http://localhost:5174 ở backend cho Flutter Web dev. Android debug mặc định dùng 10.0.2.2:3000; Android APK debug/emulator đã kiểm thử; release signing/phone thật chưa nghiệm thu. Chi tiết tại [hướng dẫn Flutter](mobile/HUONG_DAN.md).
 
-IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng rồi `node iot/simulator.mjs`. Firmware, thư viện, compile, TLS và kế hoạch nghiệm thu phần cứng ở [iot/README.md](iot/README.md). Không upload hay bật relay thật trong phiên này.
+IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng rồi `node iot/simulator.mjs`. Firmware, thư viện, compile, TLS và kế hoạch nghiệm thu phần cứng ở [iot/README.md](iot/README.md). [BOM/sơ đồ/điện áp đề xuất](docs/PHUONG_AN_PHAN_CUNG_IOT.md) cần xác nhận trước triển khai; GPIO và allowlist mặc định khóa. Không upload hay bật relay thật trong phiên này.
 
 ## Tài liệu và cấu trúc
 
@@ -96,6 +96,6 @@ IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng r
 - [Kiểm kê máy Windows và các bước còn thiếu để demo](docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md): công cụ/PATH, DB profile, Android/JDK/WSL/Docker, ESP32/camera và kết quả kiểm tra thực tế.
 - [Chạy demo Windows/Android](docs/DEMO_WINDOWS.md), [truy vết32 yêu cầu theo source/test/việc thiếu](docs/DOI_CHIEU_YEU_CAU.md). Demo: local-postgres.ps1 → `node scripts/demo.mjs init` → `node scripts/demo.mjs start`; account riêng ở `.local/demo/private.json`; dừng bằng `node scripts/demo.mjs stop`.
 
-`server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI Linux và Docker smoke. `compose.yaml` đã chạy trong CI, cổng local8080; máy Windows hiện chưa có Docker Engine. Xem [báo cáo review cuối](docs/REVIEW_CUOI.md) để biết lỗi đã sửa, kết quả CI và giới hạn nghiệm thu.
+`server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI Linux và Docker smoke. `compose.yaml` đã chạy trong CI, cổng local8080; Docker Windows build/up/smoke cũng đã PASS với Engine hiện có. Xem [báo cáo review cuối](docs/REVIEW_CUOI.md) để biết lỗi đã sửa, kết quả CI và giới hạn nghiệm thu.
 
 Khi tiếp tục, gửi **Tiếp tục đồ án.** trong cùng repo. AGENTS.md yêu cầu đối chiếu code/Git với checkpoint trước làm tiếp. Sau giai đoạn đã kiểm chứng, tự commit và push thông thường lên nhánh hiện tại theo mục 8 của AGENTS.md; không force push, không commit secret hoặc xóa lịch sử/dữ liệu/tài liệu yêu cầu. Nếu Git thất bại phải ghi lỗi vào tiến độ. Không có cơ chế tự chạy lại lúc reset token.

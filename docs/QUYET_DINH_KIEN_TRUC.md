@@ -66,3 +66,10 @@ Tham chiếu kỹ thuật: [PostgreSQL constraints](https://www.postgresql.org/d
 - Native demo scripts/demo.mjs tạo DB sm_demo_* mới trên local cluster riêng, account/password random lưu .local/demo/private.json (ignored), không seed vào DB dev hoặc lấy .env user làm đích. Init lặp giữ dữ liệu; start/stop điều khiển đúng process demo bằng control key riêng, giữ PostgreSQL/data.
 - Android integration_test chạy trên emulator được chỉ định, fixture/DB sm_test_* mới; 10.0.2.2 trỏ API host qua loopback. Ngưỡng/sensor là simulator có nhãn, không gọi hardware test. AVD test riêng trong .local tránh wipe/ghi đè AVD đang dùng của người dùng. App production không thêm backdoor/test route.
 - Không đổi auth opaque đang hoạt động sang JWT chỉ vì checklist master nhắc tên JWT: đề tài không bắt buộc định dạng token, ADR003 và tests vẫn là cơ sở.
+
+### ADR-015 — Source điều khiển thật, mặc định khóa hai lớp
+
+- Người dùng cho phép phát triển software khi chưa có thiết bị, nhưng yêu cầu BOM/sơ đồ/điện áp/giới hạn để xác nhận trước triển khai vật lý. [Phương án phần cứng](PHUONG_AN_PHAN_CUNG_IOT.md) đề xuất DevKitC V4/WROOM32E +SCD41 +4 relay4409 active-HIGH, tải prototype12VDC. Không giả định đã mua hoặc được phép flash/cấp tải.
+- Giữ REST/HTTP và data model hiện có; server allowlist UUID rỗng mặc định, firmware compile gate0 mặc định. Không thêm công tắc API tự mở quyền hardware. Web mặc định dry-run, Flutter Customer chỉ quan sát. Không thay sensor thật bằng simulator để nghiệm thu.
+- Pending physical command TTL15s, duration1–10s, sample freshness30s, poll/ack revalidate token trong transaction; pending cùng actuator bị thay thế. Firmware pure pulse policy có constexpr assertions, task FreeRTOS riêng, fail-off15s server/30s sample, không kéo dài ON đang bật, fan/heater interlock và cache ID chống áp dụng lặp. Automation ON chỉ yêu cầu lại sau30s; không phải bộ điều khiển PID hoặc chứng nhận an toàn điện.
+- ACK chỉ xác nhận lịch GPIO, chưa có feedback điện. Hardware/electrical/condensation/calibration/camera và giới hạn tải chưa kiểm thử; nguồn/cầu chì/thermostat độc lập vẫn cần xác nhận. Biên dịch cả3 profile không upload thiết bị.

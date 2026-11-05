@@ -8,5 +8,7 @@ export function readConfig(env = process.env) {
     DATABASE_URL: z.string().url().refine(v => /^postgres(ql)?:/.test(v)),
     WEB_ORIGIN: z.string().url().default('http://localhost:5173'),
     TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(1).default(0),
+    HARDWARE_ACTUATION_ALLOWLIST: z.string().default('').transform(v =>
+      z.array(z.uuid()).parse(v.split(',').map(s => s.trim()).filter(Boolean))),
   }).parse(env);
 }

@@ -6,6 +6,7 @@
 #include <time.h>
 #include <math.h>
 #include "url_policy.h"
+#include "pulse_policy.h"
 #if __has_include("config.local.h")
 #include "config.local.h"
 #else
@@ -18,7 +19,31 @@ SensirionI2cScd4x scd4x;
 bool sensorReady = false;
 #endif
 
-// No relay pins or GPIO writes: hardware actuation awaits acceptance.
+// Outputs compile out by default. No firmware is uploaded by build scripts.
+#if SM_ENABLE_HARDWARE_OUTPUTS && !SM_SIMULATION
+static const int outputPins[4]={SM_MIST_PIN,SM_FAN_PIN,SM_LIGHT_PIN,SM_HEATER_PIN};
+constexpr bool approvedPin(int p){return p==16||p==17||p==18||p==19||p==23||p==25||p==26||p==27||p==32||p==33;}
+static_assert(approvedPin(SM_MIST_PIN)&&approvedPin(SM_FAN_PIN)&&approvedPin(SM_LIGHT_PIN)&&approvedPin(SM_HEATER_PIN),"Only safe output-capable non-strap pins in proposed ESP32 profile");
+static_assert(SM_MIST_PIN!=SM_FAN_PIN&&SM_MIST_PIN!=SM_LIGHT_PIN&&SM_MIST_PIN!=SM_HEATER_PIN&&SM_FAN_PIN!=SM_LIGHT_PIN&&SM_FAN_PIN!=SM_HEATER_PIN&&SM_LIGHT_PIN!=SM_HEATER_PIN,"GPIOs must be unique");
+static_assert(SM_MIST_PIN!=SM_SDA_PIN&&SM_MIST_PIN!=SM_SCL_PIN&&SM_FAN_PIN!=SM_SDA_PIN&&SM_FAN_PIN!=SM_SCL_PIN&&SM_LIGHT_PIN!=SM_SDA_PIN&&SM_LIGHT_PIN!=SM_SCL_PIN&&SM_HEATER_PIN!=SM_SDA_PIN&&SM_HEATER_PIN!=SM_SCL_PIN,"Outputs must not share sensor I2C pins");
+static PulsePolicy pulse(true);
+static portMUX_TYPE pulseMutex=portMUX_INITIALIZER_UNLOCKED;
+static bool outputTaskReady=false;
+void outputSafetyTask(void *) {
+  uint8_t previous=0;
+  for(;;){
+    portENTER_CRITICAL(&pulseMutex);const uint8_t mask=pulse.tick(millis());portEXIT_CRITICAL(&pulseMutex);
+    // Switch every previous output off first, avoiding transient fan/heater overlap.
+    if(mask!=previous){for(int pin:outputPins)digitalWrite(pin,LOW);for(unsigned i=0;i<4;i++)if(mask&(1u<<i))digitalWrite(outputPins[i],HIGH);previous=mask;}
+    vTaskDelay(pdMS_TO_TICKS(10));
+  }
+}
+void stopOutputs(){portENTER_CRITICAL(&pulseMutex);pulse.disconnect();portEXIT_CRITICAL(&pulseMutex);}
+void recordSensor(bool valid){portENTER_CRITICAL(&pulseMutex);pulse.sample(millis(),valid);portEXIT_CRITICAL(&pulseMutex);}
+#else
+void stopOutputs(){}
+void recordSensor(bool){}
+#endif
 static bool identityVerified = false;
 static bool timeConfigured = false;
 static uint32_t lastReconnect = 0;
@@ -64,6 +89,7 @@ int apiCall(const String &path, const char *method, const String &payload, Strin
     if (response.length() > 16384) { http.end(); return -1; }
   }
   http.end();
+  if (status < 0 || status >= 400) stopOutputs();
   if (status == 401) identityVerified = false;
   return status;
 }
@@ -79,7 +105,7 @@ bool verifyIdentity() {
     Serial.println("Device mode mismatch; refusing to send misleading samples.");
     return false;
   }
-  Serial.println(SM_SIMULATION ? "SIMULATION identity verified." : "HARDWARE sensing identity verified; relays disabled.");
+  Serial.println(SM_SIMULATION ? "SIMULATION identity verified." : "HARDWARE sensing identity verified; outputs require compiled profile and server approval.");
   return true;
 }
 
@@ -101,7 +127,8 @@ bool collectSample(float &temperature, float &humidity, uint16_t &co2) {
 void sendSample() {
   float temperature, humidity;
   uint16_t co2;
-  if (!collectSample(temperature, humidity, co2)) { Serial.println("No valid fresh sensor sample; nothing sent."); return; }
+  if (!collectSample(temperature, humidity, co2)) {recordSensor(false);Serial.println("No valid fresh sensor sample; nothing sent."); return; }
+  recordSensor(true);
   JsonDocument document;
   document["temperature"] = temperature;
   document["humidity"] = humidity;
@@ -117,18 +144,40 @@ void pollCommands() {
   String response;
   if (apiCall("/api/iot/commands", "GET", "", response) != 200) return;
   JsonDocument document;
-  if (deserializeJson(document, response)) return;
+  if (deserializeJson(document, response)) {stopOutputs();return;}
+#if SM_ENABLE_HARDWARE_OUTPUTS && !SM_SIMULATION
+  const bool approved=outputTaskReady && document["meta"]["hardware_control_available"]==true;
+  portENTER_CRITICAL(&pulseMutex);pulse.contact(millis(),approved);portEXIT_CRITICAL(&pulseMutex);
+  static char seen[16][37]={};static bool seenOK[16]={};static unsigned seenNext=0;
+#endif
   for (JsonObject command : document["data"].as<JsonArray>()) {
     const char *id = command["id"] | "";
     if (strlen(id) != 36) continue;
-    if (!SM_SIMULATION || command["dry_run"] != true) {
-      Serial.println("Command refused: hardware actuation has not been accepted.");
-      continue;
+    bool accepted=false;
+    const char *result="Command refused: hardware profile locked or invalid command.";
+    if(SM_SIMULATION && command["dry_run"]==true){accepted=true;result="ESP32 simulation; no GPIO outputs.";}
+#if SM_ENABLE_HARDWARE_OUTPUTS && !SM_SIMULATION
+    if(approved && command["dry_run"]==false){
+      int duplicate=-1;for(unsigned i=0;i<16;i++)if(strcmp(seen[i],id)==0){duplicate=i;break;}
+      if(duplicate>=0){accepted=seenOK[duplicate];result="Duplicate command; GPIO not applied again.";}
+      else {
+        const char *name=command["actuator"]|"";const char *names[]={"mist","fan","light","heater"};unsigned channel=4;
+        for(unsigned i=0;i<4;i++)if(strcmp(name,names[i])==0)channel=i;
+        const int64_t nowEpoch=time(nullptr),expires=command["expires_epoch"].as<int64_t>();
+        const int duration=command["duration_seconds"]|0;
+        if(command["enabled"].is<bool>() && nowEpoch>1700000000 && expires>nowEpoch && expires<=nowEpoch+30 && duration>0 && duration<=10){
+          const unsigned seconds=(unsigned)min((int64_t)duration,expires-nowEpoch);
+          portENTER_CRITICAL(&pulseMutex);accepted=pulse.command(channel,command["enabled"].as<bool>(),seconds,millis());portEXIT_CRITICAL(&pulseMutex);
+        }
+        strncpy(seen[seenNext],id,36);seen[seenNext][36]='\0';seenOK[seenNext]=accepted;seenNext=(seenNext+1)%16;
+        result=accepted?"Bounded GPIO pulse scheduled; no electrical/relay feedback sensor.":"Rejected: stale sensor/clock/TTL/interlock/duration or existing pulse.";
+      }
     }
-    Serial.printf("DRY-RUN actuator=%s enabled=%d (no GPIO)\n", command["actuator"].as<const char *>(), command["enabled"].as<bool>());
+#endif
+    Serial.printf("%s command result=%s\n",SM_SIMULATION?"DRY-RUN":"HARDWARE PROFILE",result);
     JsonDocument ack;
-    ack["success"] = true;
-    ack["result"] = "ESP32 simulation; no GPIO outputs.";
+    ack["success"] = accepted;
+    ack["result"] = result;
     String payload, ignored;
     serializeJson(ack, payload);
     apiCall(String("/api/iot/commands/") + id + "/ack", "POST", payload, ignored);
@@ -137,7 +186,11 @@ void pollCommands() {
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Smart Mushroom: relay outputs disabled.");
+  Serial.println("Smart Mushroom: outputs locked unless accepted hardware build profile.");
+#if SM_ENABLE_HARDWARE_OUTPUTS && !SM_SIMULATION
+  for(int pin:outputPins){digitalWrite(pin,LOW);pinMode(pin,OUTPUT);}
+  outputTaskReady=xTaskCreate(outputSafetyTask,"SM safety",2048,nullptr,3,nullptr)==pdPASS;
+#endif
   WiFi.mode(WIFI_STA);
   WiFi.begin(SM_WIFI_SSID, SM_WIFI_PASSWORD);
 #if !SM_SIMULATION
@@ -154,6 +207,7 @@ void loop() {
   uint32_t nowMs = millis();
   if (WiFi.status() != WL_CONNECTED) {
     identityVerified = false;
+    stopOutputs();
     if ((uint32_t)(nowMs-lastReconnect) >= 5000) { lastReconnect = nowMs; WiFi.reconnect(); }
     delay(10);
     return;

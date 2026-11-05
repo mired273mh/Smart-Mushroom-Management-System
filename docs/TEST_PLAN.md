@@ -60,6 +60,8 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 
 ## Điều kiện nghiệm thu còn thiếu
 
+Master mới nhất đã build APK debug và chạy Android emulator UI→API→PostgreSQL; phần Android/signing bên dưới còn phone/release, không còn thiếu SDK/NDK. Thêm `server/test/hardware.test.js` cho config khóa, auth, freshness, pulse limits, TTL/ACK/supersede, automation và room-lock expiry. Firmware pulse_policy.h kiểm chứng logic constexpr ở3 profile; không thay thử nghiệm điện/board. BOM và acceptance procedure tại [phương án IoT](PHUONG_AN_PHAN_CUNG_IOT.md).
+
 - Rà soát học thuật UML đã render với người hướng dẫn; browser test thêm mọi nhánh account/camera/config.
 - Android build/signing và kiểm thử trên điện thoại/emulator. Flutter UI browser E2E đã PASS luồng chính, vẫn chưa thay thế kiểm thử mobile đích.
 - Workflow Linux tổng và Docker build/compose smoke đã PASS run42005126537. Staging HTTPS và backup lịch vận hành chưa nghiệm thu.

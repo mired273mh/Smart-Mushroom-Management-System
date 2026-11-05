@@ -6,7 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { setup } from '../../server/test/helpers.js';
 import { seedRentalHistory } from '../../server/test/history-fixtures.js';
 
-const ctx = await setup();
+const hardwareAllowlist=[];
+const ctx = await setup({HARDWARE_ACTUATION_ALLOWLIST:hardwareAllowlist});
 const [admin,operator,customer] = await Promise.all(['admin','operator','customer'].map(ctx.user));
 const vite = spawn(process.execPath, [fileURLToPath(new URL('../../node_modules/vite/bin/vite.js',import.meta.url)), '--host','127.0.0.1','--port','5177','--strictPort'], {
   cwd:fileURLToPath(new URL('../',import.meta.url)), env:{ ...process.env, API_TARGET:ctx.base }, stdio:'pipe', windowsHide:true,
@@ -109,8 +110,29 @@ try {
   await page.getByRole('button',{ name:'Đã lưu riêng',exact:true }).click();
   assert.equal((await ctx.request('/api/iot/readings',{ token:deviceToken,method:'POST',body:{ temperature:24,humidity:82,co2:850 } })).status,201);
   const roomId = (await ctx.request('/api/rooms',{ token:admin.token })).body.data.find(r => r.name === roomName).id;
+  await page.getByRole('button',{name:'Gửi lệnh',exact:true}).click();
+  await page.getByLabel('Thiết bị điều khiển',{exact:true}).selectOption('fan');
+  assert.equal(await page.getByLabel('Dry-run (bỏ chọn sẽ yêu cầu xung GPIO thật)',{exact:true}).count(),0);
+  await saveModal();
+  const simulatorId=(await ctx.request('/api/devices',{token:admin.token})).body.data.find(d=>d.name==='Simulator E2E').id;
+  assert.equal((await ctx.request(`/api/devices/${simulatorId}/commands`,{token:admin.token})).body.data[0].dry_run,true);
+  const hardware=(await ctx.request('/api/devices',{token:admin.token,method:'POST',body:{name:'Hardware HTTP fixture',mode:'hardware',room_id:roomId}})).body.data;
+  hardwareAllowlist.push(hardware.id); // Test configuration only; no physical device.
+  await ctx.request('/api/iot/readings',{token:hardware.token,method:'POST',body:{temperature:24,humidity:82,co2:850}});
+  await nav('Tổng quan');await nav('Môi trường & IoT');
+  const row=page.getByRole('row').filter({hasText:'Hardware HTTP fixture'});
+  await row.getByRole('button',{name:'Gửi lệnh',exact:true}).click();
+  await page.getByLabel('Thiết bị điều khiển',{exact:true}).selectOption('fan');
+  const dryRun=page.getByLabel('Dry-run (bỏ chọn sẽ yêu cầu xung GPIO thật)',{exact:true});
+  assert.equal(await dryRun.isChecked(),true);
+  await dryRun.uncheck();await page.getByLabel('Bật (bỏ chọn để tắt)',{exact:true}).check();
+  await saveModal();
+  const hardwareCommand=(await ctx.request(`/api/devices/${hardware.id}/commands`,{token:admin.token})).body.data[0];
+  assert.equal(hardwareCommand.dry_run,false);assert.equal(hardwareCommand.status,'pending');
+  hardwareAllowlist.length=0;
+  console.log('PASS: UI mặc định dry-run, GPIO bị khóa; allowlist fixture cho phép yêu cầu xung giới hạn (không hardware thật).');
   await page.getByLabel('Chọn phòng giám sát').selectOption(roomId);
-  await page.getByRole('table',{ name:'Lịch sử cảm biến' }).getByRole('cell',{ name:'850',exact:true }).waitFor();
+  await page.getByRole('table',{ name:'Lịch sử cảm biến' }).getByRole('cell',{ name:'850',exact:true }).first().waitFor();
   await nav('Báo cáo');
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button',{ name:'Thu hoạch CSV ↓',exact:true }).click();

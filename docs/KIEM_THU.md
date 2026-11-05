@@ -2,6 +2,22 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## Master2 — source IoT có khóa, 2026-11-05
+
+| Phạm vi | Kết quả thực tế | Bằng chứng / giới hạn |
+|---|---|---|
+| Backend allowlist/freshness/duration/TTL/ACK/rotate/automation/interlock | PASS38/38 cuối cùng | `powershell -NoProfile -File scripts/test.ps1`, `.local/master-hardware-ttl-after.log`; PostgreSQL/HTTP thật, device HTTP fixture, không board vật lý |
+| TTL sau khi chờ database lock | FAIL → ĐÃ SỬA, PASS hồi quy | `.local/master-hardware-ttl-before.log`: poll trả1 thay vì0; now() cố định đầu transaction. Đổi sang clock_timestamp(), poll và ACK sau room-lock/expiry PASS trong full38tests |
+| React production build | PASS | `npm.cmd run build:web`, `.local/master-hardware-web-build.log` |
+| React client/Chrome E2E | PASS2 tests +10 nhóm | `npm.cmd run test:web`, `.local/master-hardware-web3.log`; mặc định dry-run/khóa GPIO, test allowlist fixture gửi pending bounded, không điều khiển thiết bị |
+| E2E harness thử lần đầu | FAIL → ĐÃ SỬA | Chưa chọn actuator required; sau đó locator850 trùng do2 mẫu test. Chọn field và xác định cell đầu; chạy lại đủ suite PASS, không bỏ assertion |
+| Flutter live Dart API | PASS1/1 | `node scripts/test-mobile-api.mjs`, `.local/master-hardware-dart.log`; client→HTTP→PostgreSQL, không sensor thật |
+| ESP32 compile | PASS3/3 profiles | `scripts/compile-iot.ps1`, `.local/master-hardware-compile-final.log`; sim/locked sensing/gated outputs, URL +pulse constexpr assertions. Flash1014319/1039867/1040747B; RAM45476/46876/46924B. Không upload, không đo GPIO/relay |
+| Docker Windows rebuild/up/smoke | PASS | Compose project riêng smverify20261105200125, config/build/up +`node scripts/test-deployment.mjs`; DB/migration/Nginx/assets/CSP/login/read/logout. Volume giữ nguyên, allowlist trống |
+| CI master1 | PASS3jobs | be531fa/run42035426091: api-web/deployment/android-build success; không dùng làm kết quả CI của commit tiếp theo |
+| Hardware/camera | BLOCKED | Chưa có xác nhận BOM/nguồn/đấu dây/giới hạn và thiết bị; xem PHUONG_AN_PHAN_CUNG_IOT.md. Compile/API fixture không thay kiểm thử vật lý |
+
+
 ## Mẫu bản ghi
 
 | Thời điểm | Module / chức năng | Lệnh test | Kết quả | Bằng chứng / lý do không chạy |

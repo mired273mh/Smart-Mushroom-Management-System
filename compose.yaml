@@ -37,6 +37,7 @@ services:
       DATABASE_URL: postgresql://smart_mushroom:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/smart_mushroom
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8080}
       TRUST_PROXY_HOPS: 1
+      HARDWARE_ACTUATION_ALLOWLIST: ${HARDWARE_ACTUATION_ALLOWLIST:-}
     depends_on:
       migrate: { condition: service_completed_successfully }
     healthcheck:

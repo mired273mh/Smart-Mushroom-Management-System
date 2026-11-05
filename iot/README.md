@@ -1,6 +1,6 @@
 # IoT Smart Mushroom
 
-Hai chương trình đều mới trong repo: `simulator.mjs` chạy trên máy phát triển và `esp32/SmartMushroom/SmartMushroom.ino` cho ESP32. Mọi điều khiển hiện là **dry-run**; firmware không có GPIO điều khiển relay. Chưa upload/test cảm biến/relay/camera thật.
+Hai chương trình trong repo: `simulator.mjs` chạy trên máy phát triển và `esp32/SmartMushroom/SmartMushroom.ino` cho ESP32. Mặc định **dry-run/GPIO khóa**; đã có source output active-HIGH có giới hạn và kiểm tra an toàn, chưa flash/test cảm biến/relay/camera thật. Xem [BOM, sơ đồ và quy trình xác nhận](../docs/PHUONG_AN_PHAN_CUNG_IOT.md) trước triển khai vật lý.
 
 ## Chạy simulator HTTP
 
@@ -20,7 +20,7 @@ arduino-cli core update-index --additional-urls https://espressif.github.io/ardu
 arduino-cli core install esp32:esp32@3.3.3
 arduino-cli lib install ArduinoJson "Sensirion I2C SCD4x@1.1.0"
 arduino-cli compile --fqbn esp32:esp32:esp32 iot/esp32/SmartMushroom
-# Với bộ tool portable trên máy hiện tại, compile cả 2 nhánh:
+# Với bộ tool portable trên máy hiện tại, compile 3 profile (không upload):
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/compile-iot.ps1
 ```
 
@@ -43,7 +43,7 @@ Driver dùng I²C 0x62, start periodic, kiểm tra ready rồi đọc CO₂/nhi�
 
 - Xác nhận ESP32/module cảm biến, chân và nguồn bằng sơ đồ điện; đọc mẫu đối chiếu thiết bị tham chiếu, log Serial/API và nhãn hardware.
 - Chạy simulator/dry-run trước; kiểm tra mất Wi-Fi, API lỗi, token hết hiệu lực, sensor lỗi, lệch giờ/certificate.
-- Chỉ sau khi người dùng xác nhận: thiết kế driver relay cho mist/fan/LED/heater, mức active-low/high, trạng thái OFF lúc boot, thời gian bật tối đa, interlock và watchdog mất mạng. Hiện không có driver này, không bật qua một biến môi trường.
+- Chỉ sau khi người dùng xác nhận BOM/đấu dây/giới hạn: cho phép flash profile `SM_SIMULATION=0`, `SM_ENABLE_HARDWARE_OUTPUTS=1` và cấu hình UUID hardware vào `HARDWARE_ACTUATION_ALLOWLIST` của server. Mặc định cả hai cổng khóa vẫn tắt. Driver đề xuất active-HIGH GPIO26/27/32/33; tối đa10s/pulse, task timer riêng, stale network/sensor OFF, fan ưu tiên heater. Không áp dụng cho relay active-LOW hoặc tải khác chưa đánh giá; chi tiết và giới hạn trong phương án phần cứng.
 - Camera cần IP camera/gateway HTTPS có kiểm soát truy cập riêng; URL contract không tự cung cấp video và không bảo vệ camera công khai.
 
 Không có lệnh upload trong quy trình đã chạy. Không coi compile PASS là ESP32/cảm biến/relay PASS.

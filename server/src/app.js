@@ -26,13 +26,13 @@ export function createApp({ pool, config }) {
   });
   app.use('/api', rateLimit({ windowMs: 60000, limit: 300, standardHeaders: 'draft-8', legacyHeaders: false }));
   app.use('/api/auth', authRouter(pool));
-  app.use('/api/iot', deviceRouter(pool));
+  app.use('/api/iot', deviceRouter(pool, config));
   app.use('/api', authenticate(pool));
   app.use('/api/users', usersRouter(pool));
   app.use('/api', catalogRouter(pool));
   app.use('/api', rentalsRouter(pool));
   app.use('/api', operationsRouter(pool));
-  app.use('/api', monitoringRouter(pool));
+  app.use('/api', monitoringRouter(pool, config));
   app.use((req, res, next) => next(new HttpError(404, 'NOT_FOUND', 'Không tìm thấy API.')));
   app.use(errorHandler);
   return app;

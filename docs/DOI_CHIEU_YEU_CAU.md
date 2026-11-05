@@ -10,7 +10,7 @@ Nguồn: DE_TAI_YEU_CAU, SRS, User Requirements; không coi JWT hay public admin
 | A04 | CRUD phòng | server/src/catalog.js; web/src/App.jsx | HOÀN THÀNH phần mềm | rentals/review tests, browser CRUD | Phân trang khi dữ liệu lớn |
 | A05 | Khay/định danh/phân công | server/src/catalog.js,rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | unique/FK/race/ownership, browser gán | Phân trang/tìm kiếm toàn bộ khay |
 | A06 | Gói/chính sách giá | server/src/catalog.js,rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | snapshot giá, CRUD/E2E | Paging nếu vượt cap |
-| A07 | Device/sensor/camera | server/src/iot.js; web/src/App.jsx; iot/esp32/SmartMushroom | CHƯA KIỂM THỬ hardware | iot tests/provision/rotate; firmware compile2/2 | Kết nối sensor/camera thực |
+| A07 | Device/sensor/camera | server/src/iot.js; web/src/App.jsx; iot/esp32/SmartMushroom | CHƯA KIỂM THỬ hardware | iot tests/provision/rotate; firmware compile3/3 | Kết nối sensor/camera thực |
 | A08 | Thống kê/báo cáo | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH bản cơ bản | operations tests; Chrome dashboard | Dataset lớn/downsampling |
 | A09 | Xuất dữ liệu | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH bản CSV bounded | CSV formula guard/download E2E | Export đủ dữ liệu khi vượt10000 |
 | A10 | Ngưỡng/thông báo | server/src/iot.js; web/src/App.jsx | HOÀN THÀNH phần mềm | validation/RBAC/dedup iot tests | Hiệu chuẩn ngưỡng với giống nấm |
@@ -18,7 +18,7 @@ Nguồn: DE_TAI_YEU_CAU, SRS, User Requirements; không coi JWT hay public admin
 | O02 | Phòng/khay | server/src/catalog.js; web/src/App.jsx | HOÀN THÀNH phần mềm | CRUD/constraints/PATCH regression | Paging/tìm kiếm đầy đủ |
 | O03 | Gán thuê | server/src/rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | many-tray atomic/race201-409, browser | Kiểm thử workload thực |
 | O04 | Giám sát sensor | server/src/iot.js; web/src/App.jsx | CHƯA KIỂM THỬ sensor thật | simulator→SQL→React/Android PASS | Đối chiếu phép đo sensor |
-| O05 | Điều khiển manual/automatic | server/src/iot.js; iot/esp32/SmartMushroom/SmartMushroom.ino | THIẾU driver GPIO, hardware BLOCKED | dry-run/TTL/ack/provenance tests PASS | Cần BOM/chân/mức relay/giới hạn; driver/fail-safe/hardware test |
+| O05 | Điều khiển manual/automatic | server/src/iot.js; iot/esp32/SmartMushroom/SmartMushroom.ino | CÓ source gated; hardware BLOCKED | hardware.test.js +Chrome control UI +compile3 profile/pulse assertions PASS (software) | Xác nhận PHUONG_AN_PHAN_CUNG_IOT, flash/đo pulse/fail-safe/tải thật |
 | O06 | Camera live | server/src/iot.js; web/src/App.jsx | CHƯA KIỂM THỬ live feed | URL HTTPS/ownership tests | Camera/gateway có quyền xem |
 | O07 | Tiến trình nuôi | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH theo rental item; THIẾU cycle khay không thuê | stage/events tests; browser/Android | Mở rộng cycle độc lập nếu dùng khay không hợp đồng |
 | O08 | Lịch/thu hoạch | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH theo rental item | weight/ready/date/tenant tests, E2E | Nghiệm thu lịch canh tác thực |

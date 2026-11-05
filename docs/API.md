@@ -41,17 +41,17 @@ GET /rentals nhận `limit`, `cursor`, `status=active|completed` và `customer_i
 | GET /reports/export?type=rentals\|harvests\|environment | Admin | Download CSV có chống formula |
 | GET /devices | Staff | Trạng thái, không trả token/hash |
 | POST /devices | Admin | room_id,name,mode simulator/hardware; token chỉ trả lúc cấp |
-| PATCH /devices/:id | Admin | name, active, automation_enabled (chỉ dry-run) |
+| PATCH /devices/:id | Admin | name, active, automation_enabled; không mở khóa hardware qua API |
 | POST /devices/:id/rotate-token | Admin | Token mới, token cũ hết hiệu lực |
-| GET/POST /devices/:id/commands | Staff | actuator mist/fan/light/heater, enabled, duration_seconds 1..60, dry_run=true |
+| GET/POST /devices/:id/commands | Staff | actuator mist/fan/light/heater, enabled, duration_seconds1..60 dry-run (mặc định); physical1..10s cần allowlist/hardware/sample mới |
 | GET /rooms/:id/environment | Staff/chủ thuê active | Readings theo phòng; Customer chỉ từ thời điểm thuê đang hoạt động |
 | GET/PATCH /rooms/:id/thresholds | Staff xem/Admin sửa | temperature_min/max, humidity_min/max, co2_max, notifications_enabled |
 | GET/PATCH /rooms/:id/camera | Staff cấu hình/chủ thuê active xem | `{url: HTTPS hoặc null}`; chưa nghiệm thu live camera |
 | POST /iot/readings | Device | temperature °C, humidity %RH, co2 ppm; timestamp/provenance do server gán |
 | GET /iot/me | Device | id/room_id/name/mode để firmware/simulator kiểm tra nguồn dữ liệu |
-| GET /iot/commands | Device simulator | Dry-run chưa hết TTL 60s; hardware không nhận lệnh vận hành |
-| POST /iot/commands/:id/ack | Device simulator đúng chủ | success, result; không replay/ack command hết hạn |
+| GET /iot/commands | Device đúng chủ | Simulator nhận dry-run TTL60s; hardware chỉ nhận pending TTL15s khi UUID allowlist; meta.hardware_control_available/max_duration_seconds, expires_epoch |
+| POST /iot/commands/:id/ack | Device đúng chủ | success, result; không replay/ack hết hạn; hardware cần allowlist, simulator chỉ dry-run |
 
 `Staff` = admin/operator. HTTP: 201 tạo, 204 logout/xóa, 401 thiếu phiên, 403 sai role, 404 không tồn tại hoặc sai chủ, 409 xung đột nghiệp vụ/DB, 422 validation, 429 rate limit.
 
-Telemetry bất thường được thông báo tối đa một lần/5 phút/người/phòng; đây là chống spam đơn giản, chưa có cảnh báo đổi mức nghiêm trọng riêng. Automation đề xuất phun sương khi ẩm thấp, quạt khi CO₂/nhiệt cao, sưởi khi nhiệt thấp; chỉ tạo dry-run theo thay đổi trạng thái, chưa phải bộ điều khiển đã hiệu chuẩn. LED chỉ điều khiển dry-run thủ công. Mọi ngưỡng mặc định là dữ liệu phát triển, không phải khuyến nghị trồng cho một giống nấm cụ thể.
+Telemetry bất thường thông báo tối đa một lần/5 phút/người/phòng. Automation phun sương khi ẩm thấp, quạt khi CO₂/nhiệt cao, sưởi khi nhiệt thấp và không cần thông gió; mặc định dry-run theo thay đổi trạng thái. Hardware được allowlist dùng xung10s, yêu cầu lại ON sau30s. LED thủ công. Ngưỡng mặc định là dữ liệu phát triển, chưa hiệu chuẩn cho giống nấm. [Điều kiện bật hardware và giới hạn ACK](PHUONG_AN_PHAN_CUNG_IOT.md); GET /devices và /iot/me trả hardware_control_available, không phải chứng nhận thiết bị đã nghiệm thu.
