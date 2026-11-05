@@ -40,3 +40,4 @@ jobs:
       - run: flutter build web --no-wasm-dry-run
         working-directory: mobile
       - run: npm run test:mobile:api
+      - run: npm run test:mobile:web

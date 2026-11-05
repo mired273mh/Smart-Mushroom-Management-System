@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Đang làm:** Lưu batch phân trang/filter lịch sử thuê đã PASS; tiếp theo Flutter UI E2E qua browser trên API/DB thật. P5 chưa nghiệm thu container/Android/hardware.
-- **Đã hoàn thành:** Thiết kế; Express/PostgreSQL và API nghiệp vụ; React Web; Flutter Customer (Web/VM); firmware 2 mode compile; simulator; backup/restore test; tài liệu và 6 UML đã render.
+- **Đang làm:** Lưu batch Flutter UI E2E đã PASS, cập nhật trạng thái Git. P5 chưa nghiệm thu container/Android/hardware.
+- **Đã hoàn thành:** Thiết kế; Express/PostgreSQL24 tests; React Web6 nhóm E2E; Flutter Customer7 widget/client tests + live API + browser UI E2E4 nhóm; pagination lịch sử thuê; firmware2 mode compile; simulator; backup/restore; tài liệu và6 UML render.
 - **Chưa hoàn thành:** Docker runtime/CI remote/TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO điều khiển thật. Chưa phân trang đầy đủ/retention/benchmark tải.
-- **Blocker môi trường:** Thiếu Docker Engine và Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Chưa bật thiết bị thật. Người dùng đã cho phép commit/push thông thường lên nhánh hiện tại theo AGENTS mục 8.
-- **Công việc tiếp theo chính xác:** Flutter UI E2E cho đăng ký/thuê/theo dõi/nhận-giao; các danh sách khác ngoài /rentals còn cần pagination riêng. Git push cần đăng nhập GitHub trên máy. Docker/Android/hardware vẫn giữ điều kiện nghiệm thu cũ, không dựng lại phần đã PASS.
+- **Blocker môi trường:** Git push thiếu đăng nhập GitHub trên máy; thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Người dùng đã cho phép commit/push thông thường; không thiếu quyền chỉ dẫn, đang thiếu credential kỹ thuật.
+- **Công việc tiếp theo chính xác:** Các danh sách ngoài /rentals (catalog/khách/notifications/telemetry...) còn cần pagination; bổ sung test dữ liệu lớn/đo tải. Sau khi đăng nhập GitHub qua GCM/VS Code, push main thông thường các commit local. Docker/Android/hardware giữ điều kiện nghiệm thu cũ; không dựng lại phần đã PASS.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 
 ## 2. Trạng thái các giai đoạn
@@ -19,9 +19,9 @@
 | Mốc | Nội dung | Tình trạng | Bằng chứng |
 |---|---|---|---|
 | P0 | Kiến trúc, repo, skeleton, .env.example, tài liệu chạy | Đã kiểm thử | SRS/ADR/ERD + health/readiness PASS |
-| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử bản đầu | 21/21 integration tests PASS; còn pagination/tăng độ phủ trước production |
+| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử bản đầu | 24/24 integration tests PASS, cursor/filter lịch sử thuê; các list khác chưa phân trang |
 | P2 | React Web: Administrator và Farm Operator | Đã kiểm thử bản đầu | Vite build PASS; Chrome E2E luồng chính PASS |
-| P3 | Flutter App: Customer | Đã kiểm thử bản đầu (Web/VM) | Analyze sạch, 5 tests PASS + 1 live API test PASS; Web build PASS; chưa Android SDK |
+| P3 | Flutter App: Customer | Đã kiểm thử bản đầu (Web/VM) | Analyze sạch,7 tests + live API1/1 + Chrome UI E2E4 nhóm PASS; Web build PASS; chưa Android SDK |
 | P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP test PASS; firmware 2 nhánh compile PASS; chưa upload/relay/live camera |
 | P5 | Tích hợp, bảo mật, kiểm thử, triển khai | Đang làm; local integration đã kiểm thử | 21 backend tests, Web E2E, Dart live API, backup/restore PASS; Docker/CI remote chưa chạy |
 | P6 | UML 2.0, SRS, thiết kế, test plan, cài đặt, hướng dẫn | Hoàn thành tài liệu bản đầu | UR/SRS/ADR/ERD/detail/API/test/install/user guide; 6 PlantUML render PASS; cần review học thuật/nghiệm thu đích |
@@ -170,6 +170,17 @@
 - Kết quả sau sửa: Flutter **7/7 PASS**, analyze sạch, Web build PASS. Test lỗi HTTP nhanh còn phát hiện Future chưa được UI subscribe; đã quan sát Future ngay, vẫn hiển thị lỗi/retry qua FutureBuilder và test đã PASS. Không bỏ qua lỗi.
 - `npm run test:mobile:api`: **1/1 PASS** sau thêm25 hợp đồng fixtures; client Dart kiểm tra cursor, lọc completed12 hợp đồng và không lộ chủ thuê khác. Migration dev3 verified và `npm run test:backup` PASS với3 migrations trên DB phục hồi mới.
 - File chính: rental-pagination.js, migration003, route/tests/fixtures backend; React api/App/components/style/E2E; Flutter api/screens/widgets + paging/pull-refresh tests; runner live API và docs. Cần commit/push theo mục8; không đánh dấu Docker/Android/hardware hoàn thành.
+- **Đã commit:** `8e0092a` trên main sau staged scan29 file/whitespace PASS. **Push thất bại lần batch này:** cùng lỗi thiếu credential GitHub (`could not read Username ... terminal prompts disabled`). Không force push hay đổi remote; giữ commit local. Cần người dùng đăng nhập GitHub qua Git Credential Manager/VS Code trên máy, không gửi mật khẩu/token trong chat. Không tiếp tục retry cùng lỗi nếu chưa có thay đổi xác thực.
+
+### 2026-11-05 — HOÀN THÀNH: Flutter UI E2E trên browser
+
+- Dùng bản Flutter Web vừa build, Chrome headless, API/DB test mới; không gọi là test Android/điện thoại thật.
+- Tiêu chí: tương tác UI Customer đăng ký/thuê/theo dõi/nhận-giao/thông báo/hồ sơ, API lưu thật, không Flutter/page exception. Tách khỏi mock widget và live Dart contract.
+- Thêm `scripts/test-mobile-web.mjs`, root script `test:mobile:web` và CI step sau Flutter build; cập nhật hướng dẫn/checklist/test plan. Harness tự tạo API/DB test và static proxy cùng origin, Chrome dùng Semantics. Không upload/deploy, không test Android.
+- Lần đầu E2E đầy đủ FAIL do selector text không khớp Semantics tab/menuitem/merged text; đã kiểm tra screenshot/labels và sửa locator theo accessible role/name. Không thay đổi app để né test, không bỏ các assertion nghiệp vụ.
+- `npm run test:mobile:web`: **PASS4 nhóm**, đăng ký/login → thuê2 khay → theo dõi nhiệt/ẩm/CO₂ simulator/camera trống → liên kết đúng chủ → giao hàng/address validation/hủy-gửi lại → đánh dấu thông báo đọc → sửa hồ sơ → logout → staff login denied. Kiểm tra DB thật sau hành động và không Flutter/JS exception.
+- Ảnh QA `.local/flutter-customer.png`, diagnostics failures `.local/flutter-failure.png`/`flutter-semantics.json`, đều gitignore. Không dùng dữ liệu app thật. Browser/server test đã teardown. Các giới hạn Android/hardware/production giữ nguyên.
+- Preflight Git cuối batch: `git credential-manager github list` vẫn không có tài khoản; không retry push cùng lỗi khi xác thực chưa thay đổi. Hai lỗi push trước đã ghi rõ ở trên. Batch UI E2E được lưu bằng commit local sau rà soát staged diff/secret/whitespace; cần đăng nhập GitHub trên máy rồi push các commit main đang ahead. Không dùng force/rebase/reset.
 
 - Có file source/di trú/cấu hình tương ứng và tài liệu chạy.
 - Đã chạy kiểm tra phù hợp hoặc nêu rõ giới hạn kiểm thử.

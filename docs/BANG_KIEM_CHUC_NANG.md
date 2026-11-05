@@ -24,24 +24,24 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | O08 | Lịch/bản ghi thu hoạch | ☑ API + React | Expected date, ready→harvested/weight; browser ghi thu hoạch |
 | O09 | Cảnh báo môi trường | ☑ in-app API + React | Scope đúng người và dedup5phút PASS; dữ liệu mô phỏng |
 | O10 | Lịch sử/trạng thái thiết bị | ☑ API + React | History/last seen/mode, browser đọc mẫu mô phỏng |
-| C01 | Đăng ký | ☑ API + Flutter | Public role guard test; Flutter form source, đăng ký UI chưa E2E trên điện thoại |
+| C01 | Đăng ký | ☑ API + Flutter | Public role guard test; Flutter Chrome UI register/login PASS; chưa phone E2E |
 | C02 | Đăng nhập | ☑ API + Flutter | Mock/widget và live Dart API PASS; staff bị từ chối |
-| C03 | Hồ sơ | ☑ API + Flutter | API/profile live test, form sửa tên; chưa E2E điện thoại |
+| C03 | Hồ sơ | ☑ API + Flutter | API/profile live test và Chrome UI sửa tên PASS; chưa phone E2E |
 | C04 | Khay trống/gói | ☑ API + Flutter | Catalog và live Dart test, selection UI; giới hạn danh sách |
-| C05 | Thuê một/nhiều khay | ☑ API + Flutter | API race/rollback, live Dart rent; UI chưa E2E trên điện thoại |
+| C05 | Thuê một/nhiều khay | ☑ API + Flutter | API race/rollback, live Dart rent; Chrome UI thuê2 khay PASS; chưa phone E2E |
 | C06 | Liên kết mã khay | ☑ API + Flutter | Cần đúng chủ active, IDOR test + live Dart link |
 | C07 | Chi tiết/giai đoạn/ngày thu hoạch | ☑ API + Flutter | Detail/isolation, live Dart item; Flutter build PASS |
 | C08 | Điều kiện môi trường | ◐ API + Flutter | Room/time ownership và live Dart reading PASS; chưa sensor thật |
 | C09 | Camera trực tiếp | ◐ contract + mở URL | Chỉ chủ active; chưa live feed/camera thật, không đánh dấu hoàn tất |
 | C10 | Thông báo | ☑ in-app API + Flutter | Growth/harvest/environment scope tests; polling khi trang hoạt động, không OS push |
 | C11 | Lịch sử thuê/giao dịch | ☑ API + Flutter | Snapshot/ledger/tenant tests; cursor/status pagination API+React+Flutter PASS; các danh sách khác còn bounded |
-| C12 | Yêu cầu nhận/giao nấm | ☑ API + Flutter | Ownership/address/status API PASS, Flutter dialog source; chưa phone E2E |
+| C12 | Yêu cầu nhận/giao nấm | ☑ API + Flutter | Ownership/address/status API PASS, Flutter Chrome delivery/address/cancel-resubmit PASS; chưa phone E2E |
 
 | Sản phẩm | Trạng thái |
 |---|---|
 | REST API/PostgreSQL | 24/24 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
 | React Web | Build và Chrome E2E6 nhóm PASS; ảnh local đã xem; responsive390px không tràn |
-| Flutter Customer | Analyze sạch,7 mock unit/widget+1 live API test PASS,Web build PASS; APK/emulator chưa chạy |
+| Flutter Customer | Analyze sạch,7 mock unit/widget+1 live API test PASS,Web build + Chrome UI E2E4 nhóm PASS; APK/emulator chưa chạy |
 | ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
 | Tích hợp/triển khai | Local integration PASS; Compose config validation PASS; Docker runtime/CI remote/TLS chưa chạy |

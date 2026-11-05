@@ -44,6 +44,8 @@
 | 2026-11-05 | Pagination Flutter lần đầu | `flutter analyze`, `flutter test` | FAIL → ĐÃ SỬA | Lint null-aware; callback setState trả Future; HTTP lỗi nhanh trước UI subscribe. Sửa screen/load/helper và thêm paging/retry/pull-refresh regression |
 | 2026-11-05 | Pagination Flutter sau sửa | `flutter test`, `flutter analyze`, `flutter build web --no-wasm-dry-run` | PASS7/7 + analyze/build | Widget paging/previous/filter/retry và shared pull-refresh PASS; test không bỏ qua lỗi HTTP |
 | 2026-11-05 | Pagination Dart live + migration/backup | `npm run test:mobile:api`, `npm run db:migrate`, `npm run test:backup` | PASS1/1 + migration3/restore | Client Dart gọi API/DB thật với25 rentals fixtures; cursor/filter/ownership; restore DB mới xác minh3 migrations |
+| 2026-11-05 | Flutter browser harness ban đầu | `npm run test:mobile:web` | FAIL selector → ĐÃ SỬA | Flutter Semantics dùng tab/menuitem/merged accessible names khác DOM Text; sửa locator theo role/name, không bỏ assertion nghiệp vụ |
+| 2026-11-05 | Flutter UI E2E | `npm run test:mobile:web` | PASS4 nhóm | Chrome thật + build Flutter Web + API/PostgreSQL mới; register/rent2/env/link/delivery/cancel-resubmit/notification read/profile/logout/staff denied; không JS/Flutter exception; simulator không phải hardware |
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 

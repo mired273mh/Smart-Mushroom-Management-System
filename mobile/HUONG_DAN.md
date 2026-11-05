@@ -17,6 +17,8 @@ Android main có INTERNET permission; cleartext chỉ được mở trong debug.
 
 Tại root, đặt TEST_DATABASE_URL tên `sm_test_*` và chạy `npm run test:mobile:api`. Script dựng API và fixtures mới trên PostgreSQL thật, gọi Flutter test riêng `integration/api_live_test.dart`; truyền credentials test qua environment, không ghi source. Có thể đặt `FLUTTER_ROOT` nếu SDK ở chỗ khác.
 
+Sau `flutter build web --no-wasm-dry-run`, chạy `npm run test:mobile:web` tại root với TEST_DATABASE_URL mới. Test mở chính Flutter Web đã build bằng Chrome/Playwright, bật accessibility Semantics và thao tác UI đăng ký/thuê2 khay/liên kết/đọc môi trường/nhận-giao/thông báo/hồ sơ/logout. Backend và PostgreSQL thật, mẫu IoT là simulator. Windows dùng Chrome chuẩn hoặc CHROME_PATH, Linux dùng browser Playwright đã cài. Ảnh/diagnostic chỉ ghi `.local/`, server/browser test tự dừng. Đây là browser E2E của source Flutter, không phải test APK/điện thoại thật.
+
 Luồng dùng: đăng ký Customer → Thuê khay (chọn gói/nhiều khay) → Khay của tôi → hợp đồng → khay → tiến trình/môi trường theo phòng. Mã khay chỉ liên kết được nếu hợp đồng đã cấp cho chính tài khoản. Khi nhân viên thu hoạch, vào Nhận nấm để chọn nhận tại trại/giao hàng, nhập địa chỉ khi giao. Thông báo in-app cập nhật khi trang hoạt động, không phải OS push nền. Hồ sơ cho sửa tên và đăng xuất.
 
 Phiên chỉ giữ RAM, đóng app phải đăng nhập lại; không lưu token trong preferences. Camera chỉ mở URL được cấp khi đang thuê, chưa nghiệm thu live camera. Giới hạn danh sách hiện tại xem `docs/API.md`.

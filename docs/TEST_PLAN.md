@@ -11,6 +11,7 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | React production build | Vite/React | `npm run build:web` | PASS |
 | Flutter unit/widget | MockClient, không sensor/API thật | `flutter test` trong mobile | PASS7/7 |
 | Flutter client integration | Dart/MushroomApi gọi API/DB thật | `npm run test:mobile:api` | PASS1/1 |
+| Flutter browser UI E2E | Flutter Web build, Chrome, API/DB thật | `npm run test:mobile:web` | PASS4 nhóm; không phải Android |
 | Flutter static/build | SDK3.47.9, Dart3.13.7 | `flutter analyze`, `flutter build web --no-wasm-dry-run` | PASS |
 | Simulator executable | Node HTTP → PostgreSQL, dry-run ack | Nằm trong `npm test` | PASS |
 | Firmware compile | ESP32 core3.3.3, cả2 mode | `scripts/compile-iot.ps1` | PASS2/2, không upload |
@@ -46,11 +47,12 @@ Phạm vi: kiểm chứng đúng đề tài và các ràng buộc SRS trên sour
 | REC01 | Phục hồi dump | DB mới có dữ liệu/migrations đúng | verify-backup |
 | PAGE01 | >100 hợp đồng, timestamp ties/microsecond | Duyệt207 bản ghi không mất/lặp, giữ ownership/filter | pagination.test.js |
 | PAGE02 | UI đổi trang/filter/HTTP lỗi | Reset cursor, prev/next chính xác, lỗi có retry | React E2E + Flutter widget + live API |
+| MOB02 | UI Flutter register→rent2→item/env→link→delivery→notifications/profile/logout | DB thật, đúng chủ, validate địa chỉ, hủy/gửi lại, staff denied | scripts/test-mobile-web.mjs |
 
 ## Điều kiện nghiệm thu còn thiếu
 
 - Rà soát học thuật UML đã render với người hướng dẫn; browser test thêm mọi nhánh account/camera/config.
-- Android build/signing và kiểm thử trên điện thoại/emulator, luồng UI Flutter đầy đủ.
+- Android build/signing và kiểm thử trên điện thoại/emulator. Flutter UI browser E2E đã PASS luồng chính, vẫn chưa thay thế kiểm thử mobile đích.
 - Docker build/compose, GitHub Actions thực tế, staging HTTPS và backup lịch vận hành.
 - Cảm biến hiệu chuẩn, soak test kết nối, fail-safe relay sau xác nhận phần cứng, live camera bảo vệ truy cập.
 - Đo p95/tải20 người dùng, dung lượng retention, pagination các danh sách ngoài lịch sử thuê. Đã test207 rentals và UI122 rentals; chưa có benchmark, không suy ra mục tiêu1giây từ test chức năng.

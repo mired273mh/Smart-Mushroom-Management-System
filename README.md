@@ -6,7 +6,7 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 |---|---|---|
 | Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API; 24 integration tests PASS |
 | Web nhân sự | React + Vite | Build và Chrome E2E các luồng chính PASS |
-| App Customer | Flutter | Analyze, 7 unit/widget tests, 1 live API test, Web build PASS; chưa Android SDK/APK |
+| App Customer | Flutter | Analyze, 7 unit/widget tests, live API + Chrome UI E2E4 nhóm, Web build PASS; chưa Android SDK/APK |
 | IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
 | Deployment | Docker Compose + Nginx | Compose config validation PASS; chưa chạy container/CI remote/production TLS |
 
@@ -59,12 +59,15 @@ npm test
 npm run build:web
 npm run test:web
 npm run test:mobile:api
+npm run test:mobile:web
 npm run test:backup
 ```
 
 TEST_DATABASE_URL cần quyền tạo database test. Mỗi module tạo DB riêng, giữ lại để kiểm tra; không tự dọn/xóa DB. Các lệnh browser/live Dart/backup cần TEST_DATABASE_URL được đặt trong chính terminal đó. `scripts/test.ps1` tạo biến trong tiến trình riêng, không xuất ngược sang terminal cha.
 
 Chrome E2E Windows dùng đường dẫn Chrome chuẩn; có thể đặt CHROME_PATH. Linux cài `npx playwright install --with-deps chromium`. Flutter runner dùng FLUTTER_ROOT hoặc `.sm-tools/flutter`. Backup test dùng PG_BIN hoặc `.sm-tools/pgsql/bin`; phục hồi chỉ vào database test mới.
+
+`test:mobile:web` cần bản build mới tại `mobile/build/web`; chạy `flutter build web --no-wasm-dry-run` trong mobile trước. Test tương tác chính UI Flutter qua Chrome và DB thật; không thay thế kiểm thử Android.
 
 ## Flutter và ESP32
 

@@ -14,6 +14,7 @@
     "build:web": "npm run build -w web",
     "test:web": "npm test -w web",
     "test:mobile:api": "node scripts/test-mobile-api.mjs",
-    "test:backup": "node scripts/verify-backup.mjs"
+    "test:backup": "node scripts/verify-backup.mjs",
+    "test:mobile:web": "node scripts/test-mobile-web.mjs"
   }
 }
