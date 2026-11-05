@@ -1,0 +1,20 @@
+@startuml
+actor Customer
+participant "Flutter" as App
+participant "Express" as API
+database PostgreSQL as DB
+Customer -> App: Chọn nhiều khay và gói
+App -> API: POST /api/rentals (Bearer)
+API -> DB: Kiểm tra user/session, BEGIN
+API -> DB: SELECT trays ORDER BY id FOR UPDATE
+API -> DB: Kiểm tra active, available, chủ thuê
+alt Có khay bận hoặc dữ liệu sai
+  API -> DB: ROLLBACK
+  API --> App: 409 / 422
+else Tất cả hợp lệ
+  API -> DB: INSERT rental + items + ledger
+  note right of DB: Partial unique index ngăn thuê trùng
+  API -> DB: COMMIT
+  API --> App: 201 hợp đồng của Customer
+end
+@enduml

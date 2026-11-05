@@ -1,0 +1,103 @@
+@startuml
+hide methods
+class User {
+  id: UUID
+  email: String
+  role: Role
+  active: Boolean
+}
+class Session {
+  tokenHash: String
+  expiresAt: Instant
+}
+class Room {
+  id: UUID
+  name: String
+  active: Boolean
+}
+class Tray {
+  id: UUID
+  code: String
+  status: ServiceStatus
+}
+class RentalPlan {
+  priceVnd: Integer
+  durationDays: Integer
+  active: Boolean
+}
+class Rental {
+  status: RentalStatus
+  startsAt: Instant
+  expectedEndAt: Instant
+  pricePerTrayVnd: Integer
+}
+class RentalItem {
+  stage: GrowthStage
+  expectedHarvestAt: Instant
+  endedAt: Instant
+}
+class GrowthEvent {
+  stage: GrowthStage
+  note: String
+  createdAt: Instant
+}
+class Harvest {
+  weightGrams: Integer
+  harvestedAt: Instant
+}
+class FulfillmentRequest {
+  method: DeliveryMethod
+  status: FulfillmentStatus
+  address: String
+}
+class Transaction {
+  amountVnd: Integer
+  status: PaymentStatus
+  method: Manual
+}
+class Device {
+  mode: DeviceMode
+  tokenHash: String
+  automationEnabled: Boolean
+}
+class SensorReading {
+  temperature: Float
+  humidity: Float
+  co2: Integer
+  simulated: Boolean
+}
+class RoomThreshold {
+  temperatureMin: Float
+  temperatureMax: Float
+  humidityMin: Float
+  humidityMax: Float
+  co2Max: Integer
+}
+class DeviceCommand {
+  actuator: String
+  dryRun: Boolean
+  status: String
+  expiresAt: Instant
+}
+class Notification {
+  kind: String
+  message: String
+  readAt: Instant
+}
+User "1" -- "0..*" Session
+User "1" -- "0..*" Rental : customer
+Room "1" -- "0..*" Tray
+RentalPlan "1" -- "0..*" Rental
+Rental "1" -- "1..20" RentalItem
+Tray "1" -- "0..*" RentalItem : history
+note right of RentalItem : Tối đa một item chưa ended / tray
+RentalItem "1" -- "0..*" GrowthEvent
+RentalItem "1" -- "0..*" Harvest
+Harvest "1" -- "0..1" FulfillmentRequest
+Rental "1" -- "1..*" Transaction
+Room "1" -- "0..*" Device
+Room "1" -- "0..1" RoomThreshold
+Device "1" -- "0..*" SensorReading
+Device "1" -- "0..*" DeviceCommand
+User "1" -- "0..*" Notification
+@enduml

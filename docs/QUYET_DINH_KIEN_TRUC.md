@@ -26,3 +26,30 @@
 - **Được nêu trong đề tài hay quyết định thiết kế?** ...
 
 Giữ lịch sử khi đổi phương án; không âm thầm sửa quyết định đã dẫn đến code triển khai.
+
+## Các quyết định chốt ngày 2026-11-05
+
+Các dòng “chưa chốt” phía trên là lịch sử khởi tạo. Bảng dưới là quyết định hiện hành, đều là lựa chọn thiết kế, không phải yêu cầu bổ sung của đề tài.
+
+| ADR | Phương án cân nhắc | Quyết định và hệ quả |
+|---|---|---|
+| 001 | Multi-repo / monorepo | Monorepo `server/`, `web/`, `mobile/`, `iot/`, `docs/`; npm workspaces cho server/web, Flutter và firmware độc lập |
+| 002 | ORM / SQL trực tiếp | `pg` + SQL tham số hóa, migration SQL đánh số, checksum và advisory lock; nhìn rõ transaction/ràng buộc PostgreSQL, không thêm ORM |
+| 003 | JWT / session opaque | Bearer token ngẫu nhiên 256 bit, lưu SHA-256 trong bảng sessions, hết hạn 12h. Mỗi request đọc user/role/active từ DB; logout/khóa user có hiệu lực ngay. Web giữ token trong bộ nhớ, Flutter phiên bản đầu giữ trong bộ nhớ, đăng nhập lại khi đóng app; không refresh token |
+| 004 | Admin đăng ký công khai / bootstrap | CLI tạo admin đầu tiên từ biến môi trường; chỉ admin đã đăng nhập được tạo nhân sự. Public register luôn là Customer, từ chối trường role |
+| 005 | Khóa app / khóa DB | Thuê nhiều khay trong transaction, khóa khay theo UUID đã sắp xếp, partial unique index `rental_items(tray_id) WHERE ended_at IS NULL`; snapshot giá, không tự giải phóng khi tới ngày dự kiến |
+| 006 | MQTT / HTTP | REST HTTPS cho ESP32, token riêng theo device lưu hash; polling lệnh có TTL; chưa cần broker. Simulator tách và ghi nhãn. Không tự bật thiết bị thật |
+| 007 | WebSocket / polling | Web/mobile polling khi trang hoạt động; thông báo in-app trong PostgreSQL. Không SMS, email/push trả phí. Truy vấn có giới hạn |
+| 008 | Camera trực tiếp / proxy | Camera có URL HTTPS do nhân viên cấu hình và chỉ trả cho người đủ quyền; chỉ URL không chứa userinfo, không server-fetch (tránh SSRF). Cần gateway/camera kiểm soát truy cập riêng; không đưa camera công khai vào production. Không có hardware thì trả trạng thái chưa cấu hình |
+| 009 | Docker / cài native | Node >=22.12, PostgreSQL >=16; dev có thể portable, production Docker Compose + reverse proxy HTTPS. Tạo DB dev/test mới, không dùng database có sẵn hay dữ liệu cũ |
+| 010 | Mật khẩu | Node crypto scrypt với salt ngẫu nhiên; không hardcode secret, password 12–128 ký tự; rate-limit đăng nhập; lỗi auth không phân biệt email tồn tại |
+| 011 | Xóa cứng / giữ lịch sử | Người dùng xóa mềm; room/tray/plan/device ưu tiên archive hoặc DB RESTRICT. Chưa có retention/xóa telemetry tự động, sẽ hướng dẫn vận hành |
+
+Tham chiếu kỹ thuật: [PostgreSQL constraints](https://www.postgresql.org/docs/current/ddl-constraints.html), [Node.js crypto](https://nodejs.org/api/crypto.html). Kiểm thử sẽ dùng binary công cụ có sẵn trên máy, không sử dụng mã nguồn/dữ liệu dự án khác.
+
+### ADR-012 — Sensor/firmware và giới hạn vận hành (2026-11-05)
+
+- Chọn Arduino framework cho ESP32, SCD4x I²C làm phương án cảm biến nhiệt độ/độ ẩm/CO₂ tích hợp; có thể thay driver khi chốt BOM. Đây là đề xuất phần cứng, không khẳng định người dùng đã có SCD41.
+- Firmware kiểm tra `/iot/me` để mode biên dịch khớp mode server; simulator không được dùng token hardware. HTTPS xác minh root CA, đồng bộ NTP, không setInsecure/redirect token; HTTP chỉ mở riêng cho LAN khi dev chủ động cấu hình.
+- Relay chưa có sơ đồ/giới hạn an toàn được xác nhận nên firmware không chứa GPIO điều khiển tải; lệnh thật bị server chặn. Compile không phải kiểm thử cảm biến thật. Chưa upload lên ESP32.
+- Thư viện chuẩn nhà sản xuất: [Sensirion Arduino SCD4x](https://github.com/Sensirion/arduino-i2c-scd4x), [Espressif TLS example](https://github.com/espressif/arduino-esp32/tree/master/libraries/NetworkClientSecure/examples).

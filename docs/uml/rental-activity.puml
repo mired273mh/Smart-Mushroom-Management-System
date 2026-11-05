@@ -1,0 +1,21 @@
+@startuml
+start
+:Customer chọn gói và danh sách khay;
+:Xác thực session và validate request;
+if (Hợp lệ?) then (Có)
+  :BEGIN;
+  :Kiểm tra customer/gói active;
+  :Khóa khay theo UUID;
+  if (Mọi khay khả dụng?) then (Có)
+    :Tạo rental + items + ledger + notification;
+    :COMMIT;
+    :Trả 201;
+  else (Không)
+    :ROLLBACK;
+    :Trả 409;
+  endif
+else (Không)
+  :Trả 401/403/422;
+endif
+stop
+@enduml

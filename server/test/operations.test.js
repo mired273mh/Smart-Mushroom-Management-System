@@ -1,0 +1,68 @@
+import { before, after, test } from 'node:test';
+import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
+import { setup } from './helpers.js';
+let ctx, admin, operator, alice, bob, rental, item, harvest, fulfillment, room, tray, plan;
+const suffix = randomUUID().slice(0,8).toUpperCase();
+before(async () => {
+  ctx = await setup();
+  [admin,operator,alice,bob] = await Promise.all(['admin','operator','customer','customer'].map(ctx.user));
+  room = (await ctx.request('/api/rooms', { method: 'POST', token: operator.token, body: { name: `Ops ${suffix}` } })).body.data;
+  tray = (await ctx.request('/api/trays', { method: 'POST', token: operator.token, body: { room_id: room.id, code: `OP-${suffix}`, label: 'Khay demo' } })).body.data;
+  plan = (await ctx.request('/api/plans', { method: 'POST', token: admin.token, body: { name: `Ops ${suffix}`, duration_days: 30, price_vnd: 150000 } })).body.data;
+  rental = (await ctx.request('/api/rentals', { method: 'POST', token: alice.token, body: { plan_id: plan.id, tray_ids: [tray.id] } })).body.data;
+  item = rental.items[0];
+});
+after(async () => { await ctx?.close(); });
+test('progress enforces lifecycle and notifies only the owning customer', async () => {
+  const path = `/api/rental-items/${item.id}/progress`;
+  assert.equal((await ctx.request(path, { method: 'POST', token: alice.token, body: { stage: 'fruiting' } })).status, 403);
+  assert.equal((await ctx.request(path, { method: 'POST', token: operator.token, body: { stage: 'ready' } })).status, 409);
+  assert.equal((await ctx.request(path, { method: 'POST', token: operator.token, body: { stage: 'fruiting', note: 'Bắt đầu ra quả thể', expected_harvest_at: new Date(Date.now()+86400000).toISOString() } })).status, 201);
+  assert.equal((await ctx.request(path, { method: 'POST', token: operator.token, body: { stage: 'ready' } })).status, 201);
+  assert.equal((await ctx.request(path, { method: 'POST', token: operator.token, body: { stage: 'incubation' } })).status, 409);
+  const notes = await ctx.request('/api/notifications', { token: alice.token });
+  assert.ok(notes.body.data.some(n => n.kind === 'growth'));
+  assert.equal((await ctx.request(`/api/notifications/${notes.body.data[0].id}/read`, { token: bob.token, method: 'PATCH' })).status, 404);
+  assert.ok((await ctx.request(`/api/notifications/${notes.body.data[0].id}/read`, { token: alice.token, method: 'PATCH' })).body.data.read_at);
+});
+test('harvest and fulfillment ownership, validation and transitions', async () => {
+  const recorded = await ctx.request(`/api/rental-items/${item.id}/harvests`, { token: operator.token, method: 'POST', body: { weight_grams: 1250, note: '=HYPERLINK("bad")' } });
+  assert.equal(recorded.status, 201);
+  harvest = recorded.body.data;
+  assert.equal((await ctx.request(`/api/rental-items/${item.id}/harvests`, { token: operator.token, method: 'POST', body: { weight_grams: 1 } })).status, 409);
+  assert.equal((await ctx.request('/api/harvests', { token: bob.token })).body.data.length, 0);
+  assert.equal((await ctx.request('/api/fulfillment-requests', { token: bob.token, method: 'POST', body: { harvest_id: harvest.id, method: 'pickup' } })).status, 404);
+  assert.equal((await ctx.request('/api/fulfillment-requests', { token: alice.token, method: 'POST', body: { harvest_id: harvest.id, method: 'delivery', address: '  ' } })).status, 422);
+  const created = await ctx.request('/api/fulfillment-requests', { token: alice.token, method: 'POST', body: { harvest_id: harvest.id, method: 'delivery', address: '123 đường thử nghiệm' } });
+  assert.equal(created.status, 201);
+  fulfillment = created.body.data;
+  assert.equal((await ctx.request(`/api/fulfillment-requests/${fulfillment.id}`, { token: alice.token, method: 'PATCH', body: { status: 'completed' } })).status, 409);
+  assert.equal((await ctx.request(`/api/fulfillment-requests/${fulfillment.id}`, { token: operator.token, method: 'PATCH', body: { status: 'completed' } })).status, 409);
+});
+test('manual ledger, complete delivery, close rental and re-rent preserve history isolation', async () => {
+  const detail = (await ctx.request(`/api/rentals/${rental.id}`, { token: alice.token })).body.data;
+  assert.equal((await ctx.request(`/api/transactions/${detail.transactions[0].id}/confirm`, { token: alice.token, method: 'POST' })).status, 403);
+  assert.equal((await ctx.request(`/api/transactions/${detail.transactions[0].id}/confirm`, { token: operator.token, method: 'POST' })).status, 200);
+  assert.equal((await ctx.request(`/api/rentals/${rental.id}/complete`, { token: operator.token, method: 'POST' })).status, 409);
+  for (const status of ['processing','completed']) assert.equal((await ctx.request(`/api/fulfillment-requests/${fulfillment.id}`, { token: operator.token, method: 'PATCH', body: { status } })).status, 200);
+  assert.equal((await ctx.request(`/api/rentals/${rental.id}/complete`, { token: operator.token, method: 'POST' })).status, 200);
+  assert.equal((await ctx.request(`/api/rental-items/${item.id}/progress`, { token: operator.token, method: 'POST', body: { stage: 'harvested' } })).status, 404);
+  const rented = await ctx.request('/api/rentals', { token: bob.token, method: 'POST', body: { plan_id: plan.id, tray_ids: [tray.id] } });
+  assert.equal(rented.status, 201);
+  const bobItem = (await ctx.request(`/api/rental-items/${rented.body.data.items[0].id}`, { token: bob.token })).body.data;
+  assert.equal(bobItem.events.length, 0);
+  assert.equal(bobItem.harvests.length, 0);
+  assert.equal((await ctx.request(`/api/rental-items/${item.id}`, { token: bob.token })).status, 404);
+});
+test('dashboard/report use DB data, export prevents CSV formula injection', async () => {
+  const dashboard = await ctx.request('/api/dashboard', { token: operator.token });
+  assert.equal(dashboard.body.data.harvested_grams, '1250');
+  assert.equal(dashboard.body.data.received_vnd, '150000');
+  assert.equal((await ctx.request('/api/reports', { token: operator.token })).status, 403);
+  assert.equal((await ctx.request('/api/reports', { token: admin.token })).status, 200);
+  const exported = await ctx.request('/api/reports/export?type=harvests', { token: admin.token });
+  assert.equal(exported.status, 200);
+  assert.match(exported.body, /'=HYPERLINK/);
+  assert.match(exported.headers.get('content-type'), /text\/csv/);
+});

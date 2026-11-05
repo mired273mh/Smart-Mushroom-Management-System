@@ -1,0 +1,29 @@
+@startuml
+title Kiến trúc triển khai mục tiêu — chưa nghiệm thu container/Internet
+node "Trình duyệt nhân sự" {
+  artifact "React bundle" as React
+}
+node "Điện thoại Customer" {
+  artifact "Flutter app" as Flutter
+}
+node "ESP32" {
+  artifact "Arduino firmware" as Firmware
+}
+node "Server mục tiêu" {
+  node "HTTPS reverse proxy (cần cấu hình domain/certificate)" as TLS
+  node "Docker Compose" {
+    node "Nginx :80 (host loopback :8080)" as Nginx
+    node "Node/Express :3000 nội bộ" as API
+    database "PostgreSQL :5432 nội bộ" as DB
+  }
+}
+node "Camera gateway (tùy phần cứng)" as Camera
+React --> TLS : HTTPS
+Flutter --> TLS : HTTPS REST
+Firmware --> TLS : HTTPS telemetry/device token
+TLS --> Nginx
+Nginx --> API : /api
+API --> DB : SQL
+React --> Camera : URL được cấp quyền
+Flutter --> Camera : URL được cấp quyền
+@enduml

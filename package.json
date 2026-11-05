@@ -1,0 +1,19 @@
+{
+  "name": "smart-mushroom",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["server", "web"],
+  "engines": { "node": ">=22.12" },
+  "scripts": {
+    "dev:server": "npm run dev -w server",
+    "start": "npm start -w server",
+    "db:migrate": "npm run db:migrate -w server",
+    "admin:create": "npm run admin:create -w server",
+    "test": "npm test -w server",
+    "dev:web": "npm run dev -w web",
+    "build:web": "npm run build -w web",
+    "test:web": "npm test -w web",
+    "test:mobile:api": "node scripts/test-mobile-api.mjs",
+    "test:backup": "node scripts/verify-backup.mjs"
+  }
+}

@@ -1,12 +1,44 @@
 # NHẬT KÝ KIỂM THỬ / BẰNG CHỨNG
 
-> Dự án mới chưa có phần mềm để test. **Không ghi PASS trước khi chạy thực tế.** Mỗi batch, Codex thêm kết quả của lệnh được chạy.
+> Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
 ## Mẫu bản ghi
 
 | Thời điểm | Module / chức năng | Lệnh test | Kết quả | Bằng chứng / lý do không chạy |
 |---|---|---|---|---|
 | Chưa bắt đầu | Chưa có | — | CHƯA CHẠY | Repo mới, chưa có ứng dụng |
+| 2026-11-05 | P0a — repo/môi trường | `git status --short`, liệt kê file, kiểm tra runtime | PASS khảo sát | Git sạch; chưa có app; công cụ ở `.sm-tools`, chưa ở PATH |
+| 2026-11-05 | P0a — SRS/ERD/UML/ADR | Đối chiếu A01–A10/O01–O10/C01–C12 | Rà soát tài liệu | Có tiêu chí từng nhóm, chưa phải test phần mềm; PlantUML chưa render |
+| 2026-11-05 | Toolchain | `npm install` | PASS | 87 packages, audit 0 vulnerabilities |
+| 2026-11-05 | Script PostgreSQL lần đầu | `scripts/local-postgres.ps1` | FAIL → ĐÃ SỬA | Policy tiến trình và xử lý kết quả rỗng; không thay policy máy |
+| 2026-11-05 | Migration dev | `npm run db:migrate` (2 lần sau sửa script) | PASS | PostgreSQL 17.11 mới, 1 migration verified ở cả hai lần |
+| 2026-11-05 | Foundation | `npm test` với TEST_DATABASE_URL riêng | PASS 4/4 | `server/test/foundation.test.js`; PostgreSQL thật, HTTP thật trên cổng ngẫu nhiên, không mock |
+| 2026-11-05 | P1b lần đầu | `scripts/test.ps1` | FAIL 3/9 → ĐÃ SỬA | SQLSTATE 42P08 tại duration/interval, đã cast tham số integer |
+| 2026-11-05 | P1b + regression | `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1` | PASS 9/9 | Race 201/409, rollback nhiều khay, ownership, unique, FK, snapshot giá, RBAC, session revoke; `server/test/rentals.test.js` |
+| 2026-11-05 | P1c + regression | `scripts/test.ps1` | PASS 13/13 | `operations.test.js`: lifecycle, notification ownership, delivery/address/transitions, ledger, close/re-rent isolation, DB dashboard/CSV injection |
+| 2026-11-05 | P1d/P4a + regression | `scripts/test.ps1` | PASS 17/17 | `iot.test.js`: identity/provenance, validation, tenant/time scope, alert dedup, thresholds, automation dry-run, ack/TTL/replay, camera contract, token rotation |
+| 2026-11-05 | Migration 002 dev | `npm run db:migrate` | PASS | 2 migrations verified trên cluster mới |
+| 2026-11-05 | Hardware/live camera | Chưa có thiết bị được xác nhận | CHƯA CHẠY | HTTP tests là telemetry mô phỏng, tuyệt đối không tương đương ESP32 thật |
+| 2026-11-05 | P2 Web | `npm run build:web` | PASS | Vite 7.3.7, React 19, bundle build thành công |
+| 2026-11-05 | P2 Chrome E2E lần đầu | `npm run test:web` | FAIL → ĐÃ SỬA | Label select chưa xác định rõ; bổ sung aria-label |
+| 2026-11-05 | P2 Chrome E2E sau sửa | `npm run test:web` với TEST_DATABASE_URL mới | PASS 5 nhóm | Chrome installed, HTTP/PostgreSQL thật: staff login/Customer denied, CRUD, rental→harvest→delivery, telemetry/CSV/responsive390, Operator menu; không pageerror |
+| 2026-11-05 | Regression sau P2 | `scripts/test.ps1`, `git diff --check` | PASS 17/17 và diff sạch whitespace | Screenshot local được xem trực tiếp; không dùng ảnh giả làm bằng chứng dữ liệu |
+| 2026-11-05 | P3 analyze ban đầu | `flutter analyze` | FAIL → ĐÃ SỬA | Test counter template MyApp và curly braces; thay test Customer/sửa lint |
+| 2026-11-05 | P3 static/unit/widget | `flutter analyze`, `flutter test` | PASS, 5/5 | Không issue; MockClient cho client/widget, không gọi là integration thật |
+| 2026-11-05 | P3 build | `flutter build web --no-wasm-dry-run` | PASS | Flutter 3.47.9/Dart 3.13.7, output mobile/build/web |
+| 2026-11-05 | P3 live client | `npm run test:mobile:api` | PASS 1/1 | Client Dart → Express → PostgreSQL mới, thuê/liên kết/env/profile/notifications/logout |
+| 2026-11-05 | P3 Android | `flutter doctor -v` | CHƯA CHẠY build APK | Thiếu Android SDK, chưa có emulator/thiết bị được xác nhận |
+| 2026-11-05 | P4 simulator executable + backend | `scripts/test.ps1` | PASS 18/18 | Simulator riêng gửi 2 mẫu/ack dry-run vào DB; từ chối token hardware; `/iot/me` test |
+| 2026-11-05 | P4 firmware | `scripts/compile-iot.ps1` | PASS compile 2/2 | ESP32 core 3.3.3; mô phỏng flash77%/RAM13%, SCD4x flash79%/RAM14%; không upload |
+| 2026-11-05 | P4 physical sensor/relay/camera | Không chạy | CHƯA CHẠY | Chưa xác nhận BOM/sơ đồ/giới hạn tải; firmware không có GPIO điều khiển relay |
+| 2026-11-05 | P5 security + regression | `scripts/test.ps1` | PASS 21/21 | CLI bootstrap thật, user lifecycle, JSON/body bound, auth/RBAC/tenant/race/simulator; không skip |
+| 2026-11-05 | P5 backup recovery | `npm run test:backup` | PASS | pg_dump custom/pg_restore vào DB test MỚI; xác minh data/migrations, giữ nguồn và dump |
+| 2026-11-05 | Docker / remote CI / production TLS | Chưa chạy | CHƯA CHẠY | Không có Docker, chưa push CI hay domain/certificate triển khai |
+| 2026-11-05 | P6 Compose config | CLI5.7.0 `config --quiet` | PASS | Binary SHA256 khớp official release; chỉ kiểm config, không phải chạy Docker Engine |
+| 2026-11-05 | P6 công cụ checksum/Java | Lần gọi đầu | FAIL → ĐÃ SỬA | Decode checksum byte[] thành UTF8; quote tham số Java -D trong PowerShell; chỉ execute binary sau hash PASS |
+| 2026-11-05 | P6 UML | `scripts/render-uml.ps1` | PASS6/6 | PlantUML1.2026.9/JRE21.0.13/Smetana, PNG trong docs/uml/rendered; đã xem sequence |
+| 2026-11-05 | Checkpoint cuối | `git diff --check`, `git check-ignore` | PASS | Không lỗi whitespace; credentials/runtime/local DB/dump bị ignore; có cảnh báo chuyển LF/CRLF cho Markdown, không phải test failure |
+| 2026-11-05 | Baseline trước lưu Git theo quy tắc mới | `scripts/test.ps1`, `npm run build:web`, `npm run test:web`, Flutter analyze/test/build, `npm run test:mobile:api` | PASS | Backend21/21; Chrome5 nhóm; Flutter5/5 + live API1/1; không tuyên bố hardware/Android/container đã chạy |
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 

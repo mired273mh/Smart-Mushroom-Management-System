@@ -1,0 +1,23 @@
+@startuml
+state "Hợp đồng" as Rental {
+  [*] --> active : transaction thuê commit
+  active --> completed : staff / đã thu tiền và bàn giao
+  completed --> [*]
+}
+state "Nuôi trồng theo rental item" as Growth {
+  [*] --> incubation
+  incubation --> fruiting : staff cập nhật
+  fruiting --> ready : staff xác nhận
+  ready --> harvested : ghi cân nặng thu hoạch
+  harvested --> [*]
+}
+state "Nhận/giao" as Fulfillment {
+  [*] --> requested : Customer đúng chủ
+  requested --> processing : staff tiếp nhận
+  processing --> fulfilled : staff bàn giao
+  requested --> cancelled : Customer hủy
+  cancelled --> requested : Customer gửi lại
+  fulfilled --> [*]
+}
+note right of fulfilled : status DB = completed
+@enduml

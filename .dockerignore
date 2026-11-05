@@ -1,0 +1,13 @@
+.git
+.local
+**/node_modules
+**/build
+**/dist
+**/.dart_tool
+**/.env
+**/.env.*
+**/config.local.h
+**/*.jks
+**/*.keystore
+mobile
+iot

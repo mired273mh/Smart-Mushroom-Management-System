@@ -14,6 +14,18 @@
 
 ## Quy trình theo batch
 
+### Backlog cụ thể đã phân tích ngày 2026-11-05
+
+1. P0a: SRS, kiến trúc, ERD, UML use case/sequence, ADR — rà soát đủ A/O/C, vòng đời và ownership.
+2. P0b/P1a: npm workspace, Express health/readiness, PostgreSQL migration, config, CLI bootstrap, auth/RBAC — chạy PostgreSQL mới và integration tests.
+3. P1b: CRUD phòng/khay/gói, thuê nhiều khay/gán/liên kết/đóng — kiểm thử tranh chấp đồng thời và khách khác không đọc được dữ liệu.
+4. P1c: Tiến trình, thu hoạch, nhận/giao, thông báo, tài khoản/báo cáo — luồng dữ liệu thật và validation.
+5. P1d/P4a: thiết bị, readings, ngưỡng, dry-run commands, simulator — integration test; phần cứng thật để riêng.
+6. P2: React đăng nhập, dashboard, CRUD, thuê/vận hành/IoT/báo cáo — build và test luồng API.
+7. P3: Flutter Customer theo API đã test — analyze/test và build khi SDK hỗ trợ.
+8. P4b: ESP32 firmware, cấu hình cảm biến/relay, fail-safe, contract camera — compile và mô phỏng; chưa bật relay thật.
+9. P5/P6: Compose, tích hợp, test bảo mật/triển khai, hoàn thiện UML/guide theo mã thực tế.
+
 1. Chọn một đầu việc có thể demo (ví dụ `room CRUD` hoặc `rental transaction`).
 2. Ghi `Đang làm` trong tiến độ + tập file dự kiến.
 3. Triển khai đầy đủ: DB → API → test; phần giao diện nếu liên quan.

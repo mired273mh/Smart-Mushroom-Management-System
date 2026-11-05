@@ -1,59 +1,91 @@
-# SMART MUSHROOM — DỰ ÁN MỚI TỪ SỐ 0
+# SMART MUSHROOM — DỰ ÁN MỚI
 
-**Tên đề tài:** Xây dựng hệ thống quản lý nuôi trồng nấm thông minh tích hợp chức năng cho thuê và giám sát từ xa.
+Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ xa. Mã ứng dụng được tạo mới trong repository này từ ngày 2026-11-05, không nhập code/dữ liệu/tiến độ dự án cũ.
 
-**English:** Building a Smart Mushroom Cultivation Management System with Rental and Remote Monitoring Features.
+| Thành phần | Công nghệ | Mức đã kiểm chứng |
+|---|---|---|
+| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API; 21 integration tests PASS |
+| Web nhân sự | React + Vite | Build và Chrome E2E các luồng chính PASS |
+| App Customer | Flutter | Analyze, 5 unit/widget tests, 1 live API test, Web build PASS; chưa Android SDK/APK |
+| IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
+| Deployment | Docker Compose + Nginx | Compose config validation PASS; chưa chạy container/CI remote/production TLS |
 
-> Đây là bộ tài liệu điều khiển AI/Codex cho một **repository mới**. Không chứa, kế thừa, hoặc tái sử dụng code/tiến độ của dự án cũ. Hiện tại đây **chưa phải là ứng dụng đã chạy được**.
+Chưa nghiệm thu toàn bộ hệ thống vật lý/production. Các lệnh điều khiển hiện chỉ dry-run. Không có thanh toán online. Camera là contract URL, chưa có live feed đã xác minh. Bằng chứng và giới hạn chi tiết ở [nhật ký kiểm thử](docs/KIEM_THU.md).
 
-## Công nghệ theo đề tài
+## Chạy ứng dụng local
 
-- **Server:** Node.js + ExpressJS, RESTful API.
-- **Database:** PostgreSQL.
-- **Web quản trị/vận hành:** ReactJS.
-- **Mobile khách hàng:** Flutter.
-- **IoT:** ESP32, cảm biến nhiệt độ/độ ẩm/CO₂; hệ thống phun sương, quạt thông gió, LED trồng, sưởi.
-- **Camera:** module/IP camera là phần cứng tùy chọn trong đề tài, nhưng nhu cầu xem trực tiếp vẫn phải được phân tích và báo cáo mức độ triển khai thực tế.
+Yêu cầu Node >=22.12, PostgreSQL >=16; phiên bản đã kiểm tra: Node22.23.4, PostgreSQL17.11. Tạo database **mới**, chuẩn bị DATABASE_URL, không dùng database dự án khác.
 
-## Dùng lần đầu với Codex trong VS Code
+```powershell
+npm ci
+Copy-Item server/.env.example server/.env
+# Sửa DATABASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD >=12 ký tự, ADMIN_NAME.
+npm run db:migrate
+npm run admin:create
+npm run dev:server
+```
 
-1. Tạo một thư mục/repository GitHub **mới, sạch**.
-2. Chép **toàn bộ** các file trong gói này vào thư mục gốc, giữ nguyên cấu trúc `docs/` và `.github/`.
-3. Mở đúng thư mục đó bằng VS Code (File → Open Folder).
-4. Mở Codex, dán nội dung `PROMPT_BAT_DAU.md` hoặc gửi: **`Bắt đầu đồ án mới theo AGENTS.md và PROMPT_BAT_DAU.md.`**
-5. Kiểm tra các thay đổi và chạy thử theo hướng dẫn Codex; commit theo giai đoạn lên GitHub.
+Terminal thứ hai:
 
-## Khi Codex bị hết token / hết lượt
+```powershell
+npm run dev:web
+# Mở http://localhost:5173, đăng nhập bằng Admin vừa tạo.
+```
 
-Sau khi có lại hạn mức, mở **cùng repository** và nhập đúng câu:
+API ở localhost3000; `/health` kiểm tra tiến trình, `/ready` kiểm tra DB. Vite proxy `/api` đến 127.0.0.1:3000; có thể đặt API_TARGET khi cần. Đăng ký công khai chỉ Customer; Operator/Admin bổ sung được Admin cấp qua Web. Không có tài khoản/mật khẩu mặc định.
 
-> **Tiếp tục đồ án.**
+Nếu công cụ portable có sẵn tại `C:/Users/mired/.sm-tools` trên máy Windows hiện tại:
 
-`AGENTS.md` yêu cầu Codex đọc `TIEN_DO_CODEX.md`, kiểm tra Git và code hiện tại rồi tự tiếp tục việc kế tiếp. **Không có cơ chế tự chạy lại chỉ vì hạn mức vừa được đặt lại.** Trường hợp bị cắt đột ngột, file tiến độ có thể chưa kịp cập nhật; mã nguồn và lịch sử Git mới là căn cứ kiểm chứng.
+```powershell
+$env:PATH = 'C:/Users/mired/.sm-tools/node-v22.23.4-win-x64;' + $env:PATH
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/local-postgres.ps1
+$env:DATABASE_URL = (Get-Content .local/database.env).Substring(13)
+npm ci
+npm run db:migrate
+# Đặt ADMIN_* qua môi trường riêng, rồi npm run admin:create.
+```
 
-Nếu mở chat mới, bạn vẫn có thể nói **`Tiếp tục đồ án.`** miễn là đang mở đúng thư mục repo có `AGENTS.md` và `TIEN_DO_CODEX.md`.
+Script tạo cluster mới trong `.local/postgres`, loopback55439, password ngẫu nhiên/SCRAM. Không xóa hay dùng dữ liệu cũ; file credentials bị gitignore. Bypass chỉ theo tiến trình, không đổi PowerShell policy hệ thống.
 
-## Các file quan trọng
+## Chạy kiểm thử
 
-| File | Mục đích |
-|---|---|
-| `AGENTS.md` | Quy tắc làm việc dài hạn dành cho Codex |
-| `PROMPT_BAT_DAU.md` | Lệnh dựng dự án sạch từ đầu |
-| `PROMPT_TIEP_TUC.md` | Lệnh tiếp tục khi ngắt giữa chừng |
-| `TIEN_DO_CODEX.md` | Nhật ký trạng thái được cập nhật thường xuyên |
-| `docs/DE_TAI_YEU_CAU.md` | Đặc tả bám sát file đề tài gốc |
-| `docs/KE_HOACH_THUC_HIEN.md` | Mốc triển khai, tiêu chí hoàn thành |
-| `docs/BANG_KIEM_CHUC_NANG.md` | Checklist theo nhóm vai trò và yêu cầu |
-| `docs/QUYET_DINH_KIEN_TRUC.md` | Ghi lại lựa chọn kiến trúc (không tự nhận là yêu cầu đề tài) |
-| `docs/KIEM_THU.md` | Khung test và bằng chứng xác minh |
-| `.github/copilot-instructions.md` | Hướng dẫn cùng mục đích cho GitHub Copilot |
-| `.gitignore` | Tránh đưa file build, secret, dữ liệu máy cá nhân lên GitHub |
+```powershell
+# Windows với cluster local từ script phía trên:
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test.ps1
+# Hoặc đặt TEST_DATABASE_URL vào PostgreSQL riêng tên sm_test_* rồi:
+npm test
+npm run build:web
+npm run test:web
+npm run test:mobile:api
+npm run test:backup
+```
 
-## Quy tắc GitHub
+TEST_DATABASE_URL cần quyền tạo database test. Mỗi module tạo DB riêng, giữ lại để kiểm tra; không tự dọn/xóa DB. Các lệnh browser/live Dart/backup cần TEST_DATABASE_URL được đặt trong chính terminal đó. `scripts/test.ps1` tạo biến trong tiến trình riêng, không xuất ngược sang terminal cha.
 
-- Không commit `.env`, khóa API, mật khẩu, token, dữ liệu cá nhân hay file database thật.
-- Review `git status` và `git diff` trước khi commit.
-- Commit nhỏ theo từng tính năng ổn định; không để Codex tự push lên remote hoặc xóa nhánh nếu chưa hỏi.
-- Khi chưa có source code, README này là tài liệu khởi đầu. Sau khi tạo app, Codex phải bổ sung lệnh chạy thực tế, yêu cầu phiên bản và hướng dẫn setup vào README.
+Chrome E2E Windows dùng đường dẫn Chrome chuẩn; có thể đặt CHROME_PATH. Linux cài `npx playwright install --with-deps chromium`. Flutter runner dùng FLUTTER_ROOT hoặc `.sm-tools/flutter`. Backup test dùng PG_BIN hoặc `.sm-tools/pgsql/bin`; phục hồi chỉ vào database test mới.
 
-**Nguồn phạm vi:** File `De tai.docx` người dùng cung cấp. Những lựa chọn thiết kế cụ thể chưa có trong đề tài phải được ghi là đề xuất trong `docs/QUYET_DINH_KIEN_TRUC.md`, không tự nhận là yêu cầu bắt buộc.
+## Flutter và ESP32
+
+```powershell
+cd mobile
+flutter pub get
+flutter analyze
+flutter test
+flutter run -d chrome --web-port=5174 --dart-define=API_BASE_URL=http://localhost:3000
+flutter build web --no-wasm-dry-run
+```
+
+Đặt WEB_ORIGIN=http://localhost:5174 ở backend cho Flutter Web dev. Android debug mặc định dùng 10.0.2.2:3000; Android SDK và release signing chưa được cấu hình. Chi tiết tại [hướng dẫn Flutter](mobile/HUONG_DAN.md).
+
+IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng rồi `node iot/simulator.mjs`. Firmware, thư viện, compile, TLS và kế hoạch nghiệm thu phần cứng ở [iot/README.md](iot/README.md). Không upload hay bật relay thật trong phiên này.
+
+## Tài liệu và cấu trúc
+
+- [Yêu cầu gốc](docs/DE_TAI_YEU_CAU.md), [User Requirements](docs/USER_REQUIREMENTS.md), [SRS](docs/SRS.md).
+- [Kiến trúc/ERD](docs/KIEN_TRUC.md), [ADR](docs/QUYET_DINH_KIEN_TRUC.md), [thiết kế chi tiết/UML](docs/THIET_KE_CHI_TIET.md), [API](docs/API.md).
+- [Cài đặt/triển khai/backup](docs/CAI_DAT_TRIEN_KHAI.md), [hướng dẫn sử dụng](docs/HUONG_DAN_SU_DUNG.md), [Test Plan](docs/TEST_PLAN.md), [kết quả test](docs/KIEM_THU.md).
+- [Kế hoạch](docs/KE_HOACH_THUC_HIEN.md), [bảng kiểm](docs/BANG_KIEM_CHUC_NANG.md), [tiến độ/checkpoint](TIEN_DO_CODEX.md).
+
+`server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI chưa chạy remote. `compose.yaml` triển khai mục tiêu local8080, chưa nghiệm thu trên Docker.
+
+Khi tiếp tục, gửi **Tiếp tục đồ án.** trong cùng repo. AGENTS.md yêu cầu đối chiếu code/Git với checkpoint trước làm tiếp. Sau giai đoạn đã kiểm chứng, tự commit và push thông thường lên nhánh hiện tại theo mục 8 của AGENTS.md; không force push, không commit secret hoặc xóa lịch sử/dữ liệu/tài liệu yêu cầu. Nếu Git thất bại phải ghi lỗi vào tiến độ. Không có cơ chế tự chạy lại lúc reset token.
