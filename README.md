@@ -1,4 +1,4 @@
-# SMART MUSHROOM — DỰ ÁN MỚI TỪ SỐ 0
+# SMART MUSHROOM — DỰ ÁN MỚI
 
 **Tên đề tài:** Xây dựng hệ thống quản lý nuôi trồng nấm thông minh tích hợp chức năng cho thuê và giám sát từ xa.
 
