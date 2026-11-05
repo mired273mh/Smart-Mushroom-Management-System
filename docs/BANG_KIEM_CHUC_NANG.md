@@ -4,6 +4,8 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 
 **Master checkpoint:** bảng6 cột file/trạng thái/bằng chứng/việc tiếp theo cho32 ID tại [DOI_CHIEU_YEU_CAU.md](DOI_CHIEU_YEU_CAU.md). Android APK/emulator UI+SQL và Docker Windows runtime đã PASS; các ghi chú lịch sử chưa Android/Docker bên dưới được thay bởi checkpoint này. Phone/hardware/production còn chưa nghiệm thu.
 
+Master2/master3: GPIO source có khóa hai lớp và pulse/interlock/TTL đã compile3 profile, API38tests/React11 nhóm E2E PASS; lịch sử lệnh có ACK/result/expiry. CI8431262/run42039533054 PASS3jobs;7e13b68 đã push, CI còn chạy tại checkpoint. Chưa flash/nghiệm thu tải điện; [BOM/sơ đồ cần xác nhận](PHUONG_AN_PHAN_CUNG_IOT.md).
+
 | ID | Chức năng | Mã thực tế | Bằng chứng / giới hạn |
 |---|---|---|---|
 | A01 | Tạo tài khoản quản trị an toàn | ☑ CLI + Admin Web tạo bổ sung | security.test: bootstrap thật một lần, không log secret; public register không nâng quyền |
