@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+CI42003072419/740ea61: deployment Docker **PASS**, API-Web FAIL responsive pager390px; thêm flex-wrap, React build +2 client tests +8 E2E local PASS lại. Chưa gọi tổng workflow PASS, Flutter Linux native-editor fix chưa tới bước chạy.
+
 Review batch cuối 2026-11-05: firmware sửa allowlist HTTP dev,2 mode compile PASS với17 static assertions; Compose config PASS; UML render6/6 PASS. `test:load`200 request/20 users/0 lỗi, p95 rentals33,42ms/environment42,07ms trên loopback. CI85fb2b2 **FAIL** ở staff login Flutter UI; diagnostics xác nhận401, helper đã đổi nhập native editor, local4 nhóm PASS lại; đang chờ CI. CI Compose smoke mới **CHƯA CHẠY**. Chi tiết/giới hạn tại REVIEW_CUOI.
 
 Review UI bổ sung 2026-11-05: Flutter HTML401 và logout race **FAIL trước sửa → PASS sau sửa**; `flutter analyze` sạch, `flutter test` **12/12 PASS**, Flutter Web build PASS; `test:mobile:api`1/1 và `test:mobile:web`4 nhóm PASS trên Chrome/PostgreSQL thật. React build +2 API client tests +8 nhóm E2E PASS, gồm logout race. `test:backup` PASS, migration CLI chạy2 lần đều verified3. Chưa coi local PASS là CI Linux PASS.
