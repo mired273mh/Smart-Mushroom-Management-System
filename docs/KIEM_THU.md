@@ -2,6 +2,19 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## HQTCSDL HQ4 — staff directories, 2026-11-06
+
+| Phạm vi | Kết quả thật | Bằng chứng / giới hạn |
+|---|---|---|
+| Directory baseline | FAIL đã tái hiện thiếu metadata | hq4-before.log; fixture ban đầu trùng unique room/plan đã sửa test data, không sửa/bỏ constraint |
+| Backend/PostgreSQL | PASS50/50 | hq4-backend.log;6directory mỗi loại>200, name ties và timestamp chênh1microsecond, duyệt hết không lặp/lọt dataset ổn định; literal search/cursor scope/role/active/no hashes |
+| React build/client | PASS build +4tests | hq4-build.log/hq4-web.log; lookup2catalog cursors độc lập, directory tiếp trang, lỗi/loop không trả list thiếu |
+| Chrome thực | PASS13nhóm | hq4-web.log;5staff tables next/previous/search/reset390px, sửa khay/phòng và gán customer+tray ngoài200; SQL xác nhận đúng item/customer |
+| Flutter live Dart | PASS1/1 | hq4-dart-live.log; client thật→Express→PostgreSQL, không Android UI mới ở HQ4 vì Flutter source không đổi từ HQ3 |
+| CI HQ3 | PASS3jobs | be4a174/run42069882343: api-web/deployment/android-build đã xác minh từng job; không suy sang CI HQ4 trước push |
+
+Không schema/migration/index/firmware mới. Hành vi lookup giữ toàn bộ lựa chọn trong RAM phù hợp demo, chưa virtualized selector ở quy mô rất lớn. History/readings/notifications/harvests/fulfillment/reports còn cap riêng, không tuyên bố mọi list đã phân trang. Sensor/relay/camera thật vẫn BLOCKED.
+
 ## HQTCSDL HQ3 — catalog nhiều trang, 2026-11-05
 
 | Phạm vi | Kết quả thật | Bằng chứng |

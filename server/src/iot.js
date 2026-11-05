@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { admin, staff } from './auth.js';
 import { transaction } from './db.js';
 import { idParam, limitParam, name, uuid } from './validation.js';
+import {directoryPage} from './directory-pagination.js';
 import { fail, notFound } from './errors.js';
 import { newToken, tokenHash } from './security.js';
 import { hardwareAllowed, HARDWARE_MAX_SECONDS, enqueueHardware } from './hardware-policy.js';
@@ -116,8 +117,8 @@ export function monitoringRouter(pool, config = {}) {
   const router = Router();
   const deviceColumns = 'id,room_id,name,mode,active,last_seen_at,created_at,automation_enabled';
   router.get('/devices', staff, async (req, res) => {
-    const result = await pool.query(`SELECT ${deviceColumns},(last_seen_at>now()-interval '2 minutes') AS online FROM devices ORDER BY created_at DESC LIMIT $1`, [limitParam(req)]);
-    res.json({ data: result.rows.map(device=>({...device,hardware_control_available:hardwareAllowed(config,device)})) });
+    const page=await directoryPage(pool,req,{kind:'devices',select:`${deviceColumns},(last_seen_at>now()-interval '2 minutes') AS online`,from:'devices',order:'created_at',timestamp:true});
+    res.json({...page,data:page.data.map(device=>({...device,hardware_control_available:hardwareAllowed(config,device)}))});
   });
   router.post('/devices', admin, async (req, res) => {
     const input = z.object({ room_id: uuid, name, mode: z.enum(['simulator','hardware']).default('simulator') }).strict().parse(req.body);

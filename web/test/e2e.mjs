@@ -186,6 +186,52 @@ try {
   await page.getByText('Trang 1 · 20 hợp đồng',{exact:true}).waitFor();
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),true);
   console.log('PASS: 122 hợp đồng, next/previous không lặp, lọc status/customer reset trang và hết trang đúng; responsive pager390px.');
+  // Fresh synthetic directory data, never a user/demo database.
+  await ctx.pool.query("INSERT INTO rooms(name) SELECT 'ZZ Directory room '||lpad(g::text,4,'0') FROM generate_series(1,211) g");
+  const distantRoom=(await ctx.pool.query("SELECT id FROM rooms WHERE name='ZZ Directory room 0211'")).rows[0].id;
+  await ctx.pool.query("INSERT INTO trays(room_id,code,label) SELECT $1,'ZPAGE-'||lpad(g::text,4,'0'),'Directory tray '||g FROM generate_series(1,211) g",[distantRoom]);
+  await ctx.pool.query("INSERT INTO rental_plans(name,duration_days,price_vnd) SELECT 'ZZ Directory plan '||lpad(g::text,4,'0'),30,1000 FROM generate_series(1,211) g");
+  await ctx.pool.query("INSERT INTO users(email,name,password_hash,role) SELECT 'page'||g||'@test.invalid','ZZ Directory customer '||lpad(g::text,4,'0'),password_hash,'customer' FROM users CROSS JOIN generate_series(1,211) g WHERE id=$1",[customer.id]);
+  await ctx.pool.query("INSERT INTO devices(room_id,name,mode,token_hash,created_at) SELECT $1,'ZZ Directory device '||lpad(g::text,4,'0'),'simulator',md5('directory'||g),'2020-01-01'::timestamptz+interval '0.000001 second' FROM generate_series(1,211) g",[distantRoom]);
+  for(const [tab,target] of [['Phòng trồng','ZZ Directory room 0211'],['Khay nấm','ZPAGE-0211'],['Gói thuê','ZZ Directory plan 0211'],['Tài khoản','ZZ Directory customer 0211'],['Môi trường & IoT','ZZ Directory device 0211']]){
+    await nav(tab);
+    const directory=page.getByRole('navigation',{name:'Phân trang danh sách'});
+    await directory.getByText('Trang 1 · 20 mục',{exact:true}).waitFor();
+    const table=page.getByRole('table',{name:'Dữ liệu',exact:true});
+    const first=await table.locator('tbody tr').evaluateAll(rows=>rows.map(row=>row.dataset.recordId));
+    await directory.getByRole('button',{name:'Trang sau',exact:true}).click();
+    await directory.getByText('Trang 2 · 20 mục',{exact:true}).waitFor();
+    const second=await table.locator('tbody tr').evaluateAll(rows=>rows.map(row=>row.dataset.recordId));
+    assert.equal(second.some(id=>first.includes(id)),false);
+    await directory.getByRole('button',{name:'Trang trước',exact:true}).click();
+    await directory.getByText('Trang 1 · 20 mục',{exact:true}).waitFor();
+    assert.deepEqual(await table.locator('tbody tr').evaluateAll(rows=>rows.map(row=>row.dataset.recordId)),first);
+    await page.getByLabel('Tìm trong danh sách',{exact:true}).fill(target);
+    await page.getByRole('button',{name:'Tìm kiếm',exact:true}).click();
+    await directory.getByText('Trang 1 · 1 mục',{exact:true}).waitFor();
+    await table.getByRole('cell',{name:target,exact:true}).waitFor();
+    assert.equal(await directory.getByRole('button',{name:'Trang sau',exact:true}).isDisabled(),true);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  }
+  console.log('PASS: 5 danh sách staff >200, next/previous/search reset trang, microsecond ties và responsive390px.');
+  await nav('Khay nấm');
+  await page.getByLabel('Tìm trong danh sách',{exact:true}).fill('ZPAGE-0211');
+  await page.getByRole('button',{name:'Tìm kiếm',exact:true}).click();
+  await page.getByRole('cell',{name:'ZPAGE-0211',exact:true}).waitFor();
+  await page.getByRole('button',{name:'Sửa',exact:true}).click();
+  await page.getByLabel('Phòng trồng',{exact:true}).selectOption(distantRoom);
+  await page.getByLabel('Tên khay',{exact:true}).fill('Edited beyond200');await saveModal();
+  assert.equal((await ctx.pool.query("SELECT label FROM trays WHERE code='ZPAGE-0211'")).rows[0].label,'Edited beyond200');
+  await nav('Hợp đồng thuê');
+  await page.getByRole('button',{name:'+ Gán khay cho khách',exact:true}).click();
+  await page.getByLabel('Khách hàng',{exact:true}).selectOption({label:'ZZ Directory customer 0211 · page211@test.invalid'});
+  const distantCustomer=await page.getByLabel('Khách hàng',{exact:true}).inputValue();
+  await page.getByLabel('Gói thuê',{exact:true}).selectOption({label:'ZZ Directory plan 0211 · 1.000 ₫'});
+  await page.getByLabel('Các khay trống',{exact:true}).selectOption({label:'ZPAGE-0211 · ZZ Directory room 0211'});
+  await saveModal();
+  await page.getByRole('heading',{name:'Chi tiết hợp đồng',exact:true}).waitFor();
+  assert.equal((await ctx.pool.query("SELECT count(*)::int AS n FROM rentals n JOIN rental_items i ON i.rental_id=n.id JOIN trays t ON t.id=i.tray_id WHERE n.customer_id=$1 AND t.code='ZPAGE-0211'",[distantCustomer])).rows[0].n,1);
+  console.log('PASS: Sửa khay/phòng và gán khách+khay ngoài200 bằng UI, PostgreSQL xác nhận; lookup không còn cap100.');
   await page.getByRole('button',{ name:'Đăng xuất',exact:true }).click();
   await login(operator);
   await page.getByRole('heading',{ name:'Tổng quan',exact:true }).waitFor();
@@ -193,7 +239,7 @@ try {
   assert.equal(await page.getByRole('navigation').getByRole('button',{ name:'Báo cáo',exact:true }).count(),0);
   let releaseOld, enterOld, intercepted=false;
   const oldEntered = new Promise(resolve => { enterOld=resolve; });
-  await page.route('**/api/rooms',async route => {
+  await page.route(/\/api\/rooms(?:\?|$)/,async route => {
     if (intercepted) return route.continue();
     intercepted=true; enterOld(); await new Promise(resolve => { releaseOld=resolve; });
     await route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({error:{message:'Old session expired'}})});
@@ -202,10 +248,10 @@ try {
   await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
   await login(admin);
   await page.getByRole('heading',{name:'Tổng quan',exact:true}).waitFor();
-  const lateResponse = page.waitForResponse(response => response.url().endsWith('/api/rooms') && response.status()===401);
+  const lateResponse = page.waitForResponse(response => /\/api\/rooms(?:\?|$)/.test(response.url()) && response.status()===401);
   releaseOld(); await (await lateResponse).finished();
   await nav('Tài khoản'); await page.getByRole('heading',{name:'Người dùng & quyền',exact:true}).waitFor();
-  await page.unroute('**/api/rooms');
+  await page.unroute(/\/api\/rooms(?:\?|$)/);
   let enterLogout, releaseLogout;
   const logoutEntered = new Promise(resolve => { enterLogout=resolve; });
   await page.route('**/api/auth/logout',async route => {

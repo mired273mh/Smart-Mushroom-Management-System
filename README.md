@@ -4,8 +4,8 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 
 | Thành phần | Công nghệ | Mức đã kiểm chứng |
 |---|---|---|
-| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API;48 integration tests PASS |
-| Web nhân sự | React + Vite | Build,2 API client tests +11 nhóm Chrome E2E PASS |
+| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API;50 integration tests PASS |
+| Web nhân sự | React + Vite | Build,4 API client tests +13 nhóm Chrome E2E PASS; paging/search và lookup gán thuê ngoài200 |
 | App Customer | Flutter |Analyze/15 tests/Web build; catalog paging/search real Chrome→API→SQL; APK debug/Android UI flow PASS; chưa phone thật |
 | IoT | ESP32 Arduino + SCD4x đề xuất | 3 profile firmware compile PASS; source GPIO có khóa mặc định; chưa sensor/relay/camera thật |
 | Deployment | Docker Compose + Nginx | CI Linux toàn bộ +Docker build/up/smoke PASS run42005126537; chưa production TLS |

@@ -9,9 +9,9 @@ Nguồn: DE_TAI_YEU_CAU, SRS, User Requirements; không coi JWT hay public admin
 | A01 | Tạo Admin an toàn | server/src/cli.js,users.js; web/src/App.jsx | HOÀN THÀNH phần mềm | security.test.js bootstrap/public role guard; React E2E | Giữ credentials riêng khi deploy |
 | A02 | Đăng nhập Admin | server/src/auth.js,security.js; web/src/App.jsx | HOÀN THÀNH phần mềm | foundation/security/review-regression; Chrome E2E | HTTPS staging |
 | A03 | User/role/lock/delete/reset | server/src/users.js; web/src/App.jsx | HOÀN THÀNH phần mềm | rentals/security/review tests: last admin/reset/active rentals | Audit vận hành/retention |
-| A04 | CRUD phòng | server/src/catalog.js; web/src/App.jsx | HOÀN THÀNH phần mềm | rentals/review tests, browser CRUD | Phân trang khi dữ liệu lớn |
-| A05 | Khay/định danh/phân công | server/src/catalog.js,rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | unique/FK/race/ownership, browser gán | Phân trang/tìm kiếm toàn bộ khay |
-| A06 | Gói/chính sách giá | server/src/catalog.js,rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | snapshot giá, CRUD/E2E | Paging nếu vượt cap |
+| A04 | CRUD phòng | server/src/catalog.js; web/src/App.jsx | HOÀN THÀNH phần mềm | rentals/review tests, browser CRUD | HQ4 paging/search Chrome+SQL PASS; theo dõi quy mô lớn |
+| A05 | Khay/định danh/phân công | server/src/catalog.js,rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | unique/FK/race/ownership, browser gán | HQ4 paging/search và gán ngoài200 PASS; theo dõi quy mô lớn |
+| A06 | Gói/chính sách giá | server/src/catalog.js,rentals.js; web/src/App.jsx | HOÀN THÀNH phần mềm | snapshot giá, CRUD/E2E | HQ4 paging/search PASS; theo dõi quy mô lớn |
 | A07 | Device/sensor/camera | server/src/iot.js; web/src/App.jsx; iot/esp32/SmartMushroom | CHƯA KIỂM THỬ hardware | iot tests/provision/rotate; firmware compile3/3 | Kết nối sensor/camera thực |
 | A08 | Thống kê/báo cáo | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH bản cơ bản | operations tests; Chrome dashboard | Dataset lớn/downsampling |
 | A09 | Xuất dữ liệu | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH bản CSV bounded | CSV formula guard/download E2E | Export đủ dữ liệu khi vượt10000 |

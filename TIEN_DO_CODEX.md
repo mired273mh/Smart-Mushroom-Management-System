@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Mốc hiện tại HQTCSDL:** HQ1/HQ2 đã commit/push, CI tương ứng đều PASS3jobs; HQ3 catalog API→Flutter paging/search đã kiểm thử, đang lưu checkpoint. CI mới chỉ được xác nhận theo đúng commit, không suy ra từ CI cũ.
-- **Đã kiểm chứng:** Express/PostgreSQL48tests, React build/2tests/11Chrome groups; Flutter analyze sạch/15tests/live Dart API1/1/Chrome5groups và APK+Android UI→API→SQL PASS. Firmware3profiles compile ở checkpoint trước, firmware không đổi. Backup/restore17table counts/graph/routines/roles,9demo SQL HQTCSDL, least-privilege Docker runtime, nâng cấp demo3→4 với backup/rehearsal đều PASS. SQL/API có views/function/procedure/5triggers; tài liệu3NF/data dictionary/EXPLAIN/câu hỏi bảo vệ đã bổ sung.
-- **Chưa nghiệm thu:** Paging/search các danh sách staff ngoài rentals; TLS production/phone/signing/sensor/relay/camera thật. Retention/soak là RECOMMENDED, module cycle không thuê OPTIONAL theo PHAM_VI_HQTCSDL, không tự xem là blocker bắt buộc. Không tuyên bố hoàn thành100%.
+- **Mốc hiện tại HQTCSDL:** HQ1/HQ2/HQ3 đã commit/push, CI tương ứng đều PASS3jobs; HQ4 staff directories/lookup đã kiểm thử, đang lưu checkpoint. CI mới chỉ được xác nhận theo đúng commit, không suy ra từ CI cũ.
+- **Đã kiểm chứng:** Express/PostgreSQL50tests, React build/4tests/13Chrome groups; Flutter analyze sạch/15tests/live Dart API1/1/Chrome5groups và APK+Android UI→API→SQL PASS. Firmware3profiles compile ở checkpoint trước, firmware không đổi. Backup/restore17table counts/graph/routines/roles,9demo SQL HQTCSDL, least-privilege Docker runtime, nâng cấp demo3→4 với backup/rehearsal đều PASS. SQL/API có views/function/procedure/5triggers; tài liệu3NF/data dictionary/EXPLAIN/câu hỏi bảo vệ đã bổ sung.
+- **Chưa nghiệm thu:** History/readings/notifications/harvests/fulfillment/reports còn cap riêng, dropdown giữ mọi lựa chọn trong RAM; TLS production/phone/signing/sensor/relay/camera thật. Retention/soak là RECOMMENDED, module cycle không thuê OPTIONAL theo PHAM_VI_HQTCSDL, không tự xem là blocker bắt buộc. Không tuyên bố hoàn thành100%.
 - **Blocker hiện tại:** Chưa xác nhận BOM/đấu dây/giới hạn/camera và chưa có thiết bị kiểm thử. Android SDK/NDK28.2, Docker Engine, WSL đã chạy, không cần cài lại. GitHub main push được. AVD người dùng5554 có lúc offline; E2E dùng AVD riêng5558 trong .local, không wipe AVD người dùng.
-- **NEXT_TASK:** Chốt commit/push HQ3 và kiểm tra CI đúng HEAD; tiếp theo staff lists/search/paging theo SUPPORTING, rồi đối chiếu nghiệm thu/tài liệu demo theo Master HQTCSDL. Không làm lại HQ1/HQ2/cleanup. BOM/flash/cấp tải vẫn cần xác nhận; không chặn phần mềm/SQL.
+- **NEXT_TASK:** Chốt commit/push HQ4 và kiểm tra CI đúng HEAD; đối chiếu nghiệm thu Master HQTCSDL, chạy lại9demo khi tích hợp API mới và cập nhật báo cáo tổng/đường chạy Windows. Không làm lại HQ1/HQ2/cleanup. BOM/flash/cấp tải vẫn cần xác nhận; không chặn phần mềm/SQL.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 - **Kiểm kê Windows mới nhất:** Node26.13/npm.cmd11.20/Git2.56/PostgreSQL17.11/Flutter3.47.9/Dart3.13.7/JDK17/Studio JBR25/Android SDK+NDK28.2/Docker Desktop4.98/Engine29.9.2/Compose5.6.1/WSL3.0.3/Arduino CLI1.5.1 đã chạy. CLI cần nhận PATH Machine+User mới; `npm.cmd` tránh npm.ps1 bị Restricted. Không cài/chỉnh phần mềm hệ thống trong master review. Native5432 chưa xác thực SQL; dùng portable55439 và DB demo/test mới. Các bản kiểm kê cũ bên dưới được giữ làm lịch sử.
 
@@ -20,7 +20,7 @@
 | Mốc | Nội dung | Tình trạng | Bằng chứng |
 |---|---|---|---|
 | P0 | Kiến trúc, repo, skeleton, .env.example, tài liệu chạy | Đã kiểm thử | SRS/ADR/ERD + health/readiness PASS |
-| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử và review regression |48/48 integration tests PASS, SQL integrity/roles/routines, catalog/rental cursor/filter; các staff list khác chưa phân trang |
+| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử và review regression |50/50 integration tests PASS, SQL integrity/roles/routines, catalog/rental/directory cursor/search; history có cap riêng |
 | P2 | React Web: Administrator và Farm Operator | Đã kiểm thử bản đầu | Vite build PASS; Chrome E2E luồng chính PASS |
 | P3 | Flutter App: Customer | Đã kiểm thử Web/VM/Android emulator |Analyze sạch,15 tests +live API/Chrome5groups; APK debug/Android UI+SQL PASS; phone/signing chưa test |
 | P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP PASS; firmware3 profile/pulse assertions PASS; GPIO source gated, chưa upload/relay/live camera |
@@ -30,6 +30,15 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05→06 — HQ4 ĐÃ KIỂM THỬ: danh sách quản trị và lựa chọn ngoài cap100
+
+- HQ3 commit/push `be4a1743be7f7587946d814fd0851e17e30e0b43` main PASS, ls-remote trùng hash. CI run42069882343 đang chạy, chưa kết luận PASS. package.json user SHA256 giữ nguyên, không stage.
+- Source xác nhận rooms/trays/plans/customers/users/devices đều cap100, Web không duyệt tiếp; form gán thuê cũng chỉ lấy catalog100. Scope SUPPORTING: keyset+literal search cho6list, Web pager/search và lookup theo metadata thay cap ngầm. Giữ order mặc định, arrays data/RBAC/tokens không đổi; không migration/index hoặc đổi giao dịch.
+- Tiêu chí: DB>200/ordering ties/cursor scope/filter/RBAC, Chrome tìm/sửa mục trang sau và gán khách/khay ngoài100, regression build/tests. NEXT_TASK test gap trước sửa → shared list helper → Web → kiểm thử/checkpoint. Không thêm module optional hoặc xóa dữ liệu.
+- Baseline thiếu pagination FAIL thật (`hq4-before.log`) sau sửa fixture trùng unique name ở phòng/gói (giữ nguyên constraints). Shared directory helper +6routes giữ data arrays/ordering/RBAC, thêm q/cursor/metadata; timestamp SQL giữ microsecond. Không thay schema/index/migration, không lộ hashes.
+- Backend **50/50 PASS** (`hq4-backend.log`), riêng2tests mới duyệt6directory>200/ties/microsecond/RBAC/active/cursor scope/literal search. React build +4clienttests/13Chrome groups **PASS** (`hq4-build.log`,`hq4-web.log`):5table paging/search/reset/390px, sửa khay/phòng ngoài200, gán customer+tray ngoài200 và SQL xác nhận. Web lookup follows metadata, giữ toàn bộ lựa chọn trong RAM (quy mô demo, chưa virtualized).
+- Flutter live Dart1/1 **PASS** (`hq4-dart-live.log`), mobile/firmware source không đổi sau HQ3 nên không build lại vô ích. CI HQ3 `be4a174`/run42069882343 confirmed3jobs success qua connector. Files: directory-pagination/helper/test, catalog/users/iot routes, Directory.jsx/App/api/clienttests/e2e và ADR018/API/guide/checklist/testlog. History/readings/notifications/harvests/fulfillment/reports vẫn bounded theo contract, không gọi toàn API đã paging. Chuẩn bị staged scan/commit/push rồi acceptance tổng và CI HEAD.
 
 ### 2026-11-05 — HQ3 ĐÃ KIỂM THỬ: catalog Customer không bị cắt ở100mục
 

@@ -3,15 +3,15 @@ import { z } from 'zod';
 import { admin, publicUserColumns } from './auth.js';
 import { transaction } from './db.js';
 import { hashPassword } from './security.js';
-import { email, name, password, idParam, limitParam } from './validation.js';
+import { email, name, password, idParam } from './validation.js';
 import { fail, notFound } from './errors.js';
+import {directoryPage} from './directory-pagination.js';
 
 export function usersRouter(pool) {
   const router = Router();
   router.use(admin);
   router.get('/', async (req, res) => {
-    const result = await pool.query(`SELECT ${publicUserColumns},deleted_at FROM users ORDER BY created_at DESC LIMIT $1`, [limitParam(req)]);
-    res.json({ data: result.rows });
+    res.json(await directoryPage(pool,req,{kind:'users',select:`${publicUserColumns},deleted_at`,from:'users',order:'created_at',timestamp:true,search:"name||' '||email"}));
   });
   router.post('/', async (req, res) => {
     const input = z.object({ email, name, password, role: z.enum(['admin','operator','customer']) }).strict().parse(req.body);

@@ -3,8 +3,9 @@ import { z } from 'zod';
 import { admin, staff } from './auth.js';
 import { transaction } from './db.js';
 import { fail, notFound } from './errors.js';
-import { idParam, limitParam, name, uuid } from './validation.js';
+import { idParam, name, uuid } from './validation.js';
 import { catalogInput,catalogPage } from './catalog-pagination.js';
+import {directoryPage} from './directory-pagination.js';
 
 // Defaults belong to creation only; applying Zod defaults inside partial PATCH
 // schemas would overwrite omitted fields (e.g. reactivate a disabled room).
@@ -16,8 +17,7 @@ const someFields = schema => schema.partial().refine(v => Object.keys(v).length 
 export function catalogRouter(pool) {
   const router = Router();
   router.get('/customers', staff, async (req, res) => {
-    const result = await pool.query("SELECT id,name,email FROM users WHERE role='customer' AND active AND deleted_at IS NULL ORDER BY name LIMIT $1", [limitParam(req)]);
-    res.json({ data: result.rows });
+    res.json(await directoryPage(pool,req,{kind:'customers',select:'id,name,email',from:'users',search:"name||' '||email",where:"role='customer' AND active AND deleted_at IS NULL"}));
   });
   router.get('/catalog', async (req, res) => {
     const input=catalogInput(req),{query,after,limit}=input;
@@ -32,9 +32,8 @@ export function catalogRouter(pool) {
     res.json({ data: { plans:p.rows,trays:t.rows,pagination:{plans:p.pagination,trays:t.pagination} } });
   });
   router.get('/rooms', staff, async (req, res) => {
-    const result = await pool.query(`SELECT r.id,r.name,r.description,r.active,r.created_at,
-      (SELECT count(*)::int FROM trays t WHERE t.room_id=r.id) AS tray_count FROM rooms r ORDER BY r.name LIMIT $1`, [limitParam(req)]);
-    res.json({ data: result.rows });
+    res.json(await directoryPage(pool,req,{kind:'rooms',select:`r.id,r.name,r.description,r.active,r.created_at,
+      (SELECT count(*)::int FROM trays t WHERE t.room_id=r.id) AS tray_count`,from:'rooms r',id:'r.id',order:'r.name',search:"r.name||' '||r.description"}));
   });
   router.post('/rooms', staff, async (req, res) => {
     const input = roomInput.parse(req.body);
@@ -62,8 +61,7 @@ export function catalogRouter(pool) {
     res.status(204).end();
   });
   router.get('/plans', async (req, res) => {
-    const result = await pool.query("SELECT * FROM rental_plans WHERE ($1 <> 'customer' OR active) ORDER BY name LIMIT $2", [req.user.role, limitParam(req)]);
-    res.json({ data: result.rows });
+    res.json(await directoryPage(pool,req,{kind:'plans',select:'*',from:'rental_plans',where:"($1 <> 'customer' OR active)",values:[req.user.role]}));
   });
   router.post('/plans', admin, async (req, res) => {
     const input = planInput.parse(req.body);
@@ -87,10 +85,9 @@ export function catalogRouter(pool) {
     res.status(204).end();
   });
   router.get('/trays', staff, async (req, res) => {
-    const result = await pool.query(`SELECT t.*,r.name AS room_name,i.id AS active_rental_item_id,n.customer_id FROM trays t
-      JOIN rooms r ON r.id=t.room_id LEFT JOIN rental_items i ON i.tray_id=t.id AND i.ended_at IS NULL
-      LEFT JOIN rentals n ON n.id=i.rental_id ORDER BY t.code LIMIT $1`, [limitParam(req)]);
-    res.json({ data: result.rows });
+    res.json(await directoryPage(pool,req,{kind:'trays',select:'t.*,r.name AS room_name,i.id AS active_rental_item_id,n.customer_id',
+      from:'trays t JOIN rooms r ON r.id=t.room_id LEFT JOIN rental_items i ON i.tray_id=t.id AND i.ended_at IS NULL LEFT JOIN rentals n ON n.id=i.rental_id',
+      id:'t.id',order:'t.code',search:"t.code||' '||t.label||' '||r.name"}));
   });
   router.post('/trays', staff, async (req, res) => {
     const input = trayInput.parse(req.body);

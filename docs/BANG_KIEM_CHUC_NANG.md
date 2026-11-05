@@ -1,6 +1,8 @@
-# Bảng kiểm chức năng — checkpoint 2026-11-05
+# Bảng kiểm chức năng — checkpoint 2026-11-06
 
 Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có một phần hoặc chưa nghiệm thu môi trường đích. Một test API không tự chứng minh mọi nhánh giao diện/hardware. Chi tiết lệnh và lịch sử FAIL/PASS ở KIEM_THU.md.
+
+HQ4: rooms/trays/plans/customers/users/devices đã keyset/search; Web5table20/trang và lookup gán thuê/chọn phòng ngoài200 đã Chrome+SQL PASS. Backend50/50, React4tests/13nhóm, Flutter live Dart1/1 PASS. Không thay giới hạn của history/readings/notifications/harvests/fulfillment/reports/CSV hoặc nghiệm thu vật lý. CI HQ3 be4a174/run42069882343 PASS3jobs.
 
 HQ2: [9demo HQTCSDL](demo-hqtcsdl/README.md) PASS, [3NF/data dictionary](THIET_KE_CSDL_HQTCSDL.md)/hỏi đáp đã có; real limited-role Docker, demo upgrade/rehearsal, Android emulator UI+SQL và React provenance report PASS. Phần chưa đủ ở lists/paging/search ngoài rentals và môi trường hardware/production vẫn giữ trạng thái, không gọi hoàn thành100%.
 
@@ -49,8 +51,8 @@ Master2/master3: GPIO source có khóa hai lớp và pulse/interlock/TTL đã co
 
 | Sản phẩm | Trạng thái |
 |---|---|
-| REST API/PostgreSQL |48/48 tests PASS, schema4/routines/triggers/roles, backup restore17table counts PASS |
-| React Web |Build,2 API client tests +11 Chrome E2E PASS; session/paging/history/390px và Admin logout1280x720 |
+| REST API/PostgreSQL |50/50 tests PASS, schema4/routines/triggers/roles, backup restore17table counts PASS |
+| React Web |Build,4 API client tests +13 Chrome E2E PASS; session/paging/history/390px và Admin logout1280x720 |
 | Flutter Customer |Analyze sạch/15tests; realChrome5groups inclpaging/search/cross-page booking; APK/AndroidUI→API→SQL PASS; chưa phone thật |
 | ESP32 | Compile3 profile +pulse/URL assertions PASS; GPIO gate mặc định0, chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |

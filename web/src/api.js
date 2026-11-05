@@ -19,5 +19,36 @@ export function createApi(token, onExpired) {
     return envelope ? result : result.data;
   };
   request.page = path => request(path, 'GET', undefined, true);
+  // Small configuration/assignment lookups: follow pages instead of silently
+  // treating the first100 rows as the entire set. No arbitrary client row cap.
+  request.all = async path => {
+    const rows=new Map(),seen=new Set();let cursor=null;
+    do {
+      const params=new URLSearchParams({limit:'200',...(cursor?{cursor}:{})});
+      const page=await request.page(path+'?'+params);
+      for(const row of page.data)rows.set(row.id,row);
+      cursor=page.pagination?.next_cursor??null;
+      if(cursor&&seen.has(cursor))throw new Error('Mốc danh sách bị lặp. Hãy làm mới dữ liệu.');
+      if(cursor)seen.add(cursor);
+    } while(cursor);
+    return [...rows.values()];
+  };
+  request.catalog = async () => {
+    const first=await request('/catalog?limit=200'),result={plans:first.plans,trays:first.trays};
+    for(const kind of ['plans','trays']){
+      const rows=new Map(result[kind].map(row=>[row.id,row])),seen=new Set();
+      let cursor=first.pagination?.[kind]?.next_cursor;
+      while(cursor){
+        if(seen.has(cursor))throw new Error('Mốc catalog bị lặp. Hãy làm mới dữ liệu.');
+        seen.add(cursor);
+        const params=new URLSearchParams({limit:'200',[kind==='plans'?'plan_cursor':'tray_cursor']:cursor});
+        const page=await request('/catalog?'+params);
+        for(const row of page[kind])rows.set(row.id,row);
+        cursor=page.pagination?.[kind]?.next_cursor;
+      }
+      result[kind]=[...rows.values()];
+    }
+    return result;
+  };
   return request;
 }
