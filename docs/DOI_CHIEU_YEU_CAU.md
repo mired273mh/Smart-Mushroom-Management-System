@@ -29,7 +29,7 @@ Nguồn: DE_TAI_YEU_CAU, SRS, User Requirements; không coi JWT hay public admin
 | C01 | Đăng ký Customer | server/src/auth.js; mobile/lib/screens.dart | HOÀN THÀNH phần mềm/Android emulator | public role guard; Android UI register | Phone thật |
 | C02 | Đăng nhập Customer | server/src/auth.js; mobile/lib/api.dart,screens.dart | HOÀN THÀNH phần mềm/Android emulator | unit/live API/browser/Android | Phone/network thực |
 | C03 | Hồ sơ | server/src/auth.js; mobile/lib/api.dart,screens.dart | HOÀN THÀNH phần mềm | live API/browser sửa tên, Android xem/logout | Phone/test session nền |
-| C04 | Khay/gói khả dụng | server/src/catalog.js; mobile/lib/screens.dart | HOÀN THÀNH bounded | catalog regression; Android chọn2 khay | Paging/search khi vượt cap |
+| C04 | Khay/gói khả dụng | server/src/catalog.js,catalog-pagination.js; mobile/lib/screens.dart | HOÀN THÀNH phần mềm với keyset paging/search |205plans/230stock API; widgetmerge/race; realChrome21stock/22plans/paging/search; Android coreflow | Nghiệm thu data/phone thực, các staff lists riêng |
 | C05 | Thuê nhiều khay | server/src/rentals.js; mobile/lib/screens.dart | HOÀN THÀNH phần mềm/Android emulator | DB atomic/race; AndroidUI+SQL2items | Phone/network/retry |
 | C06 | Liên kết mã | server/src/rentals.js; mobile/lib/screens.dart | HOÀN THÀNH phần mềm/Android emulator | IDOR API; Android link+SQL linked_at | Phone/camera QR nếu yêu cầu sau |
 | C07 | Trạng thái/lịch | server/src/rentals.js,operations.js; mobile/lib/screens.dart | HOÀN THÀNH phần mềm | stage/date/details API+UI | Nghiệm thu lịch thực |

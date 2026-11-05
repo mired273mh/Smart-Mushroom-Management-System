@@ -1,5 +1,7 @@
 # Dọn repository — 2026-11-05
 
+**Đính chính HQ3 sau cleanup:** việc bỏ cupertino_icons dựa trên không có direct import chưa đủ. Build Web báo thiếu font framework tham chiếu; đã khôi phục đúng1.0.9 và lockfile, không nâng cấp package khác. Build lại hết cảnh báo, CupertinoIcons.ttf thực sự còn1472B sau tree-shaking. Lịch sử cleanup bên dưới giữ nguyên để truy vết; không lặp lại thao tác gỡ font này.
+
 Phạm vi: repository hiện tại, bắt đầu từ `fe5dbaf` trên `main`. Chỉ dọn cache/output tái tạo được và dependency không dùng; không thay nghiệp vụ. `package.json` có thay đổi của người dùng từ trước, được giữ nguyên và không đưa vào commit cleanup.
 
 ## Phân loại và quyết định trước khi xóa

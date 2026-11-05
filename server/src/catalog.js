@@ -4,6 +4,7 @@ import { admin, staff } from './auth.js';
 import { transaction } from './db.js';
 import { fail, notFound } from './errors.js';
 import { idParam, limitParam, name, uuid } from './validation.js';
+import { catalogInput,catalogPage } from './catalog-pagination.js';
 
 // Defaults belong to creation only; applying Zod defaults inside partial PATCH
 // schemas would overwrite omitted fields (e.g. reactivate a disabled room).
@@ -19,11 +20,16 @@ export function catalogRouter(pool) {
     res.json({ data: result.rows });
   });
   router.get('/catalog', async (req, res) => {
-    const plans = await pool.query('SELECT * FROM rental_plans WHERE active ORDER BY price_vnd,id LIMIT $1', [limitParam(req)]);
+    const input=catalogInput(req),{query,after,limit}=input;
+    const plans = await pool.query(`SELECT * FROM rental_plans WHERE active AND strpos(lower(name),lower($1))>0
+      AND ($2::int IS NULL OR (price_vnd,id)>($2::int,$3::uuid)) ORDER BY price_vnd,id LIMIT $4`,
+    [query.plan_q,after.plans?.price_vnd??null,after.plans?.id??null,limit+1]);
     const trays = await pool.query(`SELECT t.id,t.code,t.label,t.room_id,r.name AS room_name FROM trays t JOIN rooms r ON r.id=t.room_id
       WHERE t.status='available' AND r.active AND NOT EXISTS (SELECT 1 FROM rental_items i WHERE i.tray_id=t.id AND i.ended_at IS NULL)
-      ORDER BY t.code LIMIT $1`, [limitParam(req)]);
-    res.json({ data: { plans: plans.rows, trays: trays.rows } });
+      AND ($1::uuid IS NULL OR t.room_id=$1) AND strpos(lower(t.code||' '||t.label||' '||r.name),lower($2))>0
+      AND ($3::text IS NULL OR t.code>$3) ORDER BY t.code LIMIT $4`, [query.room_id??null,query.tray_q,after.trays?.code??null,limit+1]);
+    const p=catalogPage(plans.rows,input,'plans'),t=catalogPage(trays.rows,input,'trays');
+    res.json({ data: { plans:p.rows,trays:t.rows,pagination:{plans:p.pagination,trays:t.pagination} } });
   });
   router.get('/rooms', staff, async (req, res) => {
     const result = await pool.query(`SELECT r.id,r.name,r.description,r.active,r.created_at,

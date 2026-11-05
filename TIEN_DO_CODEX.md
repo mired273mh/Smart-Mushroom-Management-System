@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Mốc hiện tại HQTCSDL:** HQ1 PostgreSQL migration004/SQL nâng cao/least-privilege tests đã PASS, đang lưu checkpoint. CI baseline37a9db6/run42045054946 PASS3jobs đã xác minh; chưa suy ra CI source HQ1 mới.
-- **Đã kiểm chứng:** Express/PostgreSQL45tests (7 DB cases mới), React build/2tests/11Chrome groups, Flutter live Dart API1/1 sau HQ1; analyze/12tests/APK/emulator và firmware3profiles ở checkpoint trước, source client/firmware chưa đổi. Backup/restore17table counts/graph/routines/roles PASS; role login hạn quyền và column grants thực chạy. SQL/API có views/function/procedure/5triggers hỗ trợ nghiệp vụ.
-- **Chưa nghiệm thu:** Bộ9demo HQTCSDL/3NF/data dictionary/EXPLAIN và runtime Docker profile/upgrade demo cũ; paging/search ngoài rentals; TLS production/phone/signing/sensor/relay/camera thật. Retention/soak là RECOMMENDED, module cycle không thuê OPTIONAL theo PHAM_VI_HQTCSDL, không tự xem là blocker bắt buộc. Không tuyên bố hoàn thành100%.
+- **Mốc hiện tại HQTCSDL:** HQ1/HQ2 đã commit/push, CI tương ứng đều PASS3jobs; HQ3 catalog API→Flutter paging/search đã kiểm thử, đang lưu checkpoint. CI mới chỉ được xác nhận theo đúng commit, không suy ra từ CI cũ.
+- **Đã kiểm chứng:** Express/PostgreSQL48tests, React build/2tests/11Chrome groups; Flutter analyze sạch/15tests/live Dart API1/1/Chrome5groups và APK+Android UI→API→SQL PASS. Firmware3profiles compile ở checkpoint trước, firmware không đổi. Backup/restore17table counts/graph/routines/roles,9demo SQL HQTCSDL, least-privilege Docker runtime, nâng cấp demo3→4 với backup/rehearsal đều PASS. SQL/API có views/function/procedure/5triggers; tài liệu3NF/data dictionary/EXPLAIN/câu hỏi bảo vệ đã bổ sung.
+- **Chưa nghiệm thu:** Paging/search các danh sách staff ngoài rentals; TLS production/phone/signing/sensor/relay/camera thật. Retention/soak là RECOMMENDED, module cycle không thuê OPTIONAL theo PHAM_VI_HQTCSDL, không tự xem là blocker bắt buộc. Không tuyên bố hoàn thành100%.
 - **Blocker hiện tại:** Chưa xác nhận BOM/đấu dây/giới hạn/camera và chưa có thiết bị kiểm thử. Android SDK/NDK28.2, Docker Engine, WSL đã chạy, không cần cài lại. GitHub main push được. AVD người dùng5554 có lúc offline; E2E dùng AVD riêng5558 trong .local, không wipe AVD người dùng.
-- **NEXT_TASK:** HQ2 bộ9demo SQL chạy thật +EXPLAIN/data dictionary/3NF/câu hỏi bảo vệ, kiểm thử runtime Docker profile và hướng nâng cấp demo schema3→4 có backup. Sau đó paging/search theo yêu cầu và regression/tích hợp Android khi có emulator. BOM/flash/cấp tải vẫn cần xác nhận; không chặn phần mềm/SQL.
+- **NEXT_TASK:** Chốt commit/push HQ3 và kiểm tra CI đúng HEAD; tiếp theo staff lists/search/paging theo SUPPORTING, rồi đối chiếu nghiệm thu/tài liệu demo theo Master HQTCSDL. Không làm lại HQ1/HQ2/cleanup. BOM/flash/cấp tải vẫn cần xác nhận; không chặn phần mềm/SQL.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 - **Kiểm kê Windows mới nhất:** Node26.13/npm.cmd11.20/Git2.56/PostgreSQL17.11/Flutter3.47.9/Dart3.13.7/JDK17/Studio JBR25/Android SDK+NDK28.2/Docker Desktop4.98/Engine29.9.2/Compose5.6.1/WSL3.0.3/Arduino CLI1.5.1 đã chạy. CLI cần nhận PATH Machine+User mới; `npm.cmd` tránh npm.ps1 bị Restricted. Không cài/chỉnh phần mềm hệ thống trong master review. Native5432 chưa xác thực SQL; dùng portable55439 và DB demo/test mới. Các bản kiểm kê cũ bên dưới được giữ làm lịch sử.
 
@@ -20,9 +20,9 @@
 | Mốc | Nội dung | Tình trạng | Bằng chứng |
 |---|---|---|---|
 | P0 | Kiến trúc, repo, skeleton, .env.example, tài liệu chạy | Đã kiểm thử | SRS/ADR/ERD + health/readiness PASS |
-| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử và review regression |38/38 integration tests PASS, hardware policy/cursor/filter; các list khác chưa phân trang |
+| P1 | PostgreSQL, Express API, auth/RBAC, quản lý nền tảng | Đã kiểm thử và review regression |48/48 integration tests PASS, SQL integrity/roles/routines, catalog/rental cursor/filter; các staff list khác chưa phân trang |
 | P2 | React Web: Administrator và Farm Operator | Đã kiểm thử bản đầu | Vite build PASS; Chrome E2E luồng chính PASS |
-| P3 | Flutter App: Customer | Đã kiểm thử Web/VM/Android emulator |Analyze sạch,12 tests +live API/browser; APK debug/Android UI+SQL PASS; phone/signing chưa test |
+| P3 | Flutter App: Customer | Đã kiểm thử Web/VM/Android emulator |Analyze sạch,15 tests +live API/Chrome5groups; APK debug/Android UI+SQL PASS; phone/signing chưa test |
 | P4 | ESP32 + cảm biến/điều khiển + camera theo phạm vi khả thi | Đã compile/mô phỏng; chưa nghiệm thu hardware | Simulator HTTP PASS; firmware3 profile/pulse assertions PASS; GPIO source gated, chưa upload/relay/live camera |
 | P5 | Tích hợp, bảo mật, kiểm thử, triển khai |Local +CI Linux đầy đủ/Docker smoke đã kiểm thử; chưa nghiệm thu production |32 backend tests, Web/Flutter E2E, backup/restore, benchmark đọc PASS; CI42005126537 PASS; còn TLS/Android/hardware |
 | P6 | UML 2.0, SRS, thiết kế, test plan, cài đặt, hướng dẫn | Hoàn thành tài liệu bản đầu | UR/SRS/ADR/ERD/detail/API/test/install/user guide; 6 PlantUML render PASS; cần review học thuật/nghiệm thu đích |
@@ -30,6 +30,20 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — HQ3 ĐÃ KIỂM THỬ: catalog Customer không bị cắt ở100mục
+
+- HQ2 commit/push `228dc682d3d996a760aa4701453b03d9a15289d4` main/remote trùng hash; GitHub run42056855706 completed success khi kiểm tra (cần xem jobs chi tiết trước chốt). package.json user giữ nguyên.
+- Căn cứ: GET/catalog chỉ trả cap100 mặc định, Flutter không có cách duyệt phần còn lại hoặc tìm khay. Scope: keyset paging độc lập plans/trays, query theo mã/tên/phòng; thêm metadata giữ JSON arrays tương thích, Flutter load-more giữ chọn nhiều khay qua trang, search/refresh xử lý cursor/stale response an toàn. Không đổi giá/ownership/booking transaction và không thêm index chưa đo.
+- Tiêu chí: fixture>200plans/trays duyệt hết không lặp/lọt, filters/context/cursor validation và isolation; Flutter widget/network/race tests, live API/browser hoặc Android khi cần; regression +checkpoint/Git. NEXT_TASK API tests trước sửa→modulecatalogpagination→Flutter→verify/CI.
+- Đã tái hiện baseline FAIL vì catalog không có next-page metadata (`hq3-catalog-before.log`). Sau module catalog-pagination/query hỗ trợ2cursor+literalsearch, full backend **48/48 PASS** (`hq3-backend.log`), fixture205plans/230available trays, không lặp/lọt ở dataset ổn định, validatecursorviewer/kind/filter/limit và availability. Không thêm/sửa schema/index.
+- Flutter thêm load-more20rows/plan+tray độc lập, gộp uniqueID/giữ chọn khay, tìm mã/tên/phòng, search/refresh hủy lựa chọn có nhắc, generation chốnglate-response.3widgetregressions (merge/networkfailure/searchrace) +baseline **15/15 PASS** (`hq3-flutter-final.log`). Analyze lần đầu có3lint thiếu braces, đang sửa/chạy lại; chưa ghi analyze sạch. Tiếp theo liveDart/browser/buildAndroid và checkpointCI.
+- Analyze sau braces source/test **PASS sạch**, liveDart API1/1 và FlutterWeb UI4nhóm quaChrome/realDB **PASS** (`hq3-analyze-final2.log`,`hq3-dart-live.log`,`hq3-mobile-browser.log`). Web build PASS nhưng báo Expected CupertinoIcons font missing sau cleanup cũ; rà framework Material imports Cupertino và tài liệu Flutter font yêu cầuasset package choCupertinoIcons. Tiêu chí “không direct import” khi cleanup chưa đủ, đang khôi phục đúngcupertino_icons1.0.9 (bản trướccleanup), không upgrade framework hoặc package khác; giữ lịch sử lỗi và xác minhbuild hết cảnh báo, không coi đây là đã test glyph vật lý.
+- Sau khôi phục1.0.9: Web build **PASS không còn cảnh báo missingfont**, CupertinoIcons.ttf thực sự được tree-shake còn1472B (`hq3-web-font-fix.log`), lock chỉ thêm lại package đó. Flutter UI E2E mở rộng **5nhóm PASS** (`hq3-paging-e2e.log`): real21stock/22plans, tray001trang1+021trang2 được thuê cùng hợp đồng và SQLxác nhận đúng2codes; plan_cursor trảtrang2, searchtray020 còn1checkbox. Deadline scroll dùngframe/10s choCI, không giảclientdata.
+- Theo lệnh tiếp tục mới đã đọc lạiAGENTS/PROMPT/TIEN_DO vàGit: chính xác51tracked paths thay đổi kể từ37a9db6 gồm2batch đãcommit; workingtree tại kiểm tra có10paths chưacommit (kể3file mới), package.json user giữ nguyên/khôngstage. Chưa commitHQ3; đang kiểmAndroid và cập nhậtdocs/stageddiffsecrets trước checkpoint.
+- APK build/install +Android UI1/1 và SQLcompleted/2items/linked/paid/delivered **PASS** (`hq3-android-ui.log`), hostGPU1536MB/own5558. Font đã xác minh buildWeb khôngwarning, actualCupertino asset1472B; đính chính DON_DEP và AGENTS để không gỡ lại vì thiếu directimport. Không thay framework/dependency khác.
+- Đang chốtHQ3 docs/API/FlutterGuide/checklist/testlog/README, stageddiff/secret scan/commit/push; CI HQ2 `228dc68`/run42056855706 confirmed3jobs success bằngconnector. NEXT_TASK staff lists/search/paging theo phạm vi và acceptance tổng, không làm lạiHQ1/HQ2/cleanup.
+- Regression cuối sau khôi phục font: Flutter analyze sạch/15tests PASS (`hq3-analyze-package-final.log`,`hq3-tests-package-final.log`); React2tests/11nhóm realChrome PASS (`hq3-react-regression.log`). Đã dừng đúng AVD test5558 sau kiểm tra tên, giữ userdata/DB/logs. Không còn lỗi đã phát hiện trong phạm vi HQ3; chưa xem CI HQ3 hoặc thiết bị IoT là PASS trước khi có bằng chứng.
 
 ### 2026-11-05 — HQ2 ĐÃ KIỂM THỬ:9demo PostgreSQL, runtime deployment và bảo vệ
 

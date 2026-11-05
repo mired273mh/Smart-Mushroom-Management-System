@@ -23,4 +23,6 @@ Luồng dùng: đăng ký Customer → Thuê khay (chọn gói/nhiều khay) →
 
 Phiên chỉ giữ RAM, đóng app phải đăng nhập lại; không lưu token trong preferences. Camera chỉ mở URL được cấp khi đang thuê, chưa nghiệm thu live camera. Giới hạn danh sách hiện tại xem `docs/API.md`.
 
+Catalog HQ3: tải20gói/khay mỗi trang; “Xem thêm gói thuê” và “Xem thêm khay” độc lập, giữ các khay đã chọn qua trang (tối đa20). Tìm khay theo mã/tên/phòng. Tìm kiếm hoặc kéo làm mới hủy lựa chọn cũ để tránh dùng stock/cursor cũ; lỗi tải tiếp giữ dữ liệu/lựa chọn để thử lại. Backend luôn kiểm tra khay còn trống và snapshot giá trong transaction lúc xác nhận thuê.
+
 Android E2E: root đặt TEST_DATABASE_URL tên sm_test_* và ANDROID_TEST_DEVICE=emulator-<port> online, chạy `node scripts/test-mobile-android.mjs`. Runner chỉ nhận emulator, tạo DB mới/file fixture .local; Android dùng10.0.2.2 tới API host. SDK integration_test là dev dependency, không MockClient. Lần đầu harness chọn TextFormField trong dialog TextField đã sửa locator, rerun PASS; không gọi lỗi fixture là bug ứng dụng. Runner không chạy lên phone thật.

@@ -37,7 +37,7 @@ Master2/master3: GPIO source có khóa hai lớp và pulse/interlock/TTL đã co
 | C01 | Đăng ký | ☑ API + Flutter | Public role guard test; Flutter Chrome UI register/login PASS; chưa phone E2E |
 | C02 | Đăng nhập | ☑ API + Flutter | Mock/widget và live Dart API PASS; staff bị từ chối |
 | C03 | Hồ sơ | ☑ API + Flutter | API/profile live test và Chrome UI sửa tên PASS; chưa phone E2E |
-| C04 | Khay trống/gói | ☑ API + Flutter | Catalog và live Dart test, selection UI; giới hạn danh sách |
+| C04 | Khay trống/gói | ☑ API + Flutter paging/search |205plans/230stock API;20/page/2cursor, realChrome load-next/search, Android coreflow PASS |
 | C05 | Thuê một/nhiều khay | ☑ API + Flutter | API race/rollback, live Dart rent; Chrome UI thuê2 khay PASS; chưa phone E2E |
 | C06 | Liên kết mã khay | ☑ API + Flutter | Cần đúng chủ active, IDOR test + live Dart link |
 | C07 | Chi tiết/giai đoạn/ngày thu hoạch | ☑ API + Flutter | Detail/isolation, live Dart item; Flutter build PASS |
@@ -49,9 +49,9 @@ Master2/master3: GPIO source có khóa hai lớp và pulse/interlock/TTL đã co
 
 | Sản phẩm | Trạng thái |
 |---|---|
-| REST API/PostgreSQL | 38/38 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
+| REST API/PostgreSQL |48/48 tests PASS, schema4/routines/triggers/roles, backup restore17table counts PASS |
 | React Web |Build,2 API client tests +11 Chrome E2E PASS; session/paging/history/390px và Admin logout1280x720 |
-| Flutter Customer |Analyze sạch/12 tests; APK debug +Android emulator UI→API→PostgreSQL PASS; chưa phone thật |
+| Flutter Customer |Analyze sạch/15tests; realChrome5groups inclpaging/search/cross-page booking; APK/AndroidUI→API→SQL PASS; chưa phone thật |
 | ESP32 | Compile3 profile +pulse/URL assertions PASS; GPIO gate mặc định0, chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
 | Tích hợp/triển khai |Local +CI toàn bộ PASS run42005126537/3c14bc8, gồm Docker build/up/smoke; TLS production/Android/hardware chưa nghiệm thu |

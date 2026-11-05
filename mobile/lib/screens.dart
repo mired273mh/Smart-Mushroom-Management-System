@@ -498,19 +498,94 @@ class CatalogScreen extends StatefulWidget {
 
 class _CatalogScreenState extends State<CatalogScreen> {
   final selected = <String>{};
+  final searchController = TextEditingController();
+  String search = '';
+  Json? currentCatalog;
+  int catalogGeneration = 0;
+  bool loadingMore = false;
   String? planId;
   bool busy = false;
   int revision = 0;
-  Future<Json> loadCatalog() async {
-    final catalog = Map<String, dynamic>.from(
-      await widget.api.request('/catalog'),
-    );
-    final available = rows(catalog['trays']).map((tray) => tray['id']).toSet();
-    selected.removeWhere((id) => !available.contains(id));
-    if (!rows(catalog['plans']).any((plan) => plan['id'] == planId)) {
-      planId = null;
+  Json pageOf(Json catalog, String kind) {
+    final pages = catalog['pagination'];
+    if (pages is! Json) return {};
+    final page = pages[kind];
+    return page is Json ? page : {};
+  }
+
+  String catalogPath({String? kind, String? cursor}) {
+    final query = {'limit': '20', if (search.isNotEmpty) 'tray_q': search};
+    if (cursor != null) {
+      query[kind == 'trays' ? 'tray_cursor' : 'plan_cursor'] = cursor;
     }
+    return '/catalog?${Uri(queryParameters: query).query}';
+  }
+
+  Future<Json> loadCatalog() async {
+    final generation = ++catalogGeneration;
+    currentCatalog = null;
+    loadingMore = false;
+    selected.clear();
+    planId = null;
+    final catalog = Map<String, dynamic>.from(
+      await widget.api.request(catalogPath()),
+    );
+    if (mounted && generation == catalogGeneration) currentCatalog = catalog;
     return catalog;
+  }
+
+  Future<void> loadMore(String kind) async {
+    final catalog = currentCatalog;
+    if (catalog == null || loadingMore || busy) return;
+    final cursor = pageOf(catalog, kind)['next_cursor'];
+    if (cursor is! String) return;
+    final generation = catalogGeneration;
+    setState(() => loadingMore = true);
+    try {
+      final next = Map<String, dynamic>.from(
+        await widget.api.request(catalogPath(kind: kind, cursor: cursor)),
+      );
+      if (!mounted || generation != catalogGeneration) return;
+      setState(() {
+        final active = currentCatalog!;
+        final unique = {
+          for (final row in [...rows(active[kind]), ...rows(next[kind])])
+            row['id']: row,
+        };
+        currentCatalog = {
+          ...active,
+          kind: unique.values.toList(),
+          'pagination': {
+            'plans': pageOf(active, 'plans'),
+            'trays': pageOf(active, 'trays'),
+            kind: pageOf(next, kind),
+          },
+        };
+      });
+    } catch (error) {
+      if (mounted && generation == catalogGeneration) {
+        showMessage(context, error);
+      }
+    } finally {
+      if (mounted && generation == catalogGeneration) {
+        setState(() => loadingMore = false);
+      }
+    }
+  }
+
+  void applySearch() {
+    if (busy) return;
+    setState(() {
+      search = searchController.text.trim();
+      catalogGeneration++;
+      revision++;
+    });
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -518,7 +593,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
     key: ValueKey(revision),
     load: loadCatalog,
     builder: (catalog) {
-      final plans = rows(catalog['plans']), trays = rows(catalog['trays']);
+      final active = currentCatalog ?? catalog;
+      final plans = rows(active['plans']), trays = rows(active['trays']);
       return ListView(
         padding: const EdgeInsets.all(20),
         physics: const AlwaysScrollableScrollPhysics(),
@@ -532,6 +608,32 @@ class _CatalogScreenState extends State<CatalogScreen> {
             'Chọn gói và khay trống. Giá được lưu tại thời điểm xác nhận thuê.',
           ),
           const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: searchController,
+                  maxLength: 100,
+                  decoration: const InputDecoration(
+                    labelText: 'Tìm khay theo mã, tên hoặc phòng',
+                    counterText: '',
+                  ),
+                  textInputAction: TextInputAction.search,
+                  onSubmitted: (_) => applySearch(),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Tìm khay',
+                onPressed: busy ? null : applySearch,
+                icon: const Icon(Icons.search),
+              ),
+            ],
+          ),
+          const Text(
+            'Xem thêm giữ lựa chọn; tìm kiếm hoặc làm mới sẽ hủy lựa chọn cũ.',
+          ),
+          if (loadingMore) const LinearProgressIndicator(),
+          const SizedBox(height: 12),
           if (plans.isEmpty)
             const EmptyState('Chưa có gói thuê khả dụng.')
           else
@@ -550,13 +652,18 @@ class _CatalogScreenState extends State<CatalogScreen> {
                     ),
                   )
                   .toList(),
-              onChanged: busy
+              onChanged: busy || loadingMore
                   ? null
                   : (value) => setState(() => planId = value),
             ),
+          if (pageOf(active, 'plans')['has_more'] == true)
+            TextButton(
+              onPressed: busy || loadingMore ? null : () => loadMore('plans'),
+              child: const Text('Xem thêm gói thuê'),
+            ),
           const SizedBox(height: 20),
           Text(
-            'Khay trống (${trays.length})',
+            'Khay trống (${trays.length} đã tải)',
             style: Theme.of(context).textTheme.titleMedium,
           ),
           if (trays.isEmpty) const EmptyState('Hiện chưa còn khay trống.'),
@@ -566,7 +673,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 value: selected.contains(t['id']),
                 title: Text(t['code']),
                 subtitle: Text('${t['label']} · ${t['room_name']}'),
-                onChanged: busy
+                onChanged: busy || loadingMore
                     ? null
                     : (value) {
                         setState(() {
@@ -580,9 +687,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
               ),
             ),
           ),
+          if (pageOf(active, 'trays')['has_more'] == true)
+            TextButton(
+              onPressed: busy || loadingMore ? null : () => loadMore('trays'),
+              child: const Text('Xem thêm khay'),
+            ),
           const SizedBox(height: 16),
           FilledButton(
-            onPressed: busy || planId == null || selected.isEmpty
+            onPressed: busy || loadingMore || planId == null || selected.isEmpty
                 ? null
                 : () async {
                     final selectedCount = selected.length;

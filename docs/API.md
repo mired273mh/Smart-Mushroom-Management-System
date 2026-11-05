@@ -4,6 +4,8 @@ Base `/api`; JSON `{data: ...}`, lỗi `{error:{code,message,fields?}}`. `Author
 
 Danh sách mặc định100, `?limit=1..200`; environment tối đa1000. **GET /rentals đã có cursor pagination**; các danh sách khác vẫn giới hạn số bản ghi, chưa có pagination đầy đủ. CSV tối đa10.000 dòng; chưa có export bất đồng bộ.
 
+HQ3: **GET /catalog cũng đã phân trang**. Giữ `data.plans`/`data.trays`, bổ sung `data.pagination.plans` và `.trays` mỗi mục `{limit,has_more,next_cursor}`. Params: limit1..200 (mặc định100), tray_q tìm substring literal mã/label/phòng, plan_q tìm tên gói, room_id UUID, tray_cursor và plan_cursor độc lập. Trays theo code ASC, plans theo price_vnd/id ASC; cursor bound viewer/kind/limit/filter, sai trả422. `%`/`_` không là wildcard. Mỗi trang áp dụng availability hiện tại; không hứa snapshot bất biến qua nhiều HTTP request. Khay busy/maintenance/retired/phònginactive và góiinactive bị loại. Các staff lists khác vẫn bounded; không gọi là đã phân trang toàn bộ API.
+
 GET /rentals nhận `limit`, `cursor`, `status=active|completed` và `customer_id` (chỉ staff). Trả `{data:[...], pagination:{limit,has_more,next_cursor}}`. Gọi trang đầu không có cursor; trang sau gửi next_cursor với cùng bộ lọc và user. Cursor sai/đổi scope trả422; Customer gửi customer_id bị403. Mảng `data` giữ tương thích client cũ. Cursor không thay thế ownership và không cần lưu bí mật. Không có total/page count; UI lưu stack cursor để quay lại, refresh về đầu. Thứ tự `starts_at DESC,id DESC` giữ chính xác microsecond.
 
 | Method/path | Quyền | Body/ý nghĩa |

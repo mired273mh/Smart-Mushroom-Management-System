@@ -2,6 +2,21 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## HQTCSDL HQ3 — catalog nhiều trang, 2026-11-05
+
+| Phạm vi | Kết quả thật | Bằng chứng |
+|---|---|---|
+| Catalog trước sửa | FAIL đã tái hiện thiếu next-page metadata | hq3-catalog-before.log; cap100 không có cách duyệt tiếp |
+| PostgreSQL/backend | PASS48/48 | hq3-backend.log;205plans/230available trays duyệt hết dataset ổn định, ties price/id, availability, literal search, invalid/crossviewer/kind/filter/limit cursors |
+| Flutter | Analyze sạch +15/15 tests | hq3-analyze-final2.log/hq3-flutter-final.log; merge uniqueID/selection, load-next error giữdata, stale response sau search không ghi đè |
+| Analyze lúc phát triển | FAIL lint → ĐÃ SỬA |3missing-braces ởsource rồi3ởtest, đã sửa/rerun không bỏ lint |
+| FlutterWeb/Dart live | Build PASS +Dart1/1 +Chrome5groups PASS | hq3-web-font-fix.log, hq3-dart-live.log, hq3-paging-e2e.log; real21trays/22plans,001trang1+021trang2 thuê chung và SQL đúng2items; search020 còn1checkbox |
+| Font sau cleanup | Warning → ĐÃ SỬA | Không direct import chưa đủ để gỡ dependency; khôi phụccupertino_icons1.0.9/lock, tree-shaker dùng1472B font, build hết missing-font warning |
+| Android code mới | PASS APK/install/UI1/1 +SQL | hq3-android-ui.log; ownAVD5558 hostGPU1536MB, register/rent2/link/SIMULATOR/harvest/delivery/profile/logout; không phone/ESP32 thật |
+| CI HQ2 | PASS3jobs |228dc68/run42056855706 đã xem từng job api-web/deployment/android-build; chưa dùng làm CI của HQ3 |
+
+Giữ API arrays tương thích, không đổi schema/giá/booking transaction; các danh sách staff ngoài rentals/catalog vẫn còn bounded. Không chạy lại firmware compile vì source iot/ không đổi sau3profile PASS đã ghi; không suy hardware PASS từ simulator/ACK.
+
 ## HQTCSDL HQ2 — 2026-11-05
 
 | Phạm vi | Kết quả thực tế | Bằng chứng / giới hạn |

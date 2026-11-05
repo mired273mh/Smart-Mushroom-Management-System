@@ -123,6 +123,37 @@ try {
   await page.getByRole('button',{name:/đã thu hoạch 1350 g/}).waitFor();
   await page.getByRole('button',{name:/đã thu hoạch 1350 g/}).click();
   await page.getByRole('tab',{name:/Thông báo/}).waitFor();
+  // Real Flutter UI + catalog cursors + PostgreSQL beyond the 20-row page.
+  await ctx.pool.query("INSERT INTO trays(room_id,code,label) SELECT $1,'ZZ-PAGE-'||lpad(g::text,3,'0'),'Paging tray '||g FROM generate_series(1,21) g",[room.id]);
+  await ctx.pool.query("INSERT INTO rental_plans(name,duration_days,price_vnd) SELECT 'ZZ Plan '||g,30,200000+g FROM generate_series(1,21) g");
+  await page.getByRole('tab',{name:/Thuê khay/}).click();
+  await page.getByRole('checkbox',{name:/ZZ-PAGE-001/}).click();
+  const scrollTo=async(locator,direction=1)=>{
+    const deadline=Date.now()+10000;
+    while(Date.now()<deadline){
+      if(await locator.count()){const box=await locator.boundingBox();if(box&&box.y>55&&box.y+box.height<820)return;}
+      await page.mouse.move(200,600);await page.mouse.wheel(0,direction*600);
+      await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+    }
+    throw Error('Flutter scroll target not visible');
+  };
+  const moreTrays=page.getByRole('button',{name:'Xem thêm khay',exact:true});await scrollTo(moreTrays);await moreTrays.click();
+  const lastTray=page.getByRole('checkbox',{name:/ZZ-PAGE-021/});await scrollTo(lastTray);await lastTray.click();
+  const morePlans=page.getByRole('button',{name:'Xem thêm gói thuê',exact:true});await scrollTo(morePlans,-1);
+  const planResponse=page.waitForResponse(r=>r.url().includes('/api/catalog?')&&r.url().includes('plan_cursor='));
+  await morePlans.click();const planPage=await planResponse;assert.equal(planPage.status(),200);assert.equal((await planPage.json()).data.plans.length,2);
+  await page.getByText('Gói thuê',{exact:true}).click();
+  await page.getByRole('menuitem',{name:'Gói UI Flutter · 30 ngày · 130000 ₫',exact:true}).click();
+  const pagedBookingResponse=page.waitForResponse(r=>r.url().endsWith('/api/rentals')&&r.request().method()==='POST');
+  const confirmPaged=page.getByRole('button',{name:'Xác nhận thuê 2 khay',exact:true});await scrollTo(confirmPaged);await confirmPaged.click();
+  const pagedBooking=await pagedBookingResponse;assert.equal(pagedBooking.status(),201);const pagedId=(await pagedBooking.json()).data.id;
+  assert.deepEqual((await ctx.pool.query('SELECT t.code FROM rental_items i JOIN trays t ON t.id=i.tray_id WHERE i.rental_id=$1 ORDER BY t.code',[pagedId])).rows.map(r=>r.code),['ZZ-PAGE-001','ZZ-PAGE-021']);
+  await page.getByText('Chi tiết hợp đồng',{exact:true}).waitFor();await page.getByRole('button',{name:/^Back\b/}).click();
+  await scrollTo(page.getByRole('textbox',{name:'Tìm khay theo mã, tên hoặc phòng',exact:true}),-1);
+  await input('Tìm khay theo mã, tên hoặc phòng','ZZ-PAGE-020');
+  await page.getByRole('button',{name:'Tìm khay',exact:true}).click();
+  await page.getByRole('checkbox',{name:/ZZ-PAGE-020/}).waitFor();assert.equal(await page.getByRole('checkbox').count(),1);
+  console.log('PASS: Flutter catalog real paging/search, independent plan page and cross-page rental2 confirmed by SQL.');
   await page.getByRole('tab',{name:/Hồ sơ/}).click();
   await page.getByRole('button',{name:'Sửa họ tên',exact:true}).click();
   await input('Họ tên','Tên mới Flutter UI');
