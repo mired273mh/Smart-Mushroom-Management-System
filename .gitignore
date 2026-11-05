@@ -1,14 +1,47 @@
+# Node / React: generated dependencies, caches and test output.
 node_modules/
+.vite/
+.vite-temp/
+.cache/
+.parcel-cache/
+.eslintcache
+.npm/
+.pnpm-store/
+.yarn/cache/
+playwright-report/
+test-results/
+.nyc_output/
+# Secrets and machine-local state. Keep example configuration tracked.
 .env
 .env.*
 !.env.example
 dist/
 build/
 .dart_tool/
+.gradle/
+.kotlin/
+.cxx/
+.pub-cache/
+.pub/
 .flutter-plugins*
 coverage/
 .local/
 *.log
+# OS/editor temporary files; keep shared .vscode tasks/launch configuration.
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.tmp
+*~
+# Portable ESP32 output belongs in ignored .local/, not next to firmware source.
+/iot/esp32/SmartMushroom/out/
+.pio/
+/iot/esp32/SmartMushroom/*.bin
+/iot/esp32/SmartMushroom/*.elf
+/iot/esp32/SmartMushroom/*.map
+/iot/esp32/SmartMushroom/SmartMushroom.ino.cpp
 mobile/android/local.properties
 mobile/ios/Flutter/Generated.xcconfig
 mobile/ios/Flutter/flutter_export_environment.sh

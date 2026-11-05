@@ -2,6 +2,8 @@
 
 Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có một phần hoặc chưa nghiệm thu môi trường đích. Một test API không tự chứng minh mọi nhánh giao diện/hardware. Chi tiết lệnh và lịch sử FAIL/PASS ở KIEM_THU.md.
 
+Cleanup2026-11-05: giữ toàn bộ source/migration/test/UML và dữ liệu; bỏ cache/local one-off/Cupertino unused. Backend38, React2+11 nhóm, Flutter analyze/12tests/APK, firmware3profiles và Compose config/images đều PASS sau dọn. Không thay trạng thái nghiệm thu hardware/camera/production hoặc đánh dấu xong backlog. [Phân loại, file và bằng chứng cleanup](DON_DEP_REPOSITORY.md).
+
 **Master checkpoint:** bảng6 cột file/trạng thái/bằng chứng/việc tiếp theo cho32 ID tại [DOI_CHIEU_YEU_CAU.md](DOI_CHIEU_YEU_CAU.md). Android APK/emulator UI+SQL và Docker Windows runtime đã PASS; các ghi chú lịch sử chưa Android/Docker bên dưới được thay bởi checkpoint này. Phone/hardware/production còn chưa nghiệm thu.
 
 Master2/master3: GPIO source có khóa hai lớp và pulse/interlock/TTL đã compile3 profile, API38tests/React11 nhóm E2E PASS; lịch sử lệnh có ACK/result/expiry. CI8431262/run42039533054 PASS3jobs;7e13b68 đã push, CI còn chạy tại checkpoint. Chưa flash/nghiệm thu tải điện; [BOM/sơ đồ cần xác nhận](PHUONG_AN_PHAN_CUNG_IOT.md).

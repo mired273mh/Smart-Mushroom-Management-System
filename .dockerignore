@@ -4,6 +4,16 @@
 **/build
 **/dist
 **/.dart_tool
+**/.gradle
+**/.kotlin
+**/.cxx
+**/.vite
+**/.cache
+**/coverage
+**/playwright-report
+**/test-results
+**/*.log
+**/.idea
 **/.env
 **/.env.*
 **/config.local.h

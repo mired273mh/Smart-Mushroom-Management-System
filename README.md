@@ -4,13 +4,13 @@ Hệ thống quản lý nuôi trồng nấm, cho thuê khay và giám sát từ 
 
 | Thành phần | Công nghệ | Mức đã kiểm chứng |
 |---|---|---|
-| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API;32 integration tests PASS |
-| Web nhân sự | React + Vite | Build,2 API client tests +8 nhóm Chrome E2E PASS |
+| Database/API | PostgreSQL + Node.js/Express REST | Migration, auth/RBAC, CRUD, thuê/tiến trình/thu hoạch, thông báo, IoT API;38 integration tests PASS |
+| Web nhân sự | React + Vite | Build,2 API client tests +11 nhóm Chrome E2E PASS |
 | App Customer | Flutter |Analyze/12 tests/Web build; APK debug +Android emulator UI/API/PostgreSQL flow PASS; chưa phone thật |
-| IoT | ESP32 Arduino + SCD4x đề xuất | 2 nhánh firmware compile PASS; simulator HTTP PASS; chưa sensor/relay/camera thật |
+| IoT | ESP32 Arduino + SCD4x đề xuất | 3 profile firmware compile PASS; source GPIO có khóa mặc định; chưa sensor/relay/camera thật |
 | Deployment | Docker Compose + Nginx | CI Linux toàn bộ +Docker build/up/smoke PASS run42005126537; chưa production TLS |
 
-Chưa nghiệm thu toàn bộ hệ thống vật lý/production. Các lệnh điều khiển hiện chỉ dry-run. Không có thanh toán online. Camera là contract URL, chưa có live feed đã xác minh. Bằng chứng và giới hạn chi tiết ở [nhật ký kiểm thử](docs/KIEM_THU.md).
+Chưa nghiệm thu toàn bộ hệ thống vật lý/production. Điều khiển mặc định dry-run, GPIO thật cần xác nhận cấu hình và mở khóa hai lớp. Không có thanh toán online. Camera là contract URL, chưa có live feed đã xác minh. Bằng chứng và giới hạn chi tiết ở [nhật ký kiểm thử](docs/KIEM_THU.md).
 
 ## Chạy ứng dụng local
 
@@ -99,3 +99,5 @@ IoT: tạo device mode simulator trên Web, đặt API_URL/DEVICE_TOKEN riêng r
 `server/` API/migrations/tests; `web/` React; `mobile/` Flutter; `iot/` simulator/firmware; `deploy/` proxy; `scripts/` công cụ dev/test; `.github/workflows/` CI Linux và Docker smoke. `compose.yaml` đã chạy trong CI, cổng local8080; Docker Windows build/up/smoke cũng đã PASS với Engine hiện có. Xem [báo cáo review cuối](docs/REVIEW_CUOI.md) để biết lỗi đã sửa, kết quả CI và giới hạn nghiệm thu.
 
 Khi tiếp tục, gửi **Tiếp tục đồ án.** trong cùng repo. AGENTS.md yêu cầu đối chiếu code/Git với checkpoint trước làm tiếp. Sau giai đoạn đã kiểm chứng, tự commit và push thông thường lên nhánh hiện tại theo mục 8 của AGENTS.md; không force push, không commit secret hoặc xóa lịch sử/dữ liệu/tài liệu yêu cầu. Nếu Git thất bại phải ghi lỗi vào tiến độ. Không có cơ chế tự chạy lại lúc reset token.
+
+Cache/build/temp và cấu hình riêng không đưa lên Git; giữ source, migrations, test, lockfiles và bộ tài liệu. [Báo cáo dọn repository](docs/DON_DEP_REPOSITORY.md) ghi rõ nhóm đã dọn, dữ liệu giữ lại và các lệnh kiểm chứng. Không xóa toàn bộ `.local` vì nơi đó còn database, tài khoản demo, backup và bằng chứng test.

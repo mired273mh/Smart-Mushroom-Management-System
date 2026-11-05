@@ -2,6 +2,25 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## Cleanup repository — 2026-11-05
+
+Chi tiết nhóm file và bằng chứng tại [báo cáo cleanup](DON_DEP_REPOSITORY.md). Không xóa tracked source/test/migration/tài liệu/env/dữ liệu; chỉ cache/bundle tái tạo được,3 script local one-off và dependency Cupertino không dùng.
+
+| Lệnh / kiểm tra | Kết quả thực chạy | Log local |
+|---|---|---|
+| scripts/test.ps1 | PASS38/38 HTTP/PostgreSQL | cleanup-backend.log |
+| npm.cmd run build:web | PASS | cleanup-web-build.log |
+| npm.cmd run test:web | PASS2 client tests +11 nhóm Chrome E2E | cleanup-web-tests.log |
+| flutter analyze / flutter test | PASS không issue /12 tests | cleanup-flutter-analyze.log, cleanup-flutter-test.log |
+| flutter build apk --debug --no-pub | PASS native exit0, app-debug.apk tồn tại | cleanup-android-native.log |
+| scripts/compile-iot.ps1 | PASS3 profiles (simulation/locked sensing/gated GPIO), không upload | cleanup-iot-compile.log |
+| docker compose config --quiet / build | PASS native exit0 cả2 | cleanup-compose-native.log, cleanup-docker-native.log |
+| Relative imports/URLs / ignore / user change | PASS117 refs,14 ignore cases, package.json user hash giữ nguyên | cleanup-check-paths.cjs; build/web là output có prerequisite đã ghi rõ |
+| Secret/history trước commit | Không phát hiện theo rule đã chạy,151tracked +22commits/300text blobs | cleanup-audit.json; không in credential |
+| Demo DB sau cleanup | PASS đọc3users/0rentals, không seed/xóa | node scripts/demo.mjs status |
+
+Lỗi wrapper đã sửa: pub remove redirection sai path trước khi chạy; guard PNG chặn trước khi đối chiếu hash; lỗi thống kê hashtable sau xóa; PowerShell Stop coi stderr Java warning/Docker progress là lỗi. Đã kiểm tra native exit0 trước ghi PASS. Test đã dựng lại cache rồi cache được dọn lại, giữ APK/firmware/log/screenshot. Không chạy lại emulator/phone/IoT vật lý/camera/production trong phạm vi cleanup này. Các giới hạn chức năng trước cleanup giữ nguyên.
+
 ## Master2 — source IoT có khóa, 2026-11-05
 
 Master3 sau đó: `scripts/test.ps1` **38/38 PASS** (`.local/master-history-backend.log`); React build PASS +2 tests/11 nhóm Chrome E2E PASS (`.local/master-history-build.log`, `master-history-web.log`). Kiểm tra mới: Web history đúng device, pending→ACK/result qua HTTP fixture, đổi thiết bị không giữ kết quả trước; API tính expired khi device offline, giữ ACK cuối và chặn Customer. Không sensor/relay thật. Source `web/src/CommandHistory.jsx`, App/e2e, iot.js/hardware.test.js.

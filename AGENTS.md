@@ -69,6 +69,14 @@ Khi người dùng gửi **`Tiếp tục đồ án`** hoặc **`Tiếp tục đ�
 
 Yêu cầu cần bám `docs/DE_TAI_YEU_CAU.md`, các deliverables: REST APIs; web Admin/Farm Operator; Flutter Customer; hệ thống IoT. Đồng thời cung cấp phân tích thiết kế UML 2.0, user requirements, SRS, kiến trúc, thiết kế chi tiết, tài liệu triển khai, kiểm thử, hướng dẫn cài đặt và sử dụng theo đề tài.
 
+### Duy trì repository gọn gàng
+
+- Khi tạo file mới, xác định có cần Git theo dõi hay chỉ là file local tái tạo được. Source, migrations, test, scripts, cấu hình mẫu và lockfile phải giữ để clone/build được; build artifacts, cache và file tạm phải bị ignore.
+- Kiểm tra import, build/CI, tài liệu và tham chiếu trước khi loại bỏ file; không tạo thêm nhiều file trùng chức năng. Không xóa source đang dùng, tài liệu chính thức, tiến độ hoặc bằng chứng kiểm thử.
+- Cleanup chỉ tự xóa output/cache đã xác minh tái tạo được. Giữ `.env` đang dùng, database/backup, trạng thái emulator, log/screenshot/bằng chứng và artifact cần bảo vệ; hỏi trước nếu muốn xóa những dữ liệu này hoặc chưa rõ mục đích.
+- Trước xóa đệ quy: kiểm tra đường dẫn tuyệt đối nằm trong workspace, không đi qua symlink/junction, không chứa file Git theo dõi hay dữ liệu cần giữ. Không dùng `git clean -fdx`, force push, hard reset hoặc viết lại lịch sử để dọn repo.
+- File sinh tự động cần giữ local nhưng không cần Git có thể dùng `git rm --cached` sau kiểm tra; không bỏ theo dõi lockfile/migration/cấu hình cần thiết. Sau cleanup chạy build/test phù hợp, cập nhật `TIEN_DO_CODEX.md`, commit/push checkpoint an toàn theo mục8. Lệnh “Tiếp tục đồ án” vẫn phải đọc tiến độ và kiểm tra Git/source trước làm tiếp.
+
 ## 8. Tự động lưu code lên GitHub (được người dùng cho phép)
 
 - **Quyền thực hiện:** sau mỗi giai đoạn hoàn thành, tự tạo commit và push thông thường lên **nhánh hiện tại** nếu có remote GitHub, quyền truy cập và kết nối. Không cần hỏi lại quyền commit/push đã được cho phép. Không tự đổi nhánh/remote hoặc thiết lập danh tính Git theo suy đoán.
