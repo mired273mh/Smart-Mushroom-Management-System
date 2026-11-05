@@ -44,7 +44,7 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | Flutter Customer | Analyze sạch,7 mock unit/widget+1 live API test PASS,Web build + Chrome UI E2E4 nhóm PASS; APK/emulator chưa chạy |
 | ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
-| Tích hợp/triển khai | Local integration PASS; Compose config validation PASS; Docker runtime/CI remote/TLS chưa chạy |
+| Tích hợp/triển khai | Local integration PASS; source/AGENTS đã push GitHub main; Compose config validation PASS; Docker runtime/CI remote/TLS chưa nghiệm thu |
 | Tài liệu | UR/SRS/ADR/ERD/API/detail/test/deploy/user guide và 6 UML source/PNG render PASS |
 
 Chưa nghiệm thu hoàn chỉnh đồ án vật lý/production. Cần Android SDK, Docker Engine và phần cứng/giới hạn an toàn được xác nhận. Những phần mềm có thể phát triển tiếp: phân trang/filter, retention, thêm browser coverage và đo tải; không gọi các mục này là đã hoàn thành.

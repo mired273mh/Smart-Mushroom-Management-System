@@ -46,6 +46,7 @@
 | 2026-11-05 | Pagination Dart live + migration/backup | `npm run test:mobile:api`, `npm run db:migrate`, `npm run test:backup` | PASS1/1 + migration3/restore | Client Dart gọi API/DB thật với25 rentals fixtures; cursor/filter/ownership; restore DB mới xác minh3 migrations |
 | 2026-11-05 | Flutter browser harness ban đầu | `npm run test:mobile:web` | FAIL selector → ĐÃ SỬA | Flutter Semantics dùng tab/menuitem/merged accessible names khác DOM Text; sửa locator theo role/name, không bỏ assertion nghiệp vụ |
 | 2026-11-05 | Flutter UI E2E | `npm run test:mobile:web` | PASS4 nhóm | Chrome thật + build Flutter Web + API/PostgreSQL mới; register/rent2/env/link/delivery/cancel-resubmit/notification read/profile/logout/staff denied; không JS/Flutter exception; simulator không phải hardware |
+| 2026-11-05 | Đồng bộ GitHub sau đăng nhập | GCM list, `git fetch origin main`, `git diff --check`, `git push origin HEAD:refs/heads/main` | PASS | Push5756f5b..03cccf6, ahead4/behind0 trước push; source ứng dụng không đổi nên không chạy lại build/test; chưa xác nhận CI remote |
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 

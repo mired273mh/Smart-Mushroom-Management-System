@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Đang làm:** Lưu batch Flutter UI E2E đã PASS, cập nhật trạng thái Git. P5 chưa nghiệm thu container/Android/hardware.
+- **Đang làm:** Đã đồng bộ source tới03cccf6 lên GitHub main; lưu nhật ký xác nhận push thành công. P5 chưa nghiệm thu container/Android/hardware.
 - **Đã hoàn thành:** Thiết kế; Express/PostgreSQL24 tests; React Web6 nhóm E2E; Flutter Customer7 widget/client tests + live API + browser UI E2E4 nhóm; pagination lịch sử thuê; firmware2 mode compile; simulator; backup/restore; tài liệu và6 UML render.
 - **Chưa hoàn thành:** Docker runtime/CI remote/TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO điều khiển thật. Chưa phân trang đầy đủ/retention/benchmark tải.
-- **Blocker môi trường:** Git push thiếu đăng nhập GitHub trên máy; thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Người dùng đã cho phép commit/push thông thường; không thiếu quyền chỉ dẫn, đang thiếu credential kỹ thuật.
-- **Công việc tiếp theo chính xác:** Các danh sách ngoài /rentals (catalog/khách/notifications/telemetry...) còn cần pagination; bổ sung test dữ liệu lớn/đo tải. Sau khi đăng nhập GitHub qua GCM/VS Code, push main thông thường các commit local. Docker/Android/hardware giữ điều kiện nghiệm thu cũ; không dựng lại phần đã PASS.
+- **Blocker môi trường:** Thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Blocker GitHub đã giải quyết: Git Credential Manager có tài khoản mired273mh và push main thành công.
+- **Công việc tiếp theo chính xác:** Các danh sách ngoài /rentals (catalog/khách/notifications/telemetry...) còn cần pagination; bổ sung test dữ liệu lớn/đo tải. Sau các batch đã kiểm chứng, tiếp tục commit/push main theo AGENTS mục8. Docker/Android/hardware giữ điều kiện nghiệm thu cũ; không dựng lại phần đã PASS.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 
 ## 2. Trạng thái các giai đoạn
@@ -181,6 +181,14 @@
 - `npm run test:mobile:web`: **PASS4 nhóm**, đăng ký/login → thuê2 khay → theo dõi nhiệt/ẩm/CO₂ simulator/camera trống → liên kết đúng chủ → giao hàng/address validation/hủy-gửi lại → đánh dấu thông báo đọc → sửa hồ sơ → logout → staff login denied. Kiểm tra DB thật sau hành động và không Flutter/JS exception.
 - Ảnh QA `.local/flutter-customer.png`, diagnostics failures `.local/flutter-failure.png`/`flutter-semantics.json`, đều gitignore. Không dùng dữ liệu app thật. Browser/server test đã teardown. Các giới hạn Android/hardware/production giữ nguyên.
 - Preflight Git cuối batch: `git credential-manager github list` vẫn không có tài khoản; không retry push cùng lỗi khi xác thực chưa thay đổi. Hai lỗi push trước đã ghi rõ ở trên. Batch UI E2E được lưu bằng commit local sau rà soát staged diff/secret/whitespace; cần đăng nhập GitHub trên máy rồi push các commit main đang ahead. Không dùng force/rebase/reset.
+
+### 2026-11-05 — HOÀN THÀNH: đồng bộ GitHub sau khi người dùng đăng nhập
+
+- Người dùng xác nhận đã đăng nhập; kiểm tra GCM thấy tài khoản `mired273mh`. Working tree/index sạch, HEAD03cccf6 đúng bản đã kiểm chứng ở batch trước, không có thay đổi ứng dụng mới.
+- `git fetch origin main` PASS; trước push local ahead4/behind0. Đã kiểm tra diff/whitespace và danh sách tracked không có `.env` thật, `.local`, dump, keystore hoặc config.local.h.
+- `git push origin HEAD:refs/heads/main` **PASS**, GitHub cập nhật `5756f5b..03cccf6`. Bao gồm baseline/AGENTS (`afc0a23`), merge giữ thay đổi README (`18dac28`), pagination (`8e0092a`), Flutter UI E2E (`03cccf6`). Không force push, không sửa/xóa lịch sử.
+- Hai lỗi push thiếu credential trước đây **ĐÃ XỬ LÝ**; giữ nguyên bản ghi lỗi làm lịch sử. Không lưu token/mật khẩu GitHub trong repo hay log.
+- Chỉ cập nhật tiến độ/bằng chứng Git trong lượt này; không chạy lại build/test ứng dụng vì source không thay đổi so với bản24 backend tests/7 Flutter tests/React6 nhóm/Flutter UI4 nhóm đã PASS. Push thành công không phải bằng chứng CI remote/Android/hardware đã PASS.
 
 - Có file source/di trú/cấu hình tương ứng và tài liệu chạy.
 - Đã chạy kiểm tra phù hợp hoặc nêu rõ giới hạn kiểm thử.
