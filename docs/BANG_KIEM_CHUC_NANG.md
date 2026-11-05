@@ -50,3 +50,5 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 Chưa nghiệm thu hoàn chỉnh đồ án vật lý/production. Cần Android SDK, Docker Engine và phần cứng/giới hạn an toàn được xác nhận. Những phần mềm có thể phát triển tiếp: phân trang/filter, retention, thêm browser coverage và đo tải; không gọi các mục này là đã hoàn thành.
 
 Kiểm kê Windows2026-11-05: xem [báo cáo môi trường](KIEM_TRA_MOI_TRUONG_WINDOWS.md). SQL read-only55439/schema3/3 và Node26 API/React smoke PASS; DB dev trống/chưa Admin, server/.env còn placeholder. Android SDK/JDK thiếu; WSL lỗi Class not registered, Docker Windows chưa dùng được. COM3/4 là Bluetooth; sensor/camera/relay chưa test thật. CI3f53424/run42005908332 đã xác nhận success2 jobs, không thay kiểm thử hardware. Không đổi trạng thái chức năng thành hoàn tất chỉ từ kiểm kê/cài tool.
+
+Kiểm lại sau cài thêm: **JDK17.0.21 java/javac PASS**, không còn thiếu JDK; process cần nhận lại Machine PATH. Android SDK vẫn chưa tìm thấy, WSL CLI timeout12s, Docker chưa tìm thấy. Flutter SDK có nhưng PATH2 vị trí mới sai; không đánh dấu Android/ESP32 thật hoàn thành từ kiểm tra executable.

@@ -14,6 +14,7 @@
 - **Công việc tiếp theo chính xác:**Android SDK/build/emulator và nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention, chu kỳ nuôi khay không thuê và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 - **Kiểm kê Windows mới nhất:** xem `docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md`. Node26.13.0/npm11.20/Git2.56 chạy; PostgreSQL17.11 có2 cluster5432/55439; Flutter3.47.9/Dart3.13.7/Arduino CLI chạy bằng absolute path nhưng thiếu PATH. server/.env còn placeholder; DB portable đủ schema nhưng0 Admin/data. Thiếu Android SDK/JDK, Docker Desktop; WSL2.6.2 hiện lỗi Class not registered. Chưa cài/sửa cấu hình máy.
+- **Kiểm lại sau người dùng cài thêm:** JDK17.0.21 đã cài, java/javac absolute path PASS; Machine PATH đã có JDK nhưng process VS Code/Codex chưa nhận. Android SDK/Docker vẫn chưa tìm thấy; WSL --version timeout12s, chưa xác minh đã sửa. PATH Flutter C:\flutter\bin và C:\src\flutter\bin không có executable, SDK thực tế vẫn ở C:\Users\mired\.sm-tools\flutter. Không cần cài lại JDK/Flutter.
 
 ## 2. Trạng thái các giai đoạn
 
@@ -30,6 +31,14 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — HOÀN THÀNH: kiểm lại phần mềm sau khi người dùng cài thêm
+
+- Nhóm việc: chỉ xác minh executable/PATH/registry/doctor để phân biệt thiếu cài đặt với cấu hình phiên cũ; không cài phần mềm hoặc đổi cấu hình máy. Giữ thay đổi package.json có từ trước.
+- Kết quả mới: Temurin JDK17.0.21.9 có registry và java/javac17.0.21 chạy PASS. Machine PATH có JDK bin, process PATH chưa nhận, JAVA_HOME vẫn chưa đặt; cần khởi động lại ứng dụng terminal/VS Code và cấu hình khi cần, không cài lại JDK.
+- Node26.13.0/npm.cmd11.20.0/Git2.56.0.windows.4/psql17.11/Arduino CLI1.5.1 version PASS; PostgreSQL5432/55439 accepting. Flutter doctor chạy bằng SDK .sm-tools3.47.9/Dart3.13.7, vẫn báo thiếu Android SDK và PATH; chỉ có Windows/Chrome/Edge. Machine PATH Flutter2 vị trí C:\flutter\bin/C:\src\flutter\bin không chứa flutter.bat; cần trỏ SDK thực tế .sm-tools\flutter\bin.
+- Android Studio/SDK/adb và Docker Desktop/CLI/Engine chưa tìm thấy qua PATH/registry/Start Apps/vị trí chuẩn/service. WSL --version TIMEOUT12s, chỉ dừng process chẩn đoán do lượt này tạo; không khẳng định runtime đã sửa và không chạy installer/repair.
+- File cập nhật: docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md, TIEN_DO_CODEX.md, docs/BANG_KIEM_CHUC_NANG.md, docs/KIEM_THU.md. Không chạy lại build/test ứng dụng vì không đổi source; chỉ các lệnh kiểm kê nêu trên. Bước tiếp theo: cài Android SDK/Studio, sửa Flutter PATH và mở lại VS Code để nhận JDK; sửa WSL/cài Docker nếu dùng Compose. Commit/push riêng tài liệu sau scan, không stage package.json của người dùng.
 
 ### 2026-11-05 — ĐANG LÀM: kiểm kê môi trường Windows và điều kiện trình diễn end-to-end
 
