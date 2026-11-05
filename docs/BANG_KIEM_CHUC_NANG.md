@@ -54,3 +54,5 @@ Kiểm kê Windows2026-11-05: xem [báo cáo môi trường](KIEM_TRA_MOI_TRUONG
 Kiểm lại sau cài thêm: **JDK17.0.21 java/javac PASS**, không còn thiếu JDK; process cần nhận lại Machine PATH. Android SDK vẫn chưa tìm thấy, WSL CLI timeout12s, Docker chưa tìm thấy. Flutter SDK có nhưng PATH2 vị trí mới sai; không đánh dấu Android/ESP32 thật hoàn thành từ kiểm tra executable.
 
 Kiểm PATH tiếp theo: Machine PATH Flutter **đã đúng** .sm-tools\flutter\bin; sau nạp environment chỉ trong process, where/flutter3.47.9/dart3.13.7 PASS. Phiên VS Code/terminal cũ cần mở lại; không cần cài lại Flutter. Không test lại Android/Docker/WSL trong lượt này.
+
+Kiểm đủ công cụ sau cài Studio: **doctor Android PASS/licenses accepted**, SDK API36/37 và AVD đã cài; còn thiếu NDK28.2.13676358 theo source. ADB chưa có Android device chạy, chưa build APK/E2E. Docker chưa tìm thấy, WSL vẫn timeout; không chuyển trạng thái Flutter thành nghiệm thu Android chỉ vì doctor xanh.

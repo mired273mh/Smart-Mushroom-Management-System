@@ -57,6 +57,8 @@
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
 
+Kiểm đủ công cụ sau cài Android Studio2026-11-05: flutter doctor3.47.9 **Android PASS**, licenses accepted, JBR25.0.4; java/javac17.0.21/Node26/npm.cmd/Git/Arduino versions PASS. sdkmanager list_installed PASS (API36/37, Build Tools36.0.0); **NDK28.2.13676358 chưa có** so với FlutterExtension của project. AVD Medium_Phone_API_37.0 tồn tại trong emulator list, adb devices trống. WSL --version TIMEOUT12s, Docker chưa tìm thấy. Không install/download/boot AVD/build APK/test hardware; đây là kiểm kê toolchain, không phải Android E2E PASS.
+
 Xác minh PATH Flutter2026-11-05: Machine PATH đúng .sm-tools\flutter\bin, process cũ vẫn giữ2 path sai. Nạp Machine+User PATH chỉ trong process chẩn đoán: where.exe/Get-Command đúngSDK, flutter3.47.9/dart3.13.7 **PASS/exit0**. Không ghi EnvironmentVariable hệ thống, không build/test lại ứng dụng. Cần khởi động lại ứng dụng terminal cũ.
 
 Kiểm lại phần mềm2026-11-05: java/javac Temurin17.0.21 absolute path **PASS mới**, Machine PATH đã có nhưng process chưa nhận. node/npm.cmd/git/psql/Arduino CLI versions và pg_isready2 cổng PASS; flutter doctor chạy được nhưng Android SDK chưa tìm thấy. Hai PATH Flutter C:\flutter/C:\src\flutter không có executable. wsl --version **TIMEOUT12s**, không suy ra runtime hoạt động; Docker/Android vẫn chưa phát hiện qua các nguồn kiểm kê. Không đổi source hoặc chạy lại build/test nghiệp vụ; không cài/repair cấu hình máy.

@@ -10,8 +10,8 @@
 - **Mốc review cuối:** Đã review/sửa lỗi và kiểm thử lại phần mềm; **CI đầy đủ PASS** run42005908332/3f53424 (api-web +deployment), đã xác nhận lại qua GitHub trong lượt kiểm kê. Chi tiết phát hiện, test và phần thiếu ở `docs/REVIEW_CUOI.md`; chưa nghiệm thu vật lý/production.
 - **Đã hoàn thành:** Thiết kế; Express/PostgreSQL32 tests; React2 client tests +8 nhóm E2E; Flutter12 unit/widget +live API1/1 +browser UI4 nhóm; sửa lỗi regression theo REVIEW_CUOI; pagination lịch sử thuê; firmware2 mode compile/17 URL assertions; backup/restore; benchmark đọc20 users;6 UML render; Docker build/up/smoke trên CI.
 - **Chưa hoàn thành:**TLS production; Android APK/signing/phone E2E; sensor/relay/camera thật, driver GPIO. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê.
-- **Blocker môi trường:** Thiếu Docker Engine/Android SDK; chưa xác nhận BOM/relay/giới hạn an toàn/camera. Blocker GitHub đã giải quyết: Git Credential Manager có tài khoản mired273mh và push main thành công.
-- **Công việc tiếp theo chính xác:**Android SDK/build/emulator và nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention, chu kỳ nuôi khay không thuê và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
+- **Blocker môi trường mới nhất:** Android Studio/SDK và licenses đã đạt doctor; còn thiếu NDK28.2.13676358 theo cấu hình dự án, chưa boot AVD/build APK. Docker Engine chưa có/WSL CLI timeout nếu chọn Compose; chưa xác nhận BOM/relay/giới hạn an toàn/camera. GitHub đã đăng nhập và push main thành công.
+- **Công việc tiếp theo chính xác:**Bổ sung NDK28.2.13676358, mở AVD hoặc kết nối phone và build/test APK khi được cho phép; nghiệm thu staging HTTPS/phần cứng khi đủ điều kiện. Các list ngoài /rentals còn cần pagination/retention, chu kỳ nuôi khay không thuê và đo tải dài/dữ liệu lớn. Không dựng lại phần đã PASS; tiếp tục commit/push main theo AGENTS mục8.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 - **Kiểm kê Windows mới nhất:** xem `docs/KIEM_TRA_MOI_TRUONG_WINDOWS.md`. Node26.13.0/npm11.20/Git2.56 chạy; PostgreSQL17.11 có2 cluster5432/55439; Flutter3.47.9/Dart3.13.7/Arduino CLI chạy bằng absolute path nhưng thiếu PATH. server/.env còn placeholder; DB portable đủ schema nhưng0 Admin/data. Thiếu Android SDK/JDK, Docker Desktop; WSL2.6.2 hiện lỗi Class not registered. Chưa cài/sửa cấu hình máy.
 - **Kiểm lại sau người dùng cài thêm:** JDK17.0.21 đã cài, java/javac absolute path PASS; Machine PATH đã có JDK nhưng process VS Code/Codex chưa nhận. Android SDK/Docker vẫn chưa tìm thấy; WSL --version timeout12s, chưa xác minh đã sửa. PATH Flutter C:\flutter\bin và C:\src\flutter\bin không có executable, SDK thực tế vẫn ở C:\Users\mired\.sm-tools\flutter. Không cần cài lại JDK/Flutter.
@@ -31,6 +31,14 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — HOÀN THÀNH: kiểm đủ công cụ sau khi người dùng cài Android Studio
+
+- Chỉ kiểm kê, không cài package hoặc đổi cấu hình persistent, không mở emulator/build APK vì có thể tự download SDK/NDK. Giữ package.json thay đổi từ trước. Cập nhật báo cáo Windows, TIEN_DO, BANG_KIEM và KIEM_THU.
+- Studio2026.2.2.8 có registry/product-info, JBR25.0.4 chạy; doctor Flutter3.47.9/Android SDK36.0.0 **PASS**, licenses accepted. Sau nạp saved PATH chỉ trong process, node26.13/npm.cmd11.20/git2.56/java+javac17.0.21/flutter đều chạy. Flutter tự chọn JBR Studio, không thiếu JDK/SDK cơ bản nữa.
+- sdkmanager list_installed PASS: API36/37.0, Build Tools36.0.0, Platform Tools37.0.1, Command-line23.0.0, emulator37.2.13 và system image37.0. **Thiếu NDK28.2.13676358** dự án chỉ định qua FlutterExtension. CLI có cảnh báo deprecated nhưng không thất bại. Không gọi doctor xanh là APK build PASS.
+- AVD Medium_Phone_API_37.0 đã có; adb devices trống, chưa Android chạy. PostgreSQL5432 accepting/Arduino CLI1.5.1 version PASS. Docker Desktop/CLI/Engine chưa tìm thấy qua các nguồn kiểm kê; WSL --version TIMEOUT12s, chỉ dừng process kiểm tra vừa tạo, không repair. Docker là tùy chọn cho native demo.
+- Bước tiếp theo: SDK Manager bổ sung đúng NDK, mở AVD/phone và chạy build/test Android; xử lý WSL/Docker riêng nếu cần Compose. Không cần cài lại Node/PostgreSQL/Git/Flutter/JDK/Studio/SDK hiện có. Commit/push riêng4 file tài liệu sau scan; không stage thay đổi package.json của người dùng.
 
 ### 2026-11-05 — HOÀN THÀNH: xác minh PATH Flutter sau khi người dùng sửa
 
