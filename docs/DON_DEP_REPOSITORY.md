@@ -50,3 +50,7 @@ Phạm vi: repository hiện tại, bắt đầu từ `fe5dbaf` trên `main`. Ch
 Lần gọi APK/Docker đầu qua PowerShell với ErrorActionPreference=Stop dừng ở stderr warning/progress, chưa phải build app FAIL. Đã chạy lại native qua Node, kiểm tra exit0 và output thực tế. JBR25 cảnh báo restricted native access nhưng APK build thành công; không tự đổi Java hay cấu hình máy.
 
 Cleanup không nghiệm thu lại điện thoại, ESP32/cảm biến/relay/camera vật lý hay production TLS. Các phần chức năng còn thiếu trước cleanup vẫn giữ trạng thái tại bảng truy vết yêu cầu.
+
+## Commit và đồng bộ
+
+Cleanup commit `c63efbf6d2dc1862a2b394e62e6f642de5513c93` trên `main` đã push thành công; `git ls-remote origin refs/heads/main` trùng hash local khi xác minh. Không có tracked file bị xóa hoặc bỏ theo dõi;10 file source-config/docs được cập nhật, có báo cáo mới. `package.json` user vẫn giữ thay đổi riêng chưa commit. Checkpoint tài liệu kế tiếp chỉ ghi kết quả này; không dùng push thành công thay cho kết quả CI mới chưa xác minh.

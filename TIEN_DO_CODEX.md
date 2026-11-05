@@ -31,7 +31,7 @@
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
 
-### 2026-11-05 — ĐANG XÁC MINH GIT: cleanup và build/test đã đạt
+### 2026-11-05 — HOÀN THÀNH cleanup đã kiểm thử và push
 
 - Bắt đầu HEADfe5dbaf/main, remote đã fetch: ahead0/behind0. package.json user có format/allowScripts từ trước, giữ nguyên và không stage. Kiểm kê151 tracked files: không có build/cache/artifact nhầm lên Git, không có file trùng SHA256. Không cần git rm --cached hoặc xóa tracked file chỉ để có thay đổi.
 - Đã lập bảng dọn trước khi xóa: cache Vite/Android/Flutter +object cache Arduino5builds, bundle mobile/build/web và3 script one-off .local đã dùng. Giữ APK/firmware đầu ra, mọi log/screenshot/CI artifacts/UML render, database/backup/env/demo profile/tools/AVD; không xóa vùng dữ liệu4.1GiB AVD hoặc1.6GiB PostgreSQL. Thư mục node_modules đang dùng được giữ để không tải lại vô ích.
@@ -42,6 +42,8 @@
 - Build/test tái tạo cache lớn; đã dọn lại đúng nhóm đã kiểm chứng tái tạo được sau test, giữ APK/firmware output/log/bằng chứng. Lượt2:18targets/1199files/~1717.04MiB cache, không cộng với lượt đầu. Đo cuối: workspace giảm ròng886384214B (~845.32MiB), riêng web/mobile/IoT-build giảm978316455B; test DB mới tăng91841278B và vẫn giữ. Snapshot local cleanup-{before,final}-inventory.json/cleanup-size-summary.json; manifest đầu cleanup-deleted-initial.json, cuối cleanup-deleted.json.
 - Imports/URLs117 +ignore14cases +package.json user SHA256 **PASS**; mobile/build/web là output cần build trước test-mobile-web theo CI, không phải source mất. Không tracked file nào bị xóa/bỏ theo dõi. Đã tạo docs/DON_DEP_REPOSITORY.md, cập nhật README/AGENTS/.gitignore/.dockerignore/pubspec+lock; docs test/checklist và staged scan đang hoàn tất trước commit/push main. Sau cleanup quay lại backlog catalog/list pagination/search, cycle không thuê/retention; không coi cleanup là hoàn thành đồ án.
 - Kiểm tra cuối trước commit: Compose config native exit0; demo status SQL3users/0rentals PASS; staged10files secret scan +whitespace PASS, docs27/36relative links không thiếu,117imports/14ignore cases không lỗi, package.json user không đổi. Build outputs còn lại được giữ; không có thao tác git rm --cached hoặc deleted tracked files. Commit/push đang thực hiện, chỉ xác nhận đồng bộ sau kiểm tra remote.
+- Git kết quả: **PASS** commit `c63efbf6d2dc1862a2b394e62e6f642de5513c93`, nhánh main, push origin HEAD:refs/heads/main thành công; ls-remote trả đúng hash local. Working tree chỉ còn package.json user từ trước. Không force/reset/history rewrite, không có lỗi commit/push. Checkpoint tài liệu sau đây chỉ ghi kết quả Git, không thay source/dependency đã test; CI của commit mới chưa được xác minh hoàn tất.
+- Cleanup kết thúc trong phạm vi yêu cầu: giữ toàn bộ151 tracked files ban đầu và thêm báo cáo, không xóa/bỏ theo dõi file Git; `.local` chỉ dọn các path cache/one-off đã liệt kê. Không dọn dữ liệu PostgreSQL/AVD/backup/env/log/screenshots vì cần giữ trạng thái/bằng chứng. Khi “Tiếp tục đồ án”, đọc checkpoint/Git rồi quay lại backlog chức năng, không dọn lại hoặc dựng lại source đã PASS.
 
 ### 2026-11-05 — HOÀN THÀNH master3 software: lịch sử và kết quả lệnh IoT trên Web
 
