@@ -43,7 +43,7 @@ export function Form({ fields, initial = {}, submit, submitLabel = 'Lưu', onDon
     const form = new FormData(event.currentTarget), data = {};
     for (const field of fields) {
       const raw = field.type === 'multi' ? form.getAll(field.key) : form.get(field.key);
-      if (field.optional && (raw === '' || raw === null)) continue;
+      if (field.optional && (field.omitEmpty || field.type === 'password' || field.type === 'datetime-local') && (raw === '' || raw === null)) continue;
       data[field.key] = field.type === 'number' ? Number(raw) : field.type === 'checkbox' ? raw === 'on' : field.type === 'datetime-local' ? (raw ? new Date(raw).toISOString() : null) : raw;
     }
     try { const result = await submit(data); onDone?.(result); }

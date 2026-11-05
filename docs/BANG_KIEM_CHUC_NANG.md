@@ -40,8 +40,8 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | Sản phẩm | Trạng thái |
 |---|---|
 | REST API/PostgreSQL | 32/32 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
-| React Web | Build và Chrome E2E6 nhóm PASS; ảnh local đã xem; responsive390px không tràn |
-| Flutter Customer | Analyze sạch,7 mock unit/widget+1 live API test PASS,Web build + Chrome UI E2E4 nhóm PASS; APK/emulator chưa chạy |
+| React Web | Build,2 API client tests +8 nhóm Chrome E2E PASS; clear mô tả/session race regression; responsive390px không tràn |
+| Flutter Customer | Analyze sạch,12 unit/widget+1 live API test PASS,Web build + Chrome UI E2E4 nhóm PASS; session/catalog regression; APK/emulator chưa chạy |
 | ESP32 | Compile2 nhánh PASS; chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
 | Tích hợp/triển khai | Local integration PASS; source/AGENTS đã push GitHub main; Compose config validation PASS; Docker runtime/CI remote/TLS chưa nghiệm thu |

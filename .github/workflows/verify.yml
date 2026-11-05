@@ -41,3 +41,11 @@ jobs:
         working-directory: mobile
       - run: npm run test:mobile:api
       - run: npm run test:mobile:web
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: flutter-browser-failure
+          path: |
+            .local/flutter-failure.png
+            .local/flutter-semantics.json
+          if-no-files-found: ignore

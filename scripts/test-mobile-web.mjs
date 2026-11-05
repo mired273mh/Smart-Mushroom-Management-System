@@ -124,8 +124,15 @@ try {
   await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
   await page.getByText('Chào bạn trở lại',{exact:true}).waitFor();
   await input('Email',admin.email); await input('Mật khẩu',admin.password);
+  const staffLogin = page.waitForResponse(response=>response.url().endsWith('/api/auth/login') && response.request().method()==='POST');
+  const staffLogout = page.waitForResponse(response=>response.url().endsWith('/api/auth/logout') && response.request().method()==='POST');
   await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();
-  await page.getByText('Ứng dụng dành cho Customer. Nhân viên sử dụng Web.',{exact:true}).waitFor();
+  const staffResponse = await staffLogin;
+  assert.equal(staffResponse.status(),200,'Staff credentials must be entered correctly by the browser harness.');
+  assert.equal((await staffResponse.json()).data.user.role,'admin');
+  assert.equal((await staffLogout).status(),204,'Rejected staff session must be revoked.');
+  await page.getByText(/Ứng dụng dành cho\s+Customer/).last().waitFor();
+  assert.equal(await page.getByRole('tab',{name:/Thuê khay/}).count(),0);
   assert.deepEqual(errors,[]);
   console.log('PASS: Flutter UI thông báo/hồ sơ/logout và chặn tài khoản staff; không JavaScript pageerror.');
 } catch (error) {

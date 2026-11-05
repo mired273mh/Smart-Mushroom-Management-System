@@ -52,8 +52,12 @@
 | 2026-11-05 | CI remote baseline | API jobs/log của run41997537676 | FAIL xác nhận | Backend/React/build/Flutter analyze/unit/live API PASS trên Linux; Flutter UI staff-denied assertion cuối bị timeout |
 | 2026-11-05 | Review backend sau sửa | `scripts/test.ps1` | PASS32/32 | R01–R06 +8 regression cases đã PASS; original24 tests giữ PASS; không skip |
 | 2026-11-05 | Review firmware baseline | `scripts/compile-iot.ps1` | PASS compile2/2 | Mô phỏng77%flash/13%RAM, SCD4x79%flash/14%RAM; không upload/hardware |
+| 2026-11-05 | Review UI trước sửa | Flutter review_session_catalog_test, React E2E | FAIL → ĐÃ SỬA SOURCE | Flutter stale401/profile/catalog3 ca; React empty description và late401 sau đổi user tái hiện; không bỏ test |
+| 2026-11-05 | Review React sau sửa | `npm run build:web`, `npm run test:web` | PASS2 client tests +7 nhóm E2E | HTML gateway/error token scope, clear description, cross-session401, các luồng cũ giữ PASS |
 
 ## Nhóm kiểm thử cần có trước khi hoàn thành
+
+Review UI bổ sung 2026-11-05: Flutter HTML401 và logout race **FAIL trước sửa → PASS sau sửa**; `flutter analyze` sạch, `flutter test` **12/12 PASS**, Flutter Web build PASS; `test:mobile:api`1/1 và `test:mobile:web`4 nhóm PASS trên Chrome/PostgreSQL thật. React build +2 API client tests +8 nhóm E2E PASS, gồm logout race. `test:backup` PASS, migration CLI chạy2 lần đều verified3. Chưa coi local PASS là CI Linux PASS.
 
 - Migration/DB integrity: unique tray code; không gán trùng khay; transaction thuê nhất quán.
 - Auth/RBAC: Admin/Operator/Customer không truy cập trái quyền; Customer không xem khay người khác.

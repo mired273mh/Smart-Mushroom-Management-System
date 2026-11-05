@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createApi } from './api.js';
 import { Badge, date, money, Form, LoadState, Modal, Table, useData, statusLabels } from './components.jsx';
 
@@ -21,14 +21,25 @@ function Login({ onLogin }) {
 
 export default function App() {
   const [session, setSession] = useState(null), [tab, setTab] = useState('overview'), [revision,setRevision] = useState(0), [message,setMessage] = useState('');
-  const expired = useCallback(() => { setSession(null); setMessage('Phiên đã hết hạn. Vui lòng đăng nhập lại.'); }, []);
+  const sessionToken = useRef(null);
+  const expired = useCallback(token => {
+    if (sessionToken.current !== token) return;
+    sessionToken.current = null;
+    setSession(null); setMessage('Phiên đã hết hạn. Vui lòng đăng nhập lại.');
+  }, []);
   const api = useMemo(() => createApi(session?.token, expired), [session?.token,expired]);
   const refresh = () => setRevision(v => v + 1);
   const action = async fn => { try { await fn(); setMessage('Đã cập nhật dữ liệu.'); refresh(); } catch (error) { setMessage(error.message); } };
-  if (!session) return <>{message && <p role="status" className="login-message">{message}</p>}<Login onLogin={data => { setMessage(''); setSession(data); setTab('overview'); }}/></>;
+  const logout = async () => {
+    const token = sessionToken.current;
+    try { await api('/auth/logout','POST'); }
+    catch (error) { if (sessionToken.current === token) setMessage(error.message); }
+    finally { if (sessionToken.current === token) { sessionToken.current = null; setSession(null); } }
+  };
+  if (!session) return <>{message && <p role="status" className="login-message">{message}</p>}<Login onLogin={data => { sessionToken.current = data.token; setMessage(''); setSession(data); setTab('overview'); }}/></>;
   const admin = session.user.role === 'admin';
   const props = { api, revision, refresh, action, admin };
-  return <div className="app-shell"><aside className="sidebar"><a href="#" className="brand" onClick={() => setTab('overview')}>◒ <span>SMART<br/>MUSHROOM</span></a><p className="nav-label">KHÔNG GIAN LÀM VIỆC</p><nav aria-label="Điều hướng chính">{tabs.filter(([id]) => admin || !['users','reports'].includes(id)).map(([id,label,icon]) => <button key={id} aria-current={tab === id ? 'page' : undefined} onClick={() => { setTab(id); setMessage(''); }}><span aria-hidden="true">{icon}</span>{label}</button>)}</nav><div className="sidebar-footer"><span className="avatar">{session.user.name.slice(0,1).toUpperCase()}</span><div><strong>{session.user.name}</strong><small>{statusLabels[session.user.role]}</small></div><button aria-label="Đăng xuất" className="logout" onClick={async () => { await action(() => api('/auth/logout','POST')); setSession(null); }}>↪</button></div></aside><main className="workspace"><header className="topbar"><span>VẬN HÀNH NÔNG TRẠI <span className="divider">/</span> {tabs.find(t => t[0] === tab)?.[1]}</span><time>{new Date().toLocaleDateString('vi-VN',{ day:'numeric',month:'long',year:'numeric' })}</time></header><div className="page"><div className="page-title"><div><p className="eyebrow">SMART MUSHROOM</p><h1>{tabs.find(t => t[0] === tab)?.[1]}</h1></div><button className="secondary" onClick={refresh}>↻ Làm mới</button></div>{message && <p role="status" className="notice">{message}<button className="link" onClick={() => setMessage('')}>Đóng</button></p>}
+  return <div className="app-shell"><aside className="sidebar"><a href="#" className="brand" onClick={() => setTab('overview')}>◒ <span>SMART<br/>MUSHROOM</span></a><p className="nav-label">KHÔNG GIAN LÀM VIỆC</p><nav aria-label="Điều hướng chính">{tabs.filter(([id]) => admin || !['users','reports'].includes(id)).map(([id,label,icon]) => <button key={id} aria-current={tab === id ? 'page' : undefined} onClick={() => { setTab(id); setMessage(''); }}><span aria-hidden="true">{icon}</span>{label}</button>)}</nav><div className="sidebar-footer"><span className="avatar">{session.user.name.slice(0,1).toUpperCase()}</span><div><strong>{session.user.name}</strong><small>{statusLabels[session.user.role]}</small></div><button aria-label="Đăng xuất" className="logout" onClick={logout}>↪</button></div></aside><main className="workspace"><header className="topbar"><span>VẬN HÀNH NÔNG TRẠI <span className="divider">/</span> {tabs.find(t => t[0] === tab)?.[1]}</span><time>{new Date().toLocaleDateString('vi-VN',{ day:'numeric',month:'long',year:'numeric' })}</time></header><div className="page"><div className="page-title"><div><p className="eyebrow">SMART MUSHROOM</p><h1>{tabs.find(t => t[0] === tab)?.[1]}</h1></div><button className="secondary" onClick={refresh}>↻ Làm mới</button></div>{message && <p role="status" className="notice">{message}<button className="link" onClick={() => setMessage('')}>Đóng</button></p>}
     {tab === 'overview' && <Overview {...props}/>}
     {tab === 'rooms' && <Rooms {...props}/>}
     {tab === 'trays' && <Trays {...props}/>}

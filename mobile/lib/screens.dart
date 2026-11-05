@@ -501,11 +501,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
   String? planId;
   bool busy = false;
   int revision = 0;
+  Future<Json> loadCatalog() async {
+    final catalog = Map<String, dynamic>.from(
+      await widget.api.request('/catalog'),
+    );
+    final available = rows(catalog['trays']).map((tray) => tray['id']).toSet();
+    selected.removeWhere((id) => !available.contains(id));
+    if (!rows(catalog['plans']).any((plan) => plan['id'] == planId)) {
+      planId = null;
+    }
+    return catalog;
+  }
+
   @override
   Widget build(BuildContext context) => AsyncContent<Json>(
     key: ValueKey(revision),
-    load: () async =>
-        Map<String, dynamic>.from(await widget.api.request('/catalog')),
+    load: loadCatalog,
     builder: (catalog) {
       final plans = rows(catalog['plans']), trays = rows(catalog['trays']);
       return ListView(
@@ -574,6 +585,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             onPressed: busy || planId == null || selected.isEmpty
                 ? null
                 : () async {
+                    final selectedCount = selected.length;
                     setState(() => busy = true);
                     try {
                       final rental = await widget.api.request(
@@ -585,7 +597,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         },
                       ) as Json;
                       if (!context.mounted) return;
-                      showMessage(context, 'Đã thuê ${selected.length} khay.');
+                      showMessage(context, 'Đã thuê $selectedCount khay.');
                       selected.clear();
                       setState(() => revision++);
                       Navigator.push(

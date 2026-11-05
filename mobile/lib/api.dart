@@ -56,10 +56,13 @@ class MushroomApi extends ChangeNotifier {
     Json? body,
     bool envelope = false,
   }) async {
+    final requestToken = _token;
     try {
       final request = http.Request(method, Uri.parse('$origin/api$path'));
       request.headers['Content-Type'] = 'application/json';
-      if (_token != null) request.headers['Authorization'] = 'Bearer $_token';
+      if (requestToken != null) {
+        request.headers['Authorization'] = 'Bearer $requestToken';
+      }
       if (body != null) request.body = jsonEncode(body);
       final streamed = await client
           .send(request)
@@ -67,13 +70,15 @@ class MushroomApi extends ChangeNotifier {
       final response = await http.Response.fromStream(streamed)
           .timeout(const Duration(seconds: 15));
       if (response.statusCode == 204) return null;
+      if (response.statusCode == 401 &&
+          requestToken != null &&
+          _token == requestToken) {
+        _token = null;
+        user = null;
+        notifyListeners();
+      }
       final decoded = jsonDecode(utf8.decode(response.bodyBytes)) as Json;
       if (response.statusCode >= 400) {
-        if (response.statusCode == 401 && _token != null) {
-          _token = null;
-          user = null;
-          notifyListeners();
-        }
         throw ApiException(
           decoded['error']?['message'] ?? 'Yêu cầu thất bại.',
           response.statusCode,
@@ -128,19 +133,27 @@ class MushroomApi extends ChangeNotifier {
   }
 
   Future<void> logout() async {
+    final requestToken = _token;
     try {
-      if (_token != null) await request('/auth/logout', method: 'POST');
+      if (requestToken != null) await request('/auth/logout', method: 'POST');
     } finally {
-      _token = null;
-      user = null;
-      notifyListeners();
+      if (_token == requestToken) {
+        _token = null;
+        user = null;
+        notifyListeners();
+      }
     }
   }
 
   Future<void> updateName(String name) async {
-    user = Map<String, dynamic>.from(
-      await request('/auth/me', method: 'PATCH', body: {'name': name.trim()}),
+    final requestToken = _token;
+    final updated = await request(
+      '/auth/me',
+      method: 'PATCH',
+      body: {'name': name.trim()},
     );
+    if (requestToken == null || _token != requestToken || user == null) return;
+    user = Map<String, dynamic>.from(updated);
     notifyListeners();
   }
 

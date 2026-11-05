@@ -47,8 +47,13 @@ try {
   await nav('Phòng trồng');
   await page.getByRole('button',{ name:'+ Thêm phòng',exact:true }).click();
   await page.getByLabel('Tên phòng',{ exact:true }).fill(roomName);
+  await page.getByLabel('Mô tả',{exact:true}).fill('Description to clear');
   await saveModal();
   await page.getByRole('cell',{ name:roomName,exact:true }).waitFor();
+  await page.getByRole('button',{name:'Sửa',exact:true}).click();
+  await page.getByLabel('Mô tả',{exact:true}).fill('');
+  await saveModal();
+  assert.equal((await ctx.request('/api/rooms',{token:admin.token})).body.data.find(r=>r.name===roomName).description,'');
   await nav('Khay nấm');
   await page.getByRole('button',{ name:'+ Thêm khay',exact:true }).click();
   await page.getByLabel('Phòng trồng',{ exact:true }).selectOption({ label:roomName });
@@ -149,8 +154,43 @@ try {
   await page.getByRole('heading',{ name:'Tổng quan',exact:true }).waitFor();
   assert.equal(await page.getByRole('navigation').getByRole('button',{ name:'Tài khoản',exact:true }).count(),0);
   assert.equal(await page.getByRole('navigation').getByRole('button',{ name:'Báo cáo',exact:true }).count(),0);
+  let releaseOld, enterOld, intercepted=false;
+  const oldEntered = new Promise(resolve => { enterOld=resolve; });
+  await page.route('**/api/rooms',async route => {
+    if (intercepted) return route.continue();
+    intercepted=true; enterOld(); await new Promise(resolve => { releaseOld=resolve; });
+    await route.fulfill({status:401,contentType:'application/json',body:JSON.stringify({error:{message:'Old session expired'}})});
+  });
+  await nav('Phòng trồng'); await oldEntered;
+  await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
+  await login(admin);
+  await page.getByRole('heading',{name:'Tổng quan',exact:true}).waitFor();
+  const lateResponse = page.waitForResponse(response => response.url().endsWith('/api/rooms') && response.status()===401);
+  releaseOld(); await (await lateResponse).finished();
+  await nav('Tài khoản'); await page.getByRole('heading',{name:'Người dùng & quyền',exact:true}).waitFor();
+  await page.unroute('**/api/rooms');
+  let enterLogout, releaseLogout;
+  const logoutEntered = new Promise(resolve => { enterLogout=resolve; });
+  await page.route('**/api/auth/logout',async route => {
+    const response = await route.fetch();
+    enterLogout(); await new Promise(resolve => { releaseLogout=resolve; });
+    await route.fulfill({response});
+  });
+  await page.getByRole('button',{name:'Đăng xuất',exact:true}).click();
+  await logoutEntered;
+  // The server has revoked this session while its logout response is still in transit.
+  await page.getByRole('navigation').getByRole('button',{name:'Phòng trồng',exact:true}).click();
+  await page.getByRole('heading',{name:'Đăng nhập',exact:true}).waitFor();
+  await login(operator);
+  await page.getByRole('heading',{name:'Tổng quan',exact:true}).waitFor();
+  const logoutResponse = page.waitForResponse(response => response.url().endsWith('/api/auth/logout'));
+  releaseLogout(); await (await logoutResponse).finished();
+  await nav('Phòng trồng'); await page.getByRole('heading',{name:'Danh sách phòng',exact:true}).waitFor();
+  await page.unroute('**/api/auth/logout');
   assert.deepEqual(errors,[]);
   console.log('PASS: Operator đúng menu quyền; không có JavaScript pageerror.');
+  console.log('PASS: Response401 từ phiên cũ không đăng xuất người dùng mới; mô tả phòng có thể xóa trống.');
+  console.log('PASS: Response logout cũ không xóa phiên mới khi request đồng thời báo hết phiên.');
 } finally {
   await browser?.close();
   vite.kill();
