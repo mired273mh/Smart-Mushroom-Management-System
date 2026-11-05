@@ -8,7 +8,7 @@ let ctx;
 before(async () => { ctx = await setup(); });
 after(async () => { await ctx?.close(); });
 test('migration is repeatable and PostgreSQL is ready', async () => {
-  assert.equal(await migrate(ctx.pool), 3);
+  assert.equal(await migrate(ctx.pool), 4);
   assert.equal((await ctx.request('/health')).status, 200);
   assert.equal((await ctx.request('/ready')).status, 200);
 });

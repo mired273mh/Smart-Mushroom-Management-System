@@ -2,6 +2,24 @@
 
 > Lịch sử khởi tạo: repository ban đầu chưa có phần mềm. Kết quả thực tế sau triển khai được nối vào bảng dưới. **Không ghi PASS trước khi chạy thực tế.**
 
+## HQTCSDL HQ1 — 2026-11-05
+
+| Kiểm tra | Kết quả thực tế | Bằng chứng / giới hạn |
+|---|---|---|
+| Direct SQL fulfillment sai chủ trước sửa | FAIL đã tái hiện | hq1-ownership-before.log: SQL được chấp nhận dù API có ownership guard |
+| Backend sau migration004/routines/trigger | PASS45/45 | scripts/test.ps1; hq1-database-full.log;7 DB cases mới, không skip |
+| SQL PK/FK/NULL/UNIQUE/CHECK, history ownership, snapshot, view provenance | PASS | server/test/database.test.js; SQL trực tiếp trên PostgreSQL thật |
+| Procedure +caller ROLLBACK +confirm race | PASS | SQL invalid actor23514, lỗi cuối transaction rollback payment,2API confirm200/409 |
+| Roles hạn quyền thật /API | PASS |2login random sm_test_*, runtime không DDL/TRUNCATE/schema_migrations, report không users/function; runtime API login/rent/confirm/fulfillment/report/logout PASS; roles fixture đã thu hồi/xóa, giữ DB |
+| Upgrade3→4, preflight fail/idempotent | PASS | DB legacy riêng, mismatch chặn trước tạoobjects; sau sửa đúng fixture test migrate2lần giữ dữ liệu |
+| Backup/Restore | PASS | hq1-backup.log;17table row counts, graph thuê/harvest/snapshot, view/function/procedure/trigger và actual roles sau portable restore; nguồn/dump/DB mới giữ nguyên |
+| React | Build +2tests/11nhóm Chrome PASS | hq1-web-build.log, hq1-web-tests.log |
+| Flutter live Dart API | PASS1/1 | hq1-dart-api.log; không thay UI, chưa chạy lại Android UI ở HQ1 |
+| CI baseline trước HQ1 | PASS | run42045054946/37a9db6 completed success; chưa coi là CI của source HQ1 mới |
+| Schema/roles demo/dev/Compose hiện có | NOT APPLIED | Chỉ test DB mới; runtime override chuẩn bị nhưng chưa chạy Docker profile mới |
+
+SQL/API mới đã kiểm thử, không đồng nghĩa nghiệm thu toàn đồ án/hardware. Không sửa migration001–003, không xóa dữ liệu nguồn, không gọi simulator là ESP32 thật.
+
 ## Cleanup repository — 2026-11-05
 
 Chi tiết nhóm file và bằng chứng tại [báo cáo cleanup](DON_DEP_REPOSITORY.md). Không xóa tracked source/test/migration/tài liệu/env/dữ liệu; chỉ cache/bundle tái tạo được,3 script local one-off và dependency Cupertino không dùng.

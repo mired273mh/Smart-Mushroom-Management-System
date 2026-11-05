@@ -26,7 +26,7 @@ erDiagram
   trays ||--o{ rental_items : histories
   rental_items ||--o{ growth_events : progresses
   rental_items ||--o{ harvests : yields
-  harvests ||--o{ fulfillment_requests : delivery
+  harvests ||--o| fulfillment_requests : delivery
   rentals ||--o{ transactions : ledger
   rooms ||--o{ devices : monitors
   devices ||--o{ sensor_readings : measures

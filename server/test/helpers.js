@@ -4,7 +4,7 @@ import { migrate } from '../src/migrate.js';
 import { createApp } from '../src/app.js';
 import { hashPassword } from '../src/security.js';
 
-export async function setup(config = {}) {
+export async function setup(config = {}, initialize = migrate) {
   const connectionString = process.env.TEST_DATABASE_URL;
   if (!connectionString) throw new Error('TEST_DATABASE_URL is required (PostgreSQL real, no mock).');
   const url = new URL(connectionString);
@@ -21,7 +21,7 @@ export async function setup(config = {}) {
     if (!exists.rowCount) await adminPool.query(`CREATE DATABASE "${dbName}"`);
   } finally { await adminPool.end(); }
   const pool = createPool(url.href);
-  await migrate(pool);
+  await initialize(pool);
   const server = createApp({ pool, config: { WEB_ORIGIN: 'http://localhost:5173', ...config } }).listen(0, '127.0.0.1');
   await new Promise(resolve => server.once('listening', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;

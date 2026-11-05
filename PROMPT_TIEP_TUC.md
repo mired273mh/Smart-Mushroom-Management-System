@@ -18,4 +18,6 @@ Dấu chấm cuối câu cũng được chấp nhận. Không dựng lại sourc
 6. Tiếp tục sang hạng mục tiếp theo nếu không gặp blocker cần xác nhận.
 7. Ưu tiên lỗi cản chạy demo Windows/Android/Docker và thiếu chức năng bắt buộc. Phân biệt PASS/FAIL/BLOCKED/NOT TESTED, ghi file sửa/lệnh/kết quả thật/việc còn thiếu. Hardware chưa kết nối không được đánh dấu PASS; trước tác vụ dài phải có checkpoint ĐANG LÀM.
 
+Định hướng mới nhất: đồ án môn **HQTCSDL**. Đọc NEXT_TASK ở tiến độ, ưu tiên PostgreSQL/constraint/transaction/concurrency/least privilege/SQL nâng cao có lợi ích thật, rồi nghiệp vụ bắt buộc và tích hợp. Đối chiếu phân loại REQUIRED/SUPPORTING/RECOMMENDED/OPTIONAL trước thêm tính năng; cycle không thuê/retention không tự trở thành bắt buộc. Bộ demo trong docs/demo-hqtcsdl phải có lệnh, dữ liệu riêng/rollback, bằng chứng và giải thích đúng implementation. Không cần lặp cleanup/full build khi Git/source không đổi hoặc test liên quan đã đủ.
+
 Lưu ý: Yêu cầu này **không tự kích hoạt lúc token reset**. Người dùng phải mở repo và gửi lệnh, hoặc dùng một hệ thống tự động bên ngoài được cấu hình riêng.

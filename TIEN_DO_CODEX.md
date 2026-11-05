@@ -7,11 +7,11 @@
 ## 1. Trạng thái nhanh
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
-- **Mốc review cuối:** CI `be531fa`/run42035426091 **PASS cả3 jobs** (api-web, deployment, android-build), đã kiểm tra GitHub. Batch hardware tiếp theo có source/test riêng bên dưới; chưa nghiệm thu vật lý/production.
-- **Đã kiểm chứng:** Express/PostgreSQL38 tests; React2 client tests +11 nhóm Chrome E2E; Flutter analyze/12 tests +live API/browser, APK debug và Android emulator UI→API→PostgreSQL; backup/restore, benchmark đọc20 users,6 UML; Docker Windows build/up/smoke. Source GPIO có khóa hai lớp, pulse/interlock/TTL/freshness; compile đang ghi bằng chứng theo checkpoint.
-- **Chưa hoàn thành:** TLS production, signing/phone thật, sensor/relay/camera thật và hiệu chuẩn. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê. Không tuyên bố hoàn thành100%.
+- **Mốc hiện tại HQTCSDL:** HQ1 PostgreSQL migration004/SQL nâng cao/least-privilege tests đã PASS, đang lưu checkpoint. CI baseline37a9db6/run42045054946 PASS3jobs đã xác minh; chưa suy ra CI source HQ1 mới.
+- **Đã kiểm chứng:** Express/PostgreSQL45tests (7 DB cases mới), React build/2tests/11Chrome groups, Flutter live Dart API1/1 sau HQ1; analyze/12tests/APK/emulator và firmware3profiles ở checkpoint trước, source client/firmware chưa đổi. Backup/restore17table counts/graph/routines/roles PASS; role login hạn quyền và column grants thực chạy. SQL/API có views/function/procedure/5triggers hỗ trợ nghiệp vụ.
+- **Chưa nghiệm thu:** Bộ9demo HQTCSDL/3NF/data dictionary/EXPLAIN và runtime Docker profile/upgrade demo cũ; paging/search ngoài rentals; TLS production/phone/signing/sensor/relay/camera thật. Retention/soak là RECOMMENDED, module cycle không thuê OPTIONAL theo PHAM_VI_HQTCSDL, không tự xem là blocker bắt buộc. Không tuyên bố hoàn thành100%.
 - **Blocker hiện tại:** Chưa xác nhận BOM/đấu dây/giới hạn/camera và chưa có thiết bị kiểm thử. Android SDK/NDK28.2, Docker Engine, WSL đã chạy, không cần cài lại. GitHub main push được. AVD người dùng5554 có lúc offline; E2E dùng AVD riêng5558 trong .local, không wipe AVD người dùng.
-- **Công việc tiếp theo chính xác:** Hoàn tất checkpoint source hardware/compile và Git; tiếp tục pagination/search bounded lists, cycle không thuê và kiểm thử workload. Phương án `docs/PHUONG_AN_PHAN_CUNG_IOT.md` phải được xác nhận trước flash/cấp tải, nhưng không chặn công việc phần mềm. Demo Windows dùng scripts/demo.mjs và DB mới riêng.
+- **NEXT_TASK:** HQ2 bộ9demo SQL chạy thật +EXPLAIN/data dictionary/3NF/câu hỏi bảo vệ, kiểm thử runtime Docker profile và hướng nâng cấp demo schema3→4 có backup. Sau đó paging/search theo yêu cầu và regression/tích hợp Android khi có emulator. BOM/flash/cấp tải vẫn cần xác nhận; không chặn phần mềm/SQL.
 - **Lệnh tiếp tục:** `Tiếp tục đồ án.`
 - **Kiểm kê Windows mới nhất:** Node26.13/npm.cmd11.20/Git2.56/PostgreSQL17.11/Flutter3.47.9/Dart3.13.7/JDK17/Studio JBR25/Android SDK+NDK28.2/Docker Desktop4.98/Engine29.9.2/Compose5.6.1/WSL3.0.3/Arduino CLI1.5.1 đã chạy. CLI cần nhận PATH Machine+User mới; `npm.cmd` tránh npm.ps1 bị Restricted. Không cài/chỉnh phần mềm hệ thống trong master review. Native5432 chưa xác thực SQL; dùng portable55439 và DB demo/test mới. Các bản kiểm kê cũ bên dưới được giữ làm lịch sử.
 
@@ -30,6 +30,17 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — HQ1 ĐÃ KIỂM THỬ: toàn vẹn PostgreSQL và SQL nâng cao thực dụng
+
+- Bắt đầu HEAD37a9db6/main, fetch origin/main PASS ahead0/behind0; package.json user giữ nguyên. CI run42045054946/HEAD37a9db6 completed success đã truy vấn GitHub, không sửa lỗi CI lịch sử.
+- Đọc master HQTCSDL đính kèm, schema3 migrations, source thuê/thu hoạch/giao nhận/báo cáo/payment và test hiện có. Không dựng lại, không dọn lại cache hoặc mặc định retention/cycle không thuê là bắt buộc. Phân loại phạm vi sẽ ghi trong docs.
+- Tiêu chí HQ1: tái hiện SQL trực tiếp nhận-giao sai customer, thêm migration mới bảo vệ ownership/identity và SQL view/function/procedure có dùng trong API, DB role hạn quyền có test thực tế, kiểm tra rollback/concurrency/migration/backup. Mọi schema/test chỉ áp dụng DB sm_test_* mới; chưa migrate database demo/dev của user, chưa đổi credentials/quyền đang dùng. Không sửa001–003.
+- NEXT_TASK: chạy regression SQL ownership trước sửa; hoàn thiện migration004 +API sử dụng routines/views; test direct SQL và regression; checkpoint/Git; tiếp theo bộ9 demo HQTCSDL/ERD-3NF/data dictionary/EXPLAIN/least privilege deployment và acceptance.
+- P0 SQL mismatch đã tái hiện FAIL trước sửa (`.local/hq1-ownership-before.log`), migration004 additive thêm preflight/ownership/history triggers; API thuê dùng fn_rental_total_vnd, thu tiền CALL sp_confirm_rental_payment, reports đọc2views có provenance counts. Full45/45 tests PASS (`hq1-database-full.log`), gồm7 DB cases: constraints, SQL mismatch, snapshot, procedure rollback/race, thật sự đăng nhập bằng2 role hạn quyền và API, nâng cấp3→4 giữ dữ liệu/preflight rollback/idempotent.
+- `deploy/database/grants.sql` chỉ cho DBA với2 role mới không superuser/owner; test tạo login sm_test_* riêng và thu hồi/xóa đúng role fixture sau kiểm tra, giữ DB/data. Không áp dụng role/credential vào DB demo/dev hiện có hoặc Compose user. Đã phát hiện restore --no-privileges làm mất ACL routines; grants script reapplies REVOKE PUBLIC trước GRANT, backup verification mở rộng thành graph thuê/thu hoạch +row counts +objects +role test. Đang kiểm tra backup/client trước checkpoint; chưa kết luận cả giai đoạn nghiệm thu xong.
+- Chốt HQ1: backup/restore thực **PASS17table row counts +graph thuê/harvest/view/function/procedure/trigger/ACL** (`hq1-backup-final.log`); role tests7/7 PASS sau giới hạn UPDATE(status,completed_at) ở rentals, không sửa snapshot bằng runtime (`hq1-roles-final.log`). React build+2tests/11Chrome groups PASS, Dart live1/1 PASS. Các file khác: AGENTS/PROMPT_TIEP_TUC, PHAM_VI_HQTCSDL/ADR016/ERD cardinality correction, deploy/database grants/README/runtime override/.env.example, README/checklist/KIEM_THU. Không đổi001–003; không migrate DB user hiện có; chưa chạy override Docker, chưa chạy lại Android UI ở HQ1.
+- Đang staged scan/diff/commit/push; NEXT_TASK HQ2 như trạng thái nhanh. CI baseline37a9db6 confirmed3jobs success qua connector; job FAIL của commit cũ không còn tác động HEAD nên không sửa lại. package.json user không stage/không đổi.
 
 ### 2026-11-05 — HOÀN THÀNH cleanup đã kiểm thử và push
 

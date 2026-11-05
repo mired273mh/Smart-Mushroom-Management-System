@@ -77,6 +77,13 @@ Yêu cầu cần bám `docs/DE_TAI_YEU_CAU.md`, các deliverables: REST APIs; we
 - Trước xóa đệ quy: kiểm tra đường dẫn tuyệt đối nằm trong workspace, không đi qua symlink/junction, không chứa file Git theo dõi hay dữ liệu cần giữ. Không dùng `git clean -fdx`, force push, hard reset hoặc viết lại lịch sử để dọn repo.
 - File sinh tự động cần giữ local nhưng không cần Git có thể dùng `git rm --cached` sau kiểm tra; không bỏ theo dõi lockfile/migration/cấu hình cần thiết. Sau cleanup chạy build/test phù hợp, cập nhật `TIEN_DO_CODEX.md`, commit/push checkpoint an toàn theo mục8. Lệnh “Tiếp tục đồ án” vẫn phải đọc tiến độ và kiểm tra Git/source trước làm tiếp.
 
+### Ưu tiên đồ án HQTCSDL
+
+- Ưu tiên toàn vẹn dữ liệu/PostgreSQL, transaction/concurrency, phân quyền DB, EXPLAIN và backup/restore trước tiện ích ngoài đề tài. Phân loại REQUIRED/SUPPORTING/RECOMMENDED/OPTIONAL theo tài liệu; không tự coi cycle không thuê/retention/tiện ích nâng cao là bắt buộc.
+- SQL nâng cao phải giải quyết bài toán thật, có test SQL trực tiếp, không thêm bảng/trigger/procedure trùng chức năng chỉ để tăng số lượng. Không sửa migration đã apply; migration mới có preflight, transaction và hướng phục hồi, trước hết test trên DB riêng.
+- Phân biệt PostgreSQL role với role nghiệp vụ API; runtime không mặc định cần superuser/owner. Không tự đổi credentials/quyền của hệ thống đang dùng; kiểm thử role hạn quyền trên DB/role test riêng.
+- Duy trì bộ demo và giải thích HQTCSDL dựa trên schema/code đã kiểm chứng; ghi NEXT_TASK, PASS/FAIL/BLOCKED/NOT TESTED, file/lệnh/kết quả/commit/push và quyết định chờ xác nhận vào TIEN_DO. Khi tiếp tục phải kiểm tra lại Git/source/CI mới nhất, không sửa lại lỗi lịch sử đã được giải quyết.
+
 ## 8. Tự động lưu code lên GitHub (được người dùng cho phép)
 
 - **Quyền thực hiện:** sau mỗi giai đoạn hoàn thành, tự tạo commit và push thông thường lên **nhánh hiện tại** nếu có remote GitHub, quyền truy cập và kết nối. Không cần hỏi lại quyền commit/push đã được cho phép. Không tự đổi nhánh/remote hoặc thiết lập danh tính Git theo suy đoán.

@@ -1,0 +1,4 @@
+services:
+  api:
+    environment:
+      DATABASE_URL: postgresql://sm_runtime:${APP_DB_PASSWORD:?Provision sm_runtime and set its private password}@db:5432/smart_mushroom

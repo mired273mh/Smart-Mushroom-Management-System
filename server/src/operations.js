@@ -79,9 +79,17 @@ export function operationsRouter(pool) {
     res.json({ data: result });
   });
   router.post('/transactions/:id/confirm', staff, async (req, res) => {
-    const result = await pool.query("UPDATE transactions SET status='paid',confirmed_by=$2,confirmed_at=now() WHERE id=$1 AND status='pending' RETURNING *", [idParam(req),req.user.id]);
-    if (!result.rowCount) return fail(409, 'TRANSACTION_NOT_PENDING', 'Không có giao dịch đang chờ xác nhận.');
-    res.json({ data: result.rows[0] });
+    const id=idParam(req);
+    try {
+      const result=await transaction(pool,async db=>{
+        await db.query('CALL public.sp_confirm_rental_payment($1,$2)',[id,req.user.id]);
+        return (await db.query('SELECT * FROM transactions WHERE id=$1',[id])).rows[0];
+      });
+      res.json({data:result});
+    } catch(error) {
+      if(error.code==='P1001')return fail(409,'TRANSACTION_NOT_PENDING','Không có giao dịch đang chờ xác nhận.');
+      throw error;
+    }
   });
   router.get('/notifications', async (req, res) => {
     const result = await pool.query('SELECT * FROM notifications WHERE user_id=$1 ORDER BY created_at DESC LIMIT $2', [req.user.id,limitParam(req)]);
@@ -103,14 +111,8 @@ export function operationsRouter(pool) {
     res.json({ data: result.rows[0] });
   });
   router.get('/reports', admin, async (req, res) => {
-    const rooms = await pool.query(`SELECT r.id,r.name,count(DISTINCT t.id)::int AS tray_count,
-      count(DISTINCT i.id) FILTER (WHERE i.ended_at IS NULL)::int AS rented_trays,coalesce(sum(h.weight_grams),0)::bigint AS harvested_grams
-      FROM rooms r LEFT JOIN trays t ON t.room_id=r.id LEFT JOIN rental_items i ON i.tray_id=t.id LEFT JOIN harvests h ON h.rental_item_id=i.id
-      GROUP BY r.id ORDER BY r.name LIMIT $1`, [limitParam(req)]);
-    const environment = await pool.query(`SELECT r.id,r.name,round(avg(s.temperature)::numeric,2) AS avg_temperature,
-      round(avg(s.humidity)::numeric,2) AS avg_humidity,round(avg(s.co2)::numeric,0) AS avg_co2,count(s.id)::int AS sample_count
-      FROM rooms r LEFT JOIN devices d ON d.room_id=r.id LEFT JOIN sensor_readings s ON s.device_id=d.id AND s.recorded_at>now()-interval '24 hours'
-      GROUP BY r.id ORDER BY r.name LIMIT $1`, [limitParam(req)]);
+    const rooms = await pool.query('SELECT * FROM public.v_room_cultivation_summary ORDER BY name LIMIT $1', [limitParam(req)]);
+    const environment = await pool.query('SELECT * FROM public.v_room_environment_24h ORDER BY name LIMIT $1', [limitParam(req)]);
     res.json({ data: { rooms: rooms.rows, environment_last_24h: environment.rows } });
   });
   router.get('/reports/export', admin, async (req, res) => {

@@ -59,7 +59,7 @@ export function rentalsRouter(pool) {
       for (const trayId of [...input.tray_ids].sort()) {
         items.push((await db.query('INSERT INTO rental_items(rental_id,tray_id) VALUES ($1,$2) RETURNING *', [rental.id,trayId])).rows[0]);
       }
-      await db.query('INSERT INTO transactions(rental_id,amount_vnd) VALUES ($1,$2)', [rental.id,plan.price_vnd * items.length]);
+      await db.query('INSERT INTO transactions(rental_id,amount_vnd) VALUES ($1,public.fn_rental_total_vnd($1))', [rental.id]);
       await db.query("INSERT INTO notifications(user_id,kind,message) VALUES ($1,'rental',$2)", [customerId,`Đã xác nhận thuê ${items.length} khay.`]);
       return { ...rental, items };
     });
