@@ -138,7 +138,11 @@ export function monitoringRouter(pool, config = {}) {
     res.json({ data: { ...result.rows[0], token } });
   });
   router.get('/devices/:id/commands', staff, async (req, res) => {
-    const result = await pool.query('SELECT id,device_id,actuator,enabled,duration_seconds,dry_run,status,source,result,expires_at,created_at FROM device_commands WHERE device_id=$1 ORDER BY created_at DESC LIMIT $2', [idParam(req),limitParam(req)]);
+    // Device may be offline and never poll to persist expiry. Report effective
+    // TTL status using the server clock, preserving final acknowledged/failed.
+    const result = await pool.query(`SELECT id,device_id,actuator,enabled,duration_seconds,dry_run,
+      CASE WHEN status IN ('pending','dry_run') AND expires_at<=clock_timestamp() THEN 'expired' ELSE status END AS status,
+      source,result,expires_at,created_at FROM device_commands WHERE device_id=$1 ORDER BY created_at DESC,id DESC LIMIT $2`, [idParam(req),limitParam(req)]);
     res.json({ data: result.rows });
   });
   router.post('/devices/:id/commands', staff, async (req, res) => {

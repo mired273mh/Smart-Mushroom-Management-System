@@ -54,4 +54,6 @@ GET /rentals nhận `limit`, `cursor`, `status=active|completed` và `customer_i
 
 `Staff` = admin/operator. HTTP: 201 tạo, 204 logout/xóa, 401 thiếu phiên, 403 sai role, 404 không tồn tại hoặc sai chủ, 409 xung đột nghiệp vụ/DB, 422 validation, 429 rate limit.
 
+GET /devices/:id/commands trả trạng thái hết hạn hiệu lực theo đồng hồ server khi pending/dry_run đã quá expires_at, kể cả thiết bị offline chưa poll; giữ ACK/failed cuối. Web hiển thị100 lệnh mới nhất và tự cập nhật5s khi tab đang hiện. result là thông báo firmware, không chứng minh trạng thái điện tải.
+
 Telemetry bất thường thông báo tối đa một lần/5 phút/người/phòng. Automation phun sương khi ẩm thấp, quạt khi CO₂/nhiệt cao, sưởi khi nhiệt thấp và không cần thông gió; mặc định dry-run theo thay đổi trạng thái. Hardware được allowlist dùng xung10s, yêu cầu lại ON sau30s. LED thủ công. Ngưỡng mặc định là dữ liệu phát triển, chưa hiệu chuẩn cho giống nấm. [Điều kiện bật hardware và giới hạn ACK](PHUONG_AN_PHAN_CUNG_IOT.md); GET /devices và /iot/me trả hardware_control_available, không phải chứng nhận thiết bị đã nghiệm thu.

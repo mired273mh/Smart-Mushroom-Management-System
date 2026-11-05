@@ -23,7 +23,7 @@ Nguồn: DE_TAI_YEU_CAU, SRS, User Requirements; không coi JWT hay public admin
 | O07 | Tiến trình nuôi | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH theo rental item; THIẾU cycle khay không thuê | stage/events tests; browser/Android | Mở rộng cycle độc lập nếu dùng khay không hợp đồng |
 | O08 | Lịch/thu hoạch | server/src/operations.js; web/src/App.jsx | HOÀN THÀNH theo rental item | weight/ready/date/tenant tests, E2E | Nghiệm thu lịch canh tác thực |
 | O09 | Cảnh báo môi trường | server/src/iot.js; web/src/App.jsx | HOÀN THÀNH in-app, dữ liệu mô phỏng | threshold/dedup/scope tests | Sensor thật/soak/mất mạng |
-| O10 | Lịch sử/device status | server/src/iot.js; web/src/App.jsx | HOÀN THÀNH phần mềm bounded | readings/status/mode API/browser | Paging lịch sử dài/offline alert |
+| O10 | Lịch sử/device status | server/src/iot.js; web/src/App.jsx,CommandHistory.jsx | HOÀN THÀNH phần mềm bounded100 lệnh | readings/status/mode; Chrome pending→fixture ACK/result; API expired offline | Hardware/soak, paging lịch sử dài/offline alert |
 | C01 | Đăng ký Customer | server/src/auth.js; mobile/lib/screens.dart | HOÀN THÀNH phần mềm/Android emulator | public role guard; Android UI register | Phone thật |
 | C02 | Đăng nhập Customer | server/src/auth.js; mobile/lib/api.dart,screens.dart | HOÀN THÀNH phần mềm/Android emulator | unit/live API/browser/Android | Phone/network thực |
 | C03 | Hồ sơ | server/src/auth.js; mobile/lib/api.dart,screens.dart | HOÀN THÀNH phần mềm | live API/browser sửa tên, Android xem/logout | Phone/test session nền |

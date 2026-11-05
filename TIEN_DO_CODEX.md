@@ -8,7 +8,7 @@
 
 - **Mốc hiện tại:** P5/P6 — bản phần mềm local và bộ tài liệu ban đầu đã kiểm chứng; còn nghiệm thu môi trường đích.
 - **Mốc review cuối:** CI `be531fa`/run42035426091 **PASS cả3 jobs** (api-web, deployment, android-build), đã kiểm tra GitHub. Batch hardware tiếp theo có source/test riêng bên dưới; chưa nghiệm thu vật lý/production.
-- **Đã kiểm chứng:** Express/PostgreSQL38 tests; React2 client tests +10 nhóm Chrome E2E; Flutter analyze/12 tests +live API/browser, APK debug và Android emulator UI→API→PostgreSQL; backup/restore, benchmark đọc20 users,6 UML; Docker Windows build/up/smoke. Source GPIO có khóa hai lớp, pulse/interlock/TTL/freshness; compile đang ghi bằng chứng theo checkpoint.
+- **Đã kiểm chứng:** Express/PostgreSQL38 tests; React2 client tests +11 nhóm Chrome E2E; Flutter analyze/12 tests +live API/browser, APK debug và Android emulator UI→API→PostgreSQL; backup/restore, benchmark đọc20 users,6 UML; Docker Windows build/up/smoke. Source GPIO có khóa hai lớp, pulse/interlock/TTL/freshness; compile đang ghi bằng chứng theo checkpoint.
 - **Chưa hoàn thành:** TLS production, signing/phone thật, sensor/relay/camera thật và hiệu chuẩn. Chưa phân trang đầy đủ/retention/soak test/benchmark workload production; chưa chu kỳ nuôi khay không cho thuê. Không tuyên bố hoàn thành100%.
 - **Blocker hiện tại:** Chưa xác nhận BOM/đấu dây/giới hạn/camera và chưa có thiết bị kiểm thử. Android SDK/NDK28.2, Docker Engine, WSL đã chạy, không cần cài lại. GitHub main push được. AVD người dùng5554 có lúc offline; E2E dùng AVD riêng5558 trong .local, không wipe AVD người dùng.
 - **Công việc tiếp theo chính xác:** Hoàn tất checkpoint source hardware/compile và Git; tiếp tục pagination/search bounded lists, cycle không thuê và kiểm thử workload. Phương án `docs/PHUONG_AN_PHAN_CUNG_IOT.md` phải được xác nhận trước flash/cấp tải, nhưng không chặn công việc phần mềm. Demo Windows dùng scripts/demo.mjs và DB mới riêng.
@@ -30,6 +30,13 @@
 **Trạng thái được dùng:** `Chưa bắt đầu` / `Đang làm` / `Bị chặn` / `Đã kiểm thử` / `Hoàn thành (chưa kiểm thử)`.
 
 ## 3. Nhật ký thực hiện (Codex nối thêm sau MỖI batch)
+
+### 2026-11-05 — HOÀN THÀNH master3 software: lịch sử và kết quả lệnh IoT trên Web
+
+- Master2 commit `8431262d6697ea4c9be0a749f7e2d77cbc78099f`, push main PASS, ls-remote trùng hash. CI run42039533054 đang chạy tại lúc bắt đầu batch3. package.json user giữ nguyên, không stage.
+- API có lịch sử lệnh nhưng Web chưa hiển thị ACK/expired/result nên vận hành chưa biết kết quả gửi. Bổ sung lịch sử chọn đúng device, tự refresh khi trang hiện, trạng thái TTL theo server và chú thích không có feedback tải. Tiêu chí: Chrome gửi pending→fixture ACK→Web hiển thị, scope đúng device; API expired khi device offline; build/test/checkpoint/Git. Đây là software fixture, không điều khiển vật lý.
+- Đã thêm web/src/CommandHistory.jsx và nút lịch sử trong Monitoring; 100 lệnh gần nhất/auto refresh5s/manual refresh, mode/source/duration/status/expiry/result; API GET history trả effective expired bằng clock_timestamp kể cả khi device offline, giữ trạng thái cuối ACK/failed. Không dùng ACK làm xác nhận relay/tải điện.
+- `scripts/test.ps1` **38/38 PASS**; `npm.cmd run build:web` PASS; `npm.cmd run test:web` **2 client tests +11 nhóm Chrome E2E PASS**, gồm pending→HTTP fixture ACK→Web/result, đổi device không lộ kết quả cũ; Customer403 và expired offline API. Logs `.local/master-history-{backend,build,web}.log`. Files sửa: component mới, App.jsx/e2e, iot.js/hardware.test.js, TIEN_DO và docs liên quan. Tiếp theo: Git checkpoint, kiểm tra CI; phần mềm lớn hơn còn catalog/list paging/search, cycle không thuê/retention. Hardware chưa xác nhận, không flash/cấp tải.
 
 ### 2026-11-05 — HOÀN THÀNH batch software master2; hardware chưa nghiệm thu
 

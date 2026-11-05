@@ -4,6 +4,8 @@
 
 ## Master2 — source IoT có khóa, 2026-11-05
 
+Master3 sau đó: `scripts/test.ps1` **38/38 PASS** (`.local/master-history-backend.log`); React build PASS +2 tests/11 nhóm Chrome E2E PASS (`.local/master-history-build.log`, `master-history-web.log`). Kiểm tra mới: Web history đúng device, pending→ACK/result qua HTTP fixture, đổi thiết bị không giữ kết quả trước; API tính expired khi device offline, giữ ACK cuối và chặn Customer. Không sensor/relay thật. Source `web/src/CommandHistory.jsx`, App/e2e, iot.js/hardware.test.js.
+
 | Phạm vi | Kết quả thực tế | Bằng chứng / giới hạn |
 |---|---|---|
 | Backend allowlist/freshness/duration/TTL/ACK/rotate/automation/interlock | PASS38/38 cuối cùng | `powershell -NoProfile -File scripts/test.ps1`, `.local/master-hardware-ttl-after.log`; PostgreSQL/HTTP thật, device HTTP fixture, không board vật lý |

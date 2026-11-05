@@ -129,6 +129,18 @@ try {
   await saveModal();
   const hardwareCommand=(await ctx.request(`/api/devices/${hardware.id}/commands`,{token:admin.token})).body.data[0];
   assert.equal(hardwareCommand.dry_run,false);assert.equal(hardwareCommand.status,'pending');
+  await row.getByRole('button',{name:'Lịch sử lệnh',exact:true}).click();
+  const history=page.getByRole('table',{name:'Lịch sử lệnh thiết bị'});
+  await history.getByText('Chờ thiết bị',{exact:true}).waitFor();
+  assert.equal((await ctx.request(`/api/iot/commands/${hardwareCommand.id}/ack`,{token:hardware.token,method:'POST',body:{success:true,result:'HTTP fixture only; no relay feedback'}})).status,200);
+  await page.getByRole('button',{name:'Làm mới lịch sử',exact:true}).click();
+  await history.getByText('Đã ACK · chưa xác minh tải',{exact:true}).waitFor();
+  await history.getByText('HTTP fixture only; no relay feedback',{exact:true}).waitFor();
+  const simRow=page.getByRole('row').filter({hasText:'Simulator E2E'});
+  await simRow.getByRole('button',{name:'Lịch sử lệnh',exact:true}).click();
+  await history.getByText('Dry-run chưa xử lý',{exact:true}).waitFor();
+  assert.equal(await history.getByText('HTTP fixture only; no relay feedback',{exact:true}).count(),0);
+  console.log('PASS: Lịch sử đúng thiết bị, pending→ACK/result qua HTTP fixture; nhãn chưa xác minh tải.');
   hardwareAllowlist.length=0;
   console.log('PASS: UI mặc định dry-run, GPIO bị khóa; allowlist fixture cho phép yêu cầu xung giới hạn (không hardware thật).');
   await page.getByLabel('Chọn phòng giám sát').selectOption(roomId);

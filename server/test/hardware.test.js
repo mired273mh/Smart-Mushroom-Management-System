@@ -52,6 +52,10 @@ test('supersede, token-scoped ack, replay, expiration and stale OFF',async()=>{
   assert.equal((await ctx.request(ack,{token:device.token,method:'POST',body})).status,404);
   const expiring=await send(device);
   await ctx.pool.query("UPDATE device_commands SET expires_at=now()-interval '1 second' WHERE id=$1",[expiring.body.data.id]);
+  const history=(await ctx.request(`/api/devices/${device.id}/commands`,{token:operator.token})).body.data;
+  assert.equal(history.find(c=>c.id===expiring.body.data.id).status,'expired');
+  assert.equal(history.find(c=>c.id===next.body.data.id).status,'acknowledged');
+  assert.equal((await ctx.request(`/api/devices/${device.id}/commands`,{token:customer.token})).status,403);
   assert.equal((await poll(device)).body.data.length,0);
   assert.equal((await ctx.request(`/api/iot/commands/${expiring.body.data.id}/ack`,{token:device.token,method:'POST',body})).status,404);
   await ctx.pool.query("UPDATE sensor_readings SET recorded_at=now()-interval '31 seconds' WHERE device_id=$1",[device.id]);

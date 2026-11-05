@@ -25,7 +25,7 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | O07 | Tiến trình/trạng thái | ☑ API + React | Stage tuần tự, events, browser update; hiện gắn rental item |
 | O08 | Lịch/bản ghi thu hoạch | ☑ API + React | Expected date, ready→harvested/weight; browser ghi thu hoạch |
 | O09 | Cảnh báo môi trường | ☑ in-app API + React | Scope đúng người và dedup5phút PASS; dữ liệu mô phỏng |
-| O10 | Lịch sử/trạng thái thiết bị | ☑ API + React | History/last seen/mode, browser đọc mẫu mô phỏng |
+| O10 | Lịch sử/trạng thái thiết bị | ☑ API + React | Sensor/last seen/mode, lịch sử lệnh100 dòng/poll5s; Chrome pending→fixture ACK/result/scope PASS; chưa feedback tải điện |
 | C01 | Đăng ký | ☑ API + Flutter | Public role guard test; Flutter Chrome UI register/login PASS; chưa phone E2E |
 | C02 | Đăng nhập | ☑ API + Flutter | Mock/widget và live Dart API PASS; staff bị từ chối |
 | C03 | Hồ sơ | ☑ API + Flutter | API/profile live test và Chrome UI sửa tên PASS; chưa phone E2E |
@@ -42,7 +42,7 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | Sản phẩm | Trạng thái |
 |---|---|
 | REST API/PostgreSQL | 38/38 tests PASS trên HTTP/PostgreSQL thật; migration dev2 lần/backup restore PASS |
-| React Web |Build,2 API client tests +10 Chrome E2E PASS; session/paging/390px và Admin logout1280x720 |
+| React Web |Build,2 API client tests +11 Chrome E2E PASS; session/paging/history/390px và Admin logout1280x720 |
 | Flutter Customer |Analyze sạch/12 tests; APK debug +Android emulator UI→API→PostgreSQL PASS; chưa phone thật |
 | ESP32 | Compile3 profile +pulse/URL assertions PASS; GPIO gate mặc định0, chưa upload/sensor/relay/camera thật |
 | Bảo mật | Auth/RBAC/tenant/last admin/CSV/body bounds tested; chưa audit production độc lập |
