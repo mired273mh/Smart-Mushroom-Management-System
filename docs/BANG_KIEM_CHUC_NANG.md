@@ -11,7 +11,7 @@ Ký hiệu: ☑ có code và kiểm chứng theo bằng chứng ghi; ◐ có m�
 | A05 | Quản lý/định danh/phân công khay | ☑ API + React | Unique code, ownership, room/status guard, browser phân công |
 | A06 | Gói thuê/chính sách giá | ☑ API + React | Tạo/sửa/giá snapshot; browser create |
 | A07 | Thiết bị/cảm biến/camera | ◐ API + React + firmware | Provision/rotate/disable/mode/provenance PASS; sensor/camera thật chưa test |
-| A08 | Dashboard/báo cáo | ☑ API + React bản cơ bản | DB dashboard/report, room/harvest/rental/env aggregates; chưa benchmark dữ liệu lớn |
+| A08 | Dashboard/báo cáo | ☑ API + React bản cơ bản | DB dashboard/report aggregates; benchmark đọc rental/env20 users PASS, chưa tải lớn/production |
 | A09 | Xuất dữ liệu | ☑ CSV API + React | Formula escaping test, download Chrome; tối đa10.000 bản ghi |
 | A10 | Ngưỡng/thông báo | ☑ API + React | Threshold validation/RBAC/alert dedup tests; ngưỡng dev chưa hiệu chuẩn giống nấm |
 | O01 | Đăng nhập | ☑ API + React | Operator browser login/menu đúng quyền |

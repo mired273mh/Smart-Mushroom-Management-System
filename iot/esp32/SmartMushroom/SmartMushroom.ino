@@ -5,6 +5,7 @@
 #include <ArduinoJson.h>
 #include <time.h>
 #include <math.h>
+#include "url_policy.h"
 #if __has_include("config.local.h")
 #include "config.local.h"
 #else
@@ -44,7 +45,7 @@ int apiCall(const String &path, const char *method, const String &payload, Strin
   } else {
 #if SM_ALLOW_LOCAL_HTTP
     // Restrict plaintext development traffic to private IPv4 addresses.
-    if (!(base.startsWith("http://192.168.") || base.startsWith("http://10.") || base.startsWith("http://172.16."))) return -1;
+    if (!isPrivateHttpBase(base.c_str())) return -1;
     if (!http.begin(plain, base + path)) return -1;
 #else
     Serial.println("Non-HTTPS URL refused.");

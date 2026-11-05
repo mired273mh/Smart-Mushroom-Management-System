@@ -51,7 +51,13 @@ try {
   await page.getByRole('button',{name:'Chưa có tài khoản? Đăng ký',exact:true}).click();
   const input = async (label,value) => {
     const field = page.getByRole('textbox',{name:label,exact:true});
-    await field.click(); await page.keyboard.press('Control+A'); await page.keyboard.type(value);
+    await field.click();
+    // Flutter creates its native editor after Semantics focus. Fill that editor
+    // directly instead of racing synthetic keystrokes against Flutter frames.
+    const editor=page.locator('input:focus, textarea:focus');
+    await editor.waitFor(); await editor.fill(value);
+    assert.equal(await editor.inputValue(),value);
+    await page.keyboard.press('Tab');
   };
   const email = `flutter-ui-${Date.now()}@test.invalid`, password='UIOnlyTestPassword_123!';
   await input('Họ tên','Khách UI Flutter');
@@ -126,8 +132,13 @@ try {
   await input('Email',admin.email); await input('Mật khẩu',admin.password);
   const staffLogin = page.waitForResponse(response=>response.url().endsWith('/api/auth/login') && response.request().method()==='POST');
   const staffLogout = page.waitForResponse(response=>response.url().endsWith('/api/auth/logout') && response.request().method()==='POST');
+  // Keep teardown from masking the original assertion if login itself fails.
+  staffLogout.catch(()=>{});
   await page.getByRole('button',{name:'Đăng nhập',exact:true}).click();
   const staffResponse = await staffLogin;
+  const submitted=staffResponse.request().postDataJSON();
+  assert.equal(submitted.email===admin.email,true,'Staff email must match the synthetic fixture.');
+  assert.equal(submitted.password===admin.password,true,'Staff password must match the synthetic fixture (value withheld).');
   assert.equal(staffResponse.status(),200,'Staff credentials must be entered correctly by the browser harness.');
   assert.equal((await staffResponse.json()).data.user.role,'admin');
   assert.equal((await staffLogout).status(),204,'Rejected staff session must be revoked.');
